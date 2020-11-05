@@ -9,6 +9,8 @@ app.get("/", (req: Request, res: Response) => {
     res.status(200).send(`Server running at port ${port}`)
 })
 
+app.use("/app", express.static("../frontend/public"))
+
 server.listen(port, () => {
     console.log(`Server running at port ${port}`)
 })
