@@ -57,7 +57,7 @@ router.get("/shopify", (req: Request, res: Response) => {
 	}
 	const nonce = generateNonce(16)
 	const installShopUrl = buildInstallUrl(shop.toString(), nonce, buildRedirectUri())
-	res.cookie("state", nonce)
+	res.cookie("state", nonce, { sameSite: "none" })
 	res.redirect(installShopUrl)
 })
 
@@ -89,7 +89,12 @@ router.get("/shopify/callback", async (req: Request, res: Response) => {
 		const { access_token } = tokenResponse.data
 
 		const shopData = await fetchShopData(shop.toString(), access_token)
-		res.send(shopData.data.shop)
+
+		// TODO: store shop data
+		// TODO: Authenticate the shop (create session cookie?)
+		// TODO: Redirect to the app
+
+		res.send(shopData.data)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("something went wrong")
