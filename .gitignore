@@ -1,6 +1,7 @@
 /backend/node_modules
 /backend/dist
 /backend/certs
+/backend/.env
 
 /frontend/node_modules
 /frontend/public/js-build

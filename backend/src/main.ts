@@ -2,6 +2,12 @@ import express, { Application, Request, Response } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
+import cookieParser from "cookie-parser"
+
+import dotenv from "dotenv"
+dotenv.config()
+
+import shopifyRouter from "./shopify/shopify.router"
 
 const app: Application = express()
 
@@ -20,11 +26,15 @@ if (process.env.MODE != "production") {
     port = 80
 }
 
+app.use(cookieParser())
+
 app.get("/", (req: Request, res: Response) => {
     res.status(200).send(`Server running at port ${port}`)
 })
 
 app.use("/app", express.static("../frontend/public"))
+
+app.use(shopifyRouter)
 
 server.listen(port, () => {
     console.log(`Server running at port ${port}`)
