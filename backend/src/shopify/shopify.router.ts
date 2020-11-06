@@ -3,6 +3,7 @@ import * as crypto from "crypto"
 import axios from "axios"
 import { Request, Response } from "express"
 import querystring from "querystring"
+import { getSession, updateSession, clearSession } from "../util/session"
 
 const router = Router()
 
@@ -57,7 +58,7 @@ router.get("/shopify", (req: Request, res: Response) => {
 	}
 	const nonce = generateNonce(16)
 	const installShopUrl = buildInstallUrl(shop.toString(), nonce, buildRedirectUri())
-	res.cookie("state", nonce, { sameSite: "none", secure: true })
+	updateSession(req, res, { state: nonce })
 	res.redirect(installShopUrl)
 })
 
@@ -67,8 +68,9 @@ router.get("/shopify/callback", async (req: Request, res: Response) => {
 	if (!state) return res.status(400).send("Missing 'state' in the query params")
 	if (!code) return res.status(400).send("Missing 'code' in the query params")
 
-	if (!req.cookies.state) return res.status(400).send("Missing 'state' in the cookie")
-	if (state.toString() != req.cookies.state) return res.status(403).send("Cannot be verified")
+	const sessionState = getSession(req).state
+	if (!sessionState) return res.status(400).send("Missing 'state' in the session")
+	if (state.toString() != sessionState) return res.status(403).send("Cannot be verified")
 
 	const { hmac, ...params } = req.query
 	const queryParams = querystring.stringify(params as any)
@@ -91,10 +93,10 @@ router.get("/shopify/callback", async (req: Request, res: Response) => {
 		const shopData = await fetchShopData(shop.toString(), access_token)
 
 		// TODO: store shop data
-		// TODO: Authenticate the shop (create session cookie?)
-		// TODO: Redirect to the app
+		console.log(shopData.data.shop)
 
-		res.send(shopData.data)
+		updateSession(req, res, { shop: shopData.data.shop.domain, state: undefined })
+		res.redirect("/app")
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("something went wrong")

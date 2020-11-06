@@ -23,7 +23,10 @@ if (process.env.MODE != "production") {
 	server = http.createServer(app)
 }
 
-app.use(cookieParser())
+const sessionSecretKey = process.env.SESSION_SECRET_KEY || ""
+if (sessionSecretKey.length == 0) throw "Missing SESSION_SECRET_KEY"
+if (sessionSecretKey.length < 64) throw "SESSION_SECRET_KEY should be at least 64 chars"
+app.use(cookieParser(sessionSecretKey))
 
 app.get("/", (req: Request, res: Response) => {
 	res.status(200).send(`Server running at port ${port}`)
