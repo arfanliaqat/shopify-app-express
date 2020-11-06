@@ -13,5 +13,6 @@
 	],
 	"rules": {
 		"@typescript-eslint/no-explicit-any": "off"
-	}
+	},
+	"ignorePatterns": ["*.js"]
 }

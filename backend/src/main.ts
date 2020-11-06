@@ -12,30 +12,28 @@ import shopifyRouter from "./shopify/shopify.router"
 const app: Application = express()
 
 let server: https.Server | http.Server
-let port: number
 if (process.env.MODE != "production") {
-    const httpsOptions = {
-        cert: fs.readFileSync(__dirname + "/../certs/shopify-app.dev.crt"),
-        key: fs.readFileSync(__dirname + "/../certs/shopify-app.dev.key")
-    }
-    server = https.createServer(httpsOptions, app)
-    port = 443
+	const httpsOptions = {
+		cert: fs.readFileSync(__dirname + "/../certs/shopify-app.dev.crt"),
+		key: fs.readFileSync(__dirname + "/../certs/shopify-app.dev.key")
+	}
+	server = https.createServer(httpsOptions, app)
 } else {
-    // In prod, SSL will be dealt with by ngnix
-    server = http.createServer(app)
-    port = 80
+	// In prod, SSL will be dealt with by ngnix
+	server = http.createServer(app)
 }
 
 app.use(cookieParser())
 
 app.get("/", (req: Request, res: Response) => {
-    res.status(200).send(`Server running at port ${port}`)
+	res.status(200).send(`Server running at port ${port}`)
 })
 
 app.use("/app", express.static("../frontend/public"))
 
 app.use(shopifyRouter)
 
+const port = parseInt(process.env.PORT || "3000")
 server.listen(port, () => {
-    console.log(`Server running at port ${port}`)
+	console.log(`Server running at port ${port}`)
 })
