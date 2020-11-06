@@ -21,12 +21,8 @@ function buildInstallUrl(shop: string, state: string, redirectUri: string) {
 	return `${baseUrl}?${params}`
 }
 
-function generateEncryptedHash(params: any) {
-	return crypto.createHmac("sha256", shopifyApiPublicKey).update(params).digest("hex")
-}
-
-function encryptState(state: string): string {
-	return crypto.createHash("sha256").update(state).digest("hex")
+function generateEncryptedHash(params: string): string {
+	return crypto.createHmac("sha256", shopifyApiSecretKey).update(params).digest("hex")
 }
 
 async function fetchAccessToken(shop: string, data: any) {
@@ -45,14 +41,23 @@ async function fetchShopData(shop: string, accessToken: string) {
 	})
 }
 
+function generateNonce(length: number): string {
+	let text = ""
+	const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	for (let i = 0; i < length; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length))
+	}
+	return text
+}
+
 router.get("/shopify", (req: Request, res: Response) => {
 	const shop = req.query.shop
 	if (!shop) {
 		return res.status(400).send("Shop is missing")
 	}
-	const nonce = crypto.randomBytes(16).toString("base64")
+	const nonce = generateNonce(16)
 	const installShopUrl = buildInstallUrl(shop.toString(), nonce, buildRedirectUri())
-	res.cookie("state", encryptState(nonce))
+	res.cookie("state", nonce)
 	res.redirect(installShopUrl)
 })
 
@@ -62,9 +67,8 @@ router.get("/shopify/callback", async (req: Request, res: Response) => {
 	if (!state) return res.status(400).send("Missing 'state' in the query params")
 	if (!code) return res.status(400).send("Missing 'code' in the query params")
 
-	console.log(req.cookies.state)
 	if (!req.cookies.state) return res.status(400).send("Missing 'state' in the cookie")
-	if (encryptState(state.toString()) !== req.cookies.state) return res.status(403).send("Cannot be verified")
+	if (state.toString() != req.cookies.state) return res.status(403).send("Cannot be verified")
 
 	const { hmac, ...params } = req.query
 	const queryParams = querystring.stringify(params as any)
