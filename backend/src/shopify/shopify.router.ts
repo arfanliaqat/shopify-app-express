@@ -57,7 +57,7 @@ router.get("/shopify", (req: Request, res: Response) => {
 	}
 	const nonce = generateNonce(16)
 	const installShopUrl = buildInstallUrl(shop.toString(), nonce, buildRedirectUri())
-	res.cookie("state", nonce, { sameSite: "none" })
+	res.cookie("state", nonce, { sameSite: "none", secure: true })
 	res.redirect(installShopUrl)
 })
 
