@@ -3,7 +3,9 @@ import * as crypto from "crypto"
 import axios from "axios"
 import { Request, Response } from "express"
 import querystring from "querystring"
-import { getSession, updateSession, clearSession } from "../util/session"
+import { getSession, updateSession } from "../util/session"
+import { ShopService } from "../shop/shop.service"
+import { ShopApiData } from "../shop/shop.model"
 
 const router = Router()
 
@@ -33,13 +35,16 @@ async function fetchAccessToken(shop: string, data: any) {
 	})
 }
 
-async function fetchShopData(shop: string, accessToken: string) {
-	return await axios(`https://${shop}/admin/shop.json`, {
-		method: "GET",
-		headers: {
-			"X-Shopify-Access-Token": accessToken
-		}
-	})
+type FullShopApiData = { shop?: ShopApiData }
+
+async function fetchShopData(shop: string, accessToken: string): Promise<FullShopApiData> {
+	return (
+		await axios.get<FullShopApiData>(`https://${shop}/admin/shop.json`, {
+			headers: {
+				"X-Shopify-Access-Token": accessToken
+			}
+		})
+	).data
 }
 
 function generateNonce(length: number): string {
@@ -86,19 +91,28 @@ router.get("/shopify/callback", async (req: Request, res: Response) => {
 			client_secret: shopifyApiSecretKey,
 			code
 		}
-		const tokenResponse = await fetchAccessToken(shop.toString(), data)
+		const shopDomain = shop.toString()
 
+		const tokenResponse = await fetchAccessToken(shopDomain, data)
 		const { access_token } = tokenResponse.data
 
-		const shopData = await fetchShopData(shop.toString(), access_token)
+		let dbShop = await ShopService.findShopByDomain(shopDomain)
+		if (!dbShop) {
+			const shopData = await fetchShopData(shopDomain, access_token)
+			if (shopData.shop) {
+				dbShop = await ShopService.createShop(shopData.shop)
+			}
+		}
 
-		// TODO: store shop data
-		console.log(shopData.data.shop)
+		if (!dbShop || !dbShop.id) {
+			throw "Missing 'dbShop' or 'dbShop.id'"
+		}
 
-		updateSession(req, res, { shop: shopData.data.shop.domain, state: undefined })
+		updateSession(req, res, { shop: dbShop.id, state: undefined })
+
 		res.redirect("/app")
 	} catch (err) {
-		console.log(err)
+		console.error(err)
 		res.status(500).send("something went wrong")
 	}
 })
