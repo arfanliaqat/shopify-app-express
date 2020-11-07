@@ -14,8 +14,8 @@ const app: Application = express()
 let server: https.Server | http.Server
 if (process.env.MODE != "production") {
 	const httpsOptions = {
-		cert: fs.readFileSync(__dirname + "/../certs/shopify-app.dev.crt"),
-		key: fs.readFileSync(__dirname + "/../certs/shopify-app.dev.key")
+		cert: fs.readFileSync("./certs/shopify-app.dev.crt"),
+		key: fs.readFileSync("./certs/shopify-app.dev.key")
 	}
 	server = https.createServer(httpsOptions, app)
 } else {
@@ -32,11 +32,13 @@ app.use((req, res, next) => {
 	console.log(`${req.method} ${req.url}`)
 	next()
 })
-app.get("/", (req: Request, res: Response) => {
-	res.status(200).send(`Server running at port ${port}`)
+
+app.get("/app*", async (req: Request, res: Response) => {
+	const indexHtml = await fs.promises.readFile("../frontend/resources/index.html")
+	res.status(200).send(indexHtml.toString())
 })
 
-app.use("/app", express.static("../frontend/public"))
+app.use("/public", express.static("../frontend/public"))
 
 app.use(authRouter)
 
