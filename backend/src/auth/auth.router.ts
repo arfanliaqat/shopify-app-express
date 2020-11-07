@@ -41,7 +41,7 @@ router.get("/auth/callback", async (req: Request, res: Response) => {
 		if (!dbShop || !dbShop.id) {
 			throw "Missing 'dbShop' or 'dbShop.id'"
 		}
-		updateSession(req, res, { shop: dbShop.id, state: undefined })
+		updateSession(req, res, { shopId: dbShop.id, state: undefined })
 		res.redirect("/app")
 	} catch (err) {
 		console.error(err)

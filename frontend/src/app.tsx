@@ -36,7 +36,7 @@ ReactDOM.render(
         <Provider config={window.shopifyConfig}>
             <BrowserRouter>
                 <Switch>
-                    <Route exact path="/" component={HomePage} />
+                    <Route exact path="/app" component={HomePage} />
                     <Route exact path="/app/resources/:shopResourceId/calendar/:year/:month" component={CalendarPage} />
                     <Route exact path="/app/delivery_slots/:deliverySlotId" component={DeliverySlotPage} />
                     <Route path="*">404</Route>

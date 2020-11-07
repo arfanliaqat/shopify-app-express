@@ -10,6 +10,12 @@ export async function findShopByDomain(domain: string): Promise<Partial<Shop> | 
 	return result.rows.map(toShop)[0]
 }
 
+export async function findShopById(shopId: string): Promise<Partial<Shop> | undefined> {
+	const conn: Pool = await getConnection()
+	const result = await conn.query<Partial<ShopSchema>>(`SELECT id, domain, email FROM shops WHERE id = $1`, [shopId])
+	return result.rows.map(toShop)[0]
+}
+
 export async function createShop(shopData: ShopApiData): Promise<Partial<Shop> | undefined> {
 	const conn: Pool = await getConnection()
 	const result = await conn.query<Partial<ShopSchema>>(

@@ -4,4 +4,4 @@
 /backend/.env
 
 /frontend/node_modules
-/frontend/public/js-build
+/frontend/public/build
