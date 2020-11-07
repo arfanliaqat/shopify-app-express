@@ -3,11 +3,11 @@ import { Request, Response } from "express"
 import querystring from "querystring"
 import { getSession, updateSession } from "../util/session"
 import { generateNonce } from "../util/tools"
-import { buildInstallUrl, buildRedirectUri, generateEncryptedHash, findShopOrInstallApp } from "./shopify.service"
+import { buildInstallUrl, buildRedirectUri, generateEncryptedHash, findShopOrInstallApp } from "./auth.service"
 
 const router = Router()
 
-router.get("/shopify", (req: Request, res: Response) => {
+router.get("/auth", (req: Request, res: Response) => {
 	const shop = req.query.shop
 	if (!shop) {
 		return res.status(400).send("Shop is missing")
@@ -18,7 +18,7 @@ router.get("/shopify", (req: Request, res: Response) => {
 	res.redirect(installShopUrl)
 })
 
-router.get("/shopify/callback", async (req: Request, res: Response) => {
+router.get("/auth/callback", async (req: Request, res: Response) => {
 	const { shop, code, state } = req.query
 	if (!shop) return res.status(400).send("Missing 'shop' in the query params")
 	if (!state) return res.status(400).send("Missing 'state' in the query params")

@@ -10,7 +10,7 @@ const scopes = "write_products"
 const appUrl = process.env.SHOPIFY_APP_URL
 
 export function buildRedirectUri(): string {
-	return `${appUrl}/shopify/callback`
+	return `${appUrl}/auth/callback`
 }
 
 export function buildInstallUrl(shop: string, state: string, redirectUri: string): string {

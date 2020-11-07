@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser"
 import dotenv from "dotenv"
 dotenv.config()
 
-import shopifyRouter from "./shopify/shopify.router"
+import authRouter from "./auth/auth.router"
 
 const app: Application = express()
 
@@ -28,13 +28,17 @@ if (sessionSecretKey.length == 0) throw "Missing SESSION_SECRET_KEY"
 if (sessionSecretKey.length < 64) throw "SESSION_SECRET_KEY should be at least 64 chars"
 app.use(cookieParser(sessionSecretKey))
 
+app.use((req, res, next) => {
+	console.log(`${req.method} ${req.url}`)
+	next()
+})
 app.get("/", (req: Request, res: Response) => {
 	res.status(200).send(`Server running at port ${port}`)
 })
 
 app.use("/app", express.static("../frontend/public"))
 
-app.use(shopifyRouter)
+app.use(authRouter)
 
 const port = parseInt(process.env.PORT || "3000")
 server.listen(port, () => {
