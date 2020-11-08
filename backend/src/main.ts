@@ -10,6 +10,7 @@ dotenv.config()
 import authRouter from "./auth/auth.router"
 import { getSession } from "./util/session"
 import { findShopById } from "./shop/shop.service"
+import { loadConnectedShop } from "./shop/shop.middleware"
 
 const app: Application = express()
 
@@ -45,27 +46,11 @@ app.use((req, res, next) => {
 app.set("views", __dirname + "/views")
 app.set("view engine", "ejs")
 
-app.get("/app*", async (req, res) => {
-	// disable X-Frame-Options as per shopify doc: https://shopify.dev/tools/app-bridge/getting-started
-	// res.setHeader("X-Frame-Options", "DENY")
-
-	const { shopId } = getSession(req)
-	if (!shopId) {
-		console.error("Missing shopId in the session")
-		res.status(403).send("Forbidden")
-		return
-	}
-
-	const shop = await findShopById(shopId)
-	if (!shop) {
-		console.error("Shop not found")
-		res.status(403).send("Forbidden")
-		return
-	}
-
+app.get("/app*", loadConnectedShop, async (req, res) => {
+	const { connectedShop } = res.locals
 	res.render("index", {
 		apiKey: process.env.SHOPIFY_API_PUBLIC_KEY,
-		shopOrigin: shop.domain
+		shopOrigin: connectedShop.domain
 	})
 })
 
