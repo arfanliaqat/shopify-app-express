@@ -1,4 +1,4 @@
-interface ShopResourceSchema {
+export interface ShopResourceSchema {
 	id: string
 	shop_id: string
 	resource_type: string
@@ -7,7 +7,7 @@ interface ShopResourceSchema {
 	created_date?: Date
 }
 
-interface ShopResource {
+export interface ShopResource {
 	id: string
 	shopId: string
 	resourceType: string
