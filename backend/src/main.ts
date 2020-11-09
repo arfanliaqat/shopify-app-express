@@ -3,13 +3,13 @@ import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
 import cookieParser from "cookie-parser"
+import bodyParser from "body-parser"
 
 import dotenv from "dotenv"
 dotenv.config()
 
 import authRouter from "./auth/auth.router"
-import { getSession } from "./util/session"
-import { findShopById } from "./shop/shop.service"
+import shopResourceRouter from "./shopResource/shopResource.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
 
 const app: Application = express()
@@ -30,6 +30,8 @@ const sessionSecretKey = process.env.SESSION_SECRET_KEY || ""
 if (sessionSecretKey.length == 0) throw "Missing SESSION_SECRET_KEY"
 if (sessionSecretKey.length < 64) throw "SESSION_SECRET_KEY should be at least 64 chars"
 app.use(cookieParser(sessionSecretKey))
+
+app.use(bodyParser.json())
 
 app.set("etag", false)
 
@@ -66,6 +68,7 @@ app.use(
 )
 
 app.use(authRouter)
+app.use(shopResourceRouter)
 
 const port = parseInt(process.env.PORT || "3000")
 server.listen(port, () => {
