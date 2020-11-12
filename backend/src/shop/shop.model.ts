@@ -1,3 +1,5 @@
+import { AccessToken } from "../accessToken/accessToken.model"
+
 export interface ShopSchema {
 	id: string
 	domain: string

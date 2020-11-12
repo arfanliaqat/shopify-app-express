@@ -10,10 +10,9 @@ export async function findAccessTokenByShopId(shopId: string): Promise<AccessTok
 
 export async function storeAccessToken(accessToken: AccessToken): Promise<AccessToken> {
 	const conn: Pool = await getConnection()
-	await conn.query<Partial<AccessTokenSchema>>(`INSERT INTO shops (domain, email, raw_data) VALUES ($1, $2, $3)`, [
-		accessToken.token,
-		accessToken.shopId,
-		accessToken.scope
-	])
+	await conn.query<Partial<AccessTokenSchema>>(
+		`INSERT INTO access_tokens (token, shop_id, scopes) VALUES ($1, $2, $3)`,
+		[accessToken.token, accessToken.shopId, accessToken.scope]
+	)
 	return accessToken
 }

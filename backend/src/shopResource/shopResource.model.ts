@@ -8,7 +8,7 @@ export interface ShopResourceSchema {
 }
 
 export interface ShopResource {
-	id: string
+	id?: string
 	shopId: string
 	resourceType: string
 	resourceId: string

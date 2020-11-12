@@ -1,19 +1,24 @@
-import { parse } from "dotenv/types"
 import { Request, Response, Router } from "express"
-import { fetchShopData } from "../auth/auth.service"
+import { loadAccessToken } from "../accessToken/accessToken.middleware"
 import { loadConnectedShop } from "../shop/shop.middleware"
 import { Shop } from "../shop/shop.model"
-import { fetchShopifyResources, findShopResources } from "./shopResource.service"
-import { parseResourceGid } from "./shopResource.util"
+import { handleErrors, UnexpectedError } from "../util/error"
+import { getLocals } from "../util/locals"
+import { createShopifyResources, findShopResources } from "./shopResource.service"
 
 const router = Router()
 
-router.use(loadConnectedShop)
+router.use("/resources", loadConnectedShop)
+router.use("/resources", loadAccessToken)
 
 router.get("/resources", async (req: Request, res: Response) => {
-	const connectedShop = res.locals.connectedShop as Shop
-	const resources = await findShopResources(connectedShop)
-	res.send(resources)
+	try {
+		const connectedShop = res.locals.connectedShop as Shop
+		const resources = await findShopResources(connectedShop)
+		res.send(resources)
+	} catch (error) {
+		handleErrors(res, error)
+	}
 })
 
 interface PostResourcesRequestBody {
@@ -21,17 +26,21 @@ interface PostResourcesRequestBody {
 }
 
 router.post("/resources", async (req: Request, res: Response) => {
-	const body = req.body as PostResourcesRequestBody
-	if (!body.resourceIds || body.resourceIds.length == 0) {
-		res.send({ error: "'resourceIds' is missing or empty" })
-		return
+	try {
+		const body = req.body as PostResourcesRequestBody
+		if (!body.resourceIds || body.resourceIds.length == 0) {
+			res.send({ error: "'resourceIds' is missing or empty" })
+			return
+		}
+		const { connectedShop, accessToken } = getLocals(res)
+		if (!connectedShop || !accessToken) {
+			throw new UnexpectedError("`connectedShop` and `accessToken` should have been provided")
+		}
+		await createShopifyResources(connectedShop, accessToken, body.resourceIds)
+		res.end()
+	} catch (error) {
+		handleErrors(res, error)
 	}
-
-	const shop = res.locals.shop as Shop
-	const shopifyResources = await fetchShopifyResources(shop, body.resourceIds)
-
-	// TODO:
-	// await createShopResource(shopifyResources)
 })
 
 export default router
