@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express"
+import express, { Application } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
@@ -10,6 +10,7 @@ dotenv.config()
 
 import authRouter from "./auth/auth.router"
 import shopResourceRouter from "./shopResource/shopResource.router"
+import deliverySlotsRouter from "./deliverySlots/deliverySlots.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
 
 const app: Application = express()
@@ -69,6 +70,7 @@ app.use(
 
 app.use(authRouter)
 app.use(shopResourceRouter)
+app.use(deliverySlotsRouter)
 
 const port = parseInt(process.env.PORT || "3000")
 server.listen(port, () => {

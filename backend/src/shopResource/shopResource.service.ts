@@ -7,6 +7,15 @@ import { BadParameter, handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import Axios from "axios"
 
+export async function findShopResourceById(shopResourceId: string): Promise<ShopResource | undefined> {
+	const conn: Pool = await getConnection()
+	const result = await conn.query<ShopResourceSchema>(
+		`SELECT id, shop_id, resource_type, resource_id, title FROM shop_resources WHERE id = $1`,
+		[shopResourceId]
+	)
+	return result.rows.map(toShopResource)[0]
+}
+
 export async function findShopResources(shop: Shop): Promise<ShopResource[]> {
 	const conn: Pool = await getConnection()
 	const result = await conn.query<ShopResourceSchema>(

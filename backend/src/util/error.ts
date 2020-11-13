@@ -12,6 +12,8 @@ export class AxiosCallError extends Error {
 }
 export class UnexpectedError extends Error {}
 export class BadParameter extends Error {}
+export class Forbidden extends Error {}
+export class HandledError extends Error {}
 
 const isDevMode = process.env.MODE != "PRODUCTION"
 
@@ -23,6 +25,15 @@ export function handleErrors(res: Response, error: Error): void {
 			res.send("<pre>" + error.stack + "</pre>")
 		} else {
 			res.send("Unexpected error")
+		}
+	} else if (error instanceof HandledError) {
+		res.status(400)
+		res.send({ error: error.message })
+	} else if (error instanceof HandledError) {
+		if (isDevMode) {
+			res.send(error.message)
+		} else {
+			res.send("Forbidden")
 		}
 	} else if (error instanceof BadParameter) {
 		res.status(400)

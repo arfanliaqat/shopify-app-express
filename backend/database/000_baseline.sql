@@ -32,7 +32,7 @@ create table shop_resources(
 create unique index ind_unique_shop_resource_gid on shop_resources (resource_type, resource_id);
 create index ind_shop_resource_shop_id on shop_resources (shop_id);
 
-create table resource_capacities(
+create table delivery_slots(
 	id uuid default uuid_generate_v4(),
 	shop_resource_id uuid not null references shop_resources(id),
 	capacity integer,
@@ -43,6 +43,6 @@ create table resource_capacities(
 	primary key (id)
 );
 
-create index ind_resource_capacities_shop_resource_id on resource_capacities (shop_resource_id);
-create index ind_resource_capacities_start_date on resource_capacities (start_date);
-create index ind_resource_capacities_end_date on resource_capacities (end_date);
+create index ind_delivery_slots_shop_resource_id on delivery_slots (shop_resource_id);
+create index ind_delivery_slots_start_date on delivery_slots (start_date);
+create index ind_delivery_slots_end_date on delivery_slots (end_date);
