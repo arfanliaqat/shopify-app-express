@@ -60,7 +60,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 
 	useEffect(() => {
 		if (deliverySlotPageData && quantity === undefined) {
-			setQuantity(deliverySlotPageData.deliverySlot.size)
+			setQuantity(deliverySlotPageData.deliverySlot.quantity)
 		}
 	}, [deliverySlotPageData])
 
@@ -70,7 +70,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 			url: `/delivery_slots/${deliverySlotId}`,
 			postData: {
 				newDates: JSON.stringify(newDates.map((date) => moment(date).format("YYYY-MM-DD"))),
-				size: quantity
+				quantity
 			}
 		})
 	}, [newDates, quantity])

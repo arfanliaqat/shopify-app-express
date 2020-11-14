@@ -6,7 +6,7 @@ import _ from "lodash"
 import DeliveryDatePicker from "../common/DeliveryDatePicker"
 
 interface Props {
-	shopResourceId: number
+	shopResourceId: string
 	date: Moment
 	onSuccess: () => void
 	onClose: () => void
@@ -29,8 +29,8 @@ export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose 
 			method: "POST",
 			url: `/resources/${shopResourceId}/slots`,
 			postData: {
-				dates: JSON.stringify(selectedDates.map((date) => moment(date).format("YYYY-MM-DD"))),
-				size: quantity
+				dates: selectedDates.map((date) => moment(date).format("YYYY-MM-DD")),
+				quantity
 			}
 		})
 	}, [selectedDates, quantity])

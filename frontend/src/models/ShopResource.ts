@@ -1,5 +1,5 @@
 export interface ShopResource {
-	id: number
+	id: string
 	resourceType: string
 	resourceId: number
 	title: string

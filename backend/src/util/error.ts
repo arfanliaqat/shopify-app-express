@@ -10,6 +10,15 @@ export class AxiosCallError extends Error {
 			`Status: ${axiosError.response?.status || "-"} ${JSON.stringify(axiosError.response?.data)}`
 	}
 }
+
+export class FormErrors {
+	formErrors: FormError[]
+
+	constructor(formErrors: FormError[]) {
+		this.formErrors = formErrors
+	}
+}
+
 export class UnexpectedError extends Error {}
 export class BadParameter extends Error {}
 export class Forbidden extends Error {}
@@ -26,10 +35,13 @@ export function handleErrors(res: Response, error: Error): void {
 		} else {
 			res.send("Unexpected error")
 		}
+	} else if (error instanceof FormErrors) {
+		res.status(400)
+		res.send(error.formErrors)
 	} else if (error instanceof HandledError) {
 		res.status(400)
 		res.send({ error: error.message })
-	} else if (error instanceof HandledError) {
+	} else if (error instanceof Forbidden) {
 		if (isDevMode) {
 			res.send(error.message)
 		} else {
@@ -59,4 +71,9 @@ export function handleAxiosErrors(error: AxiosError | Error): void {
 	} else {
 		throw new UnexpectedError(error as any)
 	}
+}
+
+export interface FormError {
+	field: string
+	message: string
 }

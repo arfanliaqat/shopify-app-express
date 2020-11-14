@@ -38,7 +38,7 @@ export const currentStartOfMonth = moment().startOf("month")
 
 export default function CalendarPage({ match, history }: RouteChildrenProps<Params>) {
 	const params = match.params
-	const shopResourceId = parseInt(params.shopResourceId)
+	const shopResourceId = params.shopResourceId
 	const calendarDates = useMemo(() => getCalendarDatesFromParams(params), [params])
 
 	const [addSlotDate, setAddSlotDate] = useState<Moment>()

@@ -27,7 +27,7 @@ export default function HomePage({ history }: RouteChildrenProps) {
 
 	return (
 		<div id="homePage">
-			<AddResourceModal open={open} onSuccess={() => fetchShopResources()} onClose={() => setOpen(false)} />,
+			<AddResourceModal open={open} onSuccess={() => fetchShopResources()} onClose={() => setOpen(false)} />
 			<Page
 				title="Products"
 				primaryAction={{

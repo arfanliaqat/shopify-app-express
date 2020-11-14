@@ -35,7 +35,7 @@ create index ind_shop_resource_shop_id on shop_resources (shop_id);
 create table delivery_slots(
 	id uuid default uuid_generate_v4(),
 	shop_resource_id uuid not null references shop_resources(id),
-	capacity integer,
+	quantity integer,
 	start_date timestamp with time zone not null,
 	end_date timestamp with time zone not null,
 	dates jsonb, -- to be refactored into a separate table

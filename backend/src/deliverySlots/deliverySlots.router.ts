@@ -1,18 +1,27 @@
 import { Request, Response, Router } from "express"
 import { loadConnectedShop } from "../shop/shop.middleware"
-import { HandledError, Forbidden, handleErrors } from "../util/error"
+import {
+	HandledError,
+	Forbidden,
+	handleErrors,
+	BadParameter,
+	FormError,
+	FormErrors,
+	UnexpectedError
+} from "../util/error"
 import { getLocals } from "../util/locals"
-import moment from "moment"
-import { findShopResourceById } from "../shopResource/shopResource.service"
-import { findDeliverySlots } from "./deliverySlots.service"
+import moment, { Moment } from "moment"
+import { createDeliverySlot, findDeliverySlots } from "./deliverySlots.service"
+import _ from "lodash"
+import { loadShopResource } from "../shopResource/shopResource.middleware"
 
 const router = Router()
 
 router.use(loadConnectedShop)
 
-router.get("/resources/:shopResourceId/calendar_page", async (req: Request, res: Response) => {
+router.get("/resources/:shopResourceId/calendar_page", loadShopResource, async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
+		const { shopResource } = getLocals(res)
 		const { from, to } = req.query
 		if (!from || !to) {
 			throw new HandledError("Missing from/to parameters")
@@ -22,38 +31,48 @@ router.get("/resources/:shopResourceId/calendar_page", async (req: Request, res:
 		if (mFrom.diff(mTo, "days") > 45) {
 			throw new HandledError("Incorrect from/to parameters")
 		}
-		const { shopResourceId } = req.params
-		const shopResource = await findShopResourceById(shopResourceId)
-		if (!shopResource) {
-			throw new HandledError("Shop resource not found")
-		}
-		if (!connectedShop || shopResource.shopId != connectedShop.id) {
-			throw new Forbidden("The shop resource doesn't belong to the shop")
-		}
-		const slots = await findDeliverySlots(shopResourceId, mFrom, mTo)
+		const slots = await findDeliverySlots(shopResource?.id || "", mFrom, mTo)
 		res.send({ shopResource, slots })
 	} catch (error) {
 		handleErrors(res, error)
 	}
 })
 
-router.post("/resources/{shopResourceId}/slots", async (req: Request, res: Response) => {
+function validateDates(errors: FormError[], strDates?: any): Moment[] | undefined {
+	if (!strDates) {
+		errors.push({ field: "dates", message: "Please select dates" })
+		return
+	}
+	if (!_.isArray(strDates)) {
+		throw new UnexpectedError("Dates should be an array of strings")
+	}
+	return strDates.map((date) => moment(date))
+}
+
+function validateQuantity(errors: FormError[], quantity?: any): number | undefined {
+	if (!quantity) errors.push({ field: "quantity", message: "Please provide a quantity" })
+	if (!_.isNumber(quantity)) errors.push({ field: "quantity", message: "The quantity should be a number" })
+	return quantity
+}
+
+router.post("/resources/:shopResourceId/slots", loadShopResource, async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
-		// $request->validate([
-		// 	"dates" => "required|starts_with:[|ends_with:]",
-		// 	"size" => "required|numeric"
-		// ]);
-		// $dates = collect(json_decode($request->input("dates")));
-		// $size = $request->input("size");
-		// $slot = DeliverySlot::createSlot($shopResourceId, $dates, $size);
-		// return Response::json(DeliverySlotViewModel::create($slot));
+		const { connectedShop, shopResource } = getLocals(res)
+		const errors = [] as FormError[]
+		const dates = validateDates(errors, req.body.dates)
+		const quantity = validateQuantity(errors, req.body.quantity)
+		if (!dates || !quantity || errors.length > 0) throw new FormErrors(errors)
+		if (!connectedShop || !shopResource || shopResource.shopId != connectedShop.id) {
+			throw new Forbidden("The shop resource doesn't belong to the shop")
+		}
+		const deliverySlot = await createDeliverySlot(shopResource?.id || "", dates, quantity)
+		res.send(deliverySlot)
 	} catch (error) {
 		handleErrors(res, error)
 	}
 })
 
-router.get("/delivery_slots/{deliverySlotId}/page", async (req: Request, res: Response) => {
+router.get("/delivery_slots/:deliverySlotId/page", async (req: Request, res: Response) => {
 	try {
 		const { connectedShop } = getLocals(res)
 		// $slot = DeliverySlot::find($deliverySlotId);
@@ -67,7 +86,7 @@ router.get("/delivery_slots/{deliverySlotId}/page", async (req: Request, res: Re
 	}
 })
 
-router.post("/delivery_slots/{deliverySlotId}", async (req: Request, res: Response) => {
+router.post("/delivery_slots/:deliverySlotId", async (req: Request, res: Response) => {
 	try {
 		const { connectedShop } = getLocals(res)
 		// $deliverySlot = DeliverySlot::find($deliverySlotId);
@@ -86,7 +105,7 @@ router.post("/delivery_slots/{deliverySlotId}", async (req: Request, res: Respon
 	}
 })
 
-router.delete("/delivery_slots/{deliverySlotId}", async (req: Request, res: Response) => {
+router.delete("/delivery_slots/:deliverySlotId", async (req: Request, res: Response) => {
 	try {
 		const { connectedShop } = getLocals(res)
 		// $deliverySlot = DeliverySlot::find($deliverySlotId);
