@@ -1,19 +1,12 @@
 import { Request, Response, Router } from "express"
 import { loadConnectedShop } from "../shop/shop.middleware"
-import {
-	HandledError,
-	Forbidden,
-	handleErrors,
-	BadParameter,
-	FormError,
-	FormErrors,
-	UnexpectedError
-} from "../util/error"
+import { HandledError, Forbidden, handleErrors, FormError, FormErrors, UnexpectedError } from "../util/error"
 import { getLocals } from "../util/locals"
 import moment, { Moment } from "moment"
 import { createDeliverySlot, findDeliverySlots } from "./deliverySlots.service"
 import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
+import { DeliverySlot } from "./deliverySlots.model"
 
 const router = Router()
 
@@ -32,7 +25,7 @@ router.get("/resources/:shopResourceId/calendar_page", loadShopResource, async (
 			throw new HandledError("Incorrect from/to parameters")
 		}
 		const slots = await findDeliverySlots(shopResource?.id || "", mFrom, mTo)
-		res.send({ shopResource, slots })
+		res.send({ shopResource, deliverySlots: DeliverySlot.toViewModels(slots) })
 	} catch (error) {
 		handleErrors(res, error)
 	}
@@ -66,7 +59,7 @@ router.post("/resources/:shopResourceId/slots", loadShopResource, async (req: Re
 			throw new Forbidden("The shop resource doesn't belong to the shop")
 		}
 		const deliverySlot = await createDeliverySlot(shopResource?.id || "", dates, quantity)
-		res.send(deliverySlot)
+		res.send(deliverySlot?.toViewModel())
 	} catch (error) {
 		handleErrors(res, error)
 	}

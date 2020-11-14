@@ -1,7 +1,7 @@
 import { Moment } from "moment"
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
-import { DeliverySlot, DeliverySlotSchema, toDeliverySlot } from "./deliverySlots.model"
+import { DeliverySlot, DeliverySlotSchema } from "./deliverySlots.model"
 import { UnexpectedError } from "../util/error"
 
 export async function findDeliverySlots(shopResourceId: string, mFrom: Moment, mTo: Moment): Promise<DeliverySlot[]> {
@@ -16,7 +16,7 @@ export async function findDeliverySlots(shopResourceId: string, mFrom: Moment, m
 		AND end_date between $2 and $3`,
 		[shopResourceId, mFrom.format("YYYY-MM-DD"), mTo.format("YYYY-MM-DD")]
 	)
-	return result.rows.map(toDeliverySlot)
+	return DeliverySlot.createFromSchemas(result.rows)
 }
 
 export async function createDeliverySlot(
@@ -39,5 +39,6 @@ export async function createDeliverySlot(
 			JSON.stringify(dates)
 		]
 	)
-	return result.rows.map(toDeliverySlot)[0]
+	const schema = result.rows[0]
+	return schema ? DeliverySlot.createFromSchema(schema) : undefined
 }

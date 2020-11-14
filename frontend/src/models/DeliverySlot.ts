@@ -1,8 +1,6 @@
-import ResourceId from "./ResourceId"
-
 export default interface DeliverySlot {
 	id: string
-	resourceId: ResourceId
+	resourceId: string
 	deliveryDates: string[]
 	quantity: number
 }
