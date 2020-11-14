@@ -6,7 +6,7 @@ import AddSlotModal from "./AddSlotModal"
 import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
 import { Page } from "@shopify/polaris"
-import { ShopResource } from "../models/ShopResource"
+import ShopResource from "../models/ShopResource"
 
 interface Params {
 	shopResourceId: string

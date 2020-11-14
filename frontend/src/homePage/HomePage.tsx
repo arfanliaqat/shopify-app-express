@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react"
 import { Page, Card, Spinner, ResourceList } from "@shopify/polaris"
 import moment from "moment"
 import { useApi } from "../util/useApi"
-import { ShopResource } from "../models/ShopResource"
+import ShopResource from "../models/ShopResource"
 import AddResourceModal from "./AddResourceModal"
 import { RouteChildrenProps } from "react-router"
 

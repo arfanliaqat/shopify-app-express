@@ -4,7 +4,7 @@ import { Page, ResourceList, Card, Layout, Button, TextField, PageActions } from
 import { useApi } from "../util/useApi"
 import DeliverySlot from "../models/DeliverySlot"
 import moment from "moment"
-import { ShopResource } from "../models/ShopResource"
+import ShopResource from "../models/ShopResource"
 import _ from "lodash"
 import { Toast } from "@shopify/app-bridge-react"
 import DeliveryDatePickerModal from "./DeliveryDatePickerModal"

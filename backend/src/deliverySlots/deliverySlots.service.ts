@@ -19,6 +19,20 @@ export async function findDeliverySlots(shopResourceId: string, mFrom: Moment, m
 	return DeliverySlot.createFromSchemas(result.rows)
 }
 
+export async function findDeliverySlotById(deliverySlotId: string): Promise<DeliverySlot | undefined> {
+	const conn: Pool = await getConnection()
+	const result = await conn.query<DeliverySlotSchema>(
+		`
+		SELECT ds.id, sr.shop_id, ds.shop_resource_id, ds.quantity, ds.start_date, ds.end_date, ds.dates
+		FROM delivery_slots ds
+		JOIN shop_resources sr ON sr.id = ds.shop_resource_id
+		WHERE ds.id = $1`,
+		[deliverySlotId]
+	)
+	const schema = result.rows[0]
+	return schema ? DeliverySlot.createFromSchema(schema) : undefined
+}
+
 export async function createDeliverySlot(
 	shopResourceId: string,
 	dates: Moment[],

@@ -1,28 +1,51 @@
+import ShopResourceViewModel from "../../../frontend/src/models/ShopResource"
+import { Shop } from "../shop/shop.model"
+import { ResourceId } from "./shopResource.util"
+
 export interface ShopResourceSchema {
 	id: string
 	shop_id: string
 	resource_type: string
-	resource_id: string
+	resource_id: number
 	title: string
 	created_date?: Date
 }
 
-export interface ShopResource {
-	id?: string
-	shopId: string
-	resourceType: string
-	resourceId: string
-	title: string
-	createdDate?: Date
-}
+export class ShopResource {
+	constructor(
+		public id: string | undefined,
+		public shopId: string,
+		public resourceType: string,
+		public resourceId: number,
+		public title: string,
+		public createdDate?: Date
+	) {}
 
-export function toShopResource(schema: ShopResourceSchema): ShopResource {
-	return {
-		id: schema.id,
-		shopId: schema.shop_id,
-		resourceType: schema.resource_type,
-		resourceId: schema.resource_id,
-		title: schema.title,
-		createdDate: schema.created_date
+	belongsTo(connectedShop: Shop): boolean {
+		return !!connectedShop?.id && !!this.shopId && connectedShop?.id == this.shopId
+	}
+
+	static create(shopId: string, resourceId: ResourceId, title: string): ShopResource {
+		return new ShopResource(undefined, shopId, resourceId.type, resourceId.id, title)
+	}
+
+	static createFromSchema(schema: ShopResourceSchema): ShopResource {
+		return new ShopResource(
+			schema.id,
+			schema.shop_id,
+			schema.resource_type,
+			schema.resource_id,
+			schema.title,
+			schema.created_date
+		)
+	}
+
+	toViewModel(): ShopResourceViewModel {
+		return {
+			id: this.id || "",
+			resourceId: this.resourceId,
+			resourceType: this.resourceType,
+			title: this.title
+		}
 	}
 }

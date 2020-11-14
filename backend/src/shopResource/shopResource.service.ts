@@ -1,7 +1,7 @@
 import { Pool } from "pg"
 import { Shop } from "../shop/shop.model"
 import { getConnection } from "../util/database"
-import { ShopResource, ShopResourceSchema, toShopResource } from "./shopResource.model"
+import { ShopResource, ShopResourceSchema } from "./shopResource.model"
 import { parseResourceGid } from "./shopResource.util"
 import { BadParameter, handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
@@ -13,7 +13,9 @@ export async function findShopResourceById(shopResourceId: string): Promise<Shop
 		`SELECT id, shop_id, resource_type, resource_id, title FROM shop_resources WHERE id = $1`,
 		[shopResourceId]
 	)
-	return result.rows.map(toShopResource)[0]
+	const row = result.rows[0]
+	if (!row) return undefined
+	return ShopResource.createFromSchema(row)
 }
 
 export async function findShopResources(shop: Shop): Promise<ShopResource[]> {
@@ -22,10 +24,10 @@ export async function findShopResources(shop: Shop): Promise<ShopResource[]> {
 		`SELECT id, shop_id, resource_type, resource_id, title FROM shop_resources WHERE shop_id = $1`,
 		[shop.id]
 	)
-	return result.rows.map(toShopResource)
+	return result.rows.map(ShopResource.createFromSchema)
 }
 
-export async function createShopResource(shopResource: ShopResource): Promise<void> {
+export async function insertShopResource(shopResource: ShopResource): Promise<void> {
 	const conn: Pool = await getConnection()
 	await conn.query<ShopResourceSchema>(
 		`insert into shop_resources (shop_id, resource_type, resource_id, title) values ($1, $2, $3, $4) on conflict do nothing`,
@@ -82,12 +84,8 @@ export async function createShopifyResources(
 		if (!title) {
 			throw new BadParameter("`title` should be defined")
 		} else {
-			await createShopResource({
-				shopId: shop.id,
-				resourceId: resourceId.id,
-				resourceType: resourceId.type,
-				title: title
-			})
+			const shopResource = ShopResource.create(shop.id, resourceId, title)
+			await insertShopResource(shopResource)
 		}
 	}
 }

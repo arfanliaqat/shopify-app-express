@@ -1,4 +1,4 @@
-export interface ShopResource {
+export default interface ShopResource {
 	id: string
 	resourceType: string
 	resourceId: number

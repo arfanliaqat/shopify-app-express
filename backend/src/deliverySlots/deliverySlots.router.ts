@@ -7,6 +7,8 @@ import { createDeliverySlot, findDeliverySlots } from "./deliverySlots.service"
 import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
 import { DeliverySlot } from "./deliverySlots.model"
+import { loadDeliverySlot } from "./deliverySlots.middleware"
+import { findShopResourceById } from "../shopResource/shopResource.service"
 
 const router = Router()
 
@@ -65,15 +67,17 @@ router.post("/resources/:shopResourceId/slots", loadShopResource, async (req: Re
 	}
 })
 
-router.get("/delivery_slots/:deliverySlotId/page", async (req: Request, res: Response) => {
+router.get("/delivery_slots/:deliverySlotId/page", [loadDeliverySlot], async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
-		// $slot = DeliverySlot::find($deliverySlotId);
-		// $shopResource = ShopResource::find($slot->shop_resource_id);
-		// return Response::json([
-		// 	"shopResource" => ShopResourceViewModel::create($shopResource),
-		// 	"deliverySlot" => DeliverySlotViewModel::create($slot)
-		// ]);
+		const { deliverySlot } = getLocals(res)
+		if (!deliverySlot) {
+			throw new UnexpectedError("deliverySlot should be loaded")
+		}
+		const shopResource = await findShopResourceById(deliverySlot.shopResourceId)
+		if (!shopResource) {
+			throw new UnexpectedError("shopResource not found")
+		}
+		res.send({ shopResource: shopResource.toViewModel(), deliverySlot: deliverySlot.toViewModel() })
 	} catch (error) {
 		handleErrors(res, error)
 	}

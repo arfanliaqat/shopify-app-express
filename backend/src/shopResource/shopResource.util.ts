@@ -1,8 +1,8 @@
 type ResourceType = "Product" | "ProductVariant" | "Collection"
 
-interface ResourceId {
+export interface ResourceId {
 	type: ResourceType
-	id: string
+	id: number
 }
 
 export function parseResourceGid(gid: string): ResourceId | undefined {
@@ -10,7 +10,7 @@ export function parseResourceGid(gid: string): ResourceId | undefined {
 	if (result && result.length == 3) {
 		return {
 			type: result[1] as ResourceType,
-			id: result[2]
+			id: parseInt(result[2])
 		}
 	}
 }

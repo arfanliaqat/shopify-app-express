@@ -23,7 +23,7 @@ create table shop_resources(
 	id uuid default uuid_generate_v4(),
 	shop_id uuid not null references shops(id),
 	resource_type text not null,
-	resource_id text not null,
+	resource_id bigint not null,
 	title text not null,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)

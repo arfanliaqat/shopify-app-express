@@ -1,8 +1,11 @@
 import moment, { Moment } from "moment"
 import DeliverySlotViewModel from "../../../frontend/src/models/DeliverySlot"
+import { Shop } from "../shop/shop.model"
+import { ShopResource } from "../shopResource/shopResource.model"
 
 export interface DeliverySlotSchema {
 	id: string
+	shop_id?: string // joined
 	shop_resource_id: string
 	quantity: number
 	start_date: Date
@@ -19,7 +22,8 @@ export class DeliverySlot {
 		public startDate: Moment,
 		public endDate: Moment,
 		public dates: Moment[],
-		public createdDate: Moment
+		public createdDate: Moment,
+		private shopId?: string
 	) {}
 
 	static createFromSchema(schema: DeliverySlotSchema): DeliverySlot {
@@ -30,7 +34,8 @@ export class DeliverySlot {
 			moment(schema.start_date),
 			moment(schema.end_date),
 			((schema.dates || []) as string[]).map((date) => moment(date)),
-			moment(schema.created_date)
+			moment(schema.created_date),
+			schema.shop_id
 		)
 	}
 
@@ -49,5 +54,9 @@ export class DeliverySlot {
 
 	static toViewModels(slots: DeliverySlot[]): DeliverySlotViewModel[] {
 		return slots.map((slot) => slot.toViewModel())
+	}
+
+	belongsTo(shop?: Shop): boolean {
+		return !!this.shopId && !!shop?.id && this.shopId == shop.id
 	}
 }
