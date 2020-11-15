@@ -44,11 +44,21 @@ function getBackUrl(shopResource: ShopResource) {
 export default function DeliverySlotPage({ match, history }: RouteChildrenProps<UrlParams>) {
 	const { deliverySlotId } = match.params
 
+	const [newDates, setNewDates] = useState<Moment[]>([])
+	const [quantity, setQuantity] = useState<number>()
 	const [successMessage, setSuccessMessage] = useState<string>()
-	const { setApiRequest: fetchSlot, data: deliverySlotPageData, isLoading } = useApi<DeliverySlotPageData>({})
+	const [addSlotModalOpen, setAddSlotModalOpen] = useState<boolean>()
+
+	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
+	const { setApiRequest: fetchSlot, data: deliverySlotPageData, isLoading } = useApi<DeliverySlotPageData>({
+		onSuccess: useCallback(() => {
+			setNewDates([])
+		}, [])
+	})
 	const { setApiRequest: saveSlot, isLoading: isSavingSlot } = useApi({
 		onSuccess: useCallback(() => {
 			setSuccessMessage("Delivery slot saved!")
+			setReloadIncrement(reloadIncrement + 1)
 		}, [])
 	})
 	const { setApiRequest: deleteSlot, isLoading: isDeletingSlot } = useApi({
@@ -56,16 +66,12 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 			history.push(getBackUrl(deliverySlotPageData.shopResource))
 		}, [deliverySlotPageData, history])
 	})
-	const [addSlotModalOpen, setAddSlotModalOpen] = useState<boolean>()
-
-	const [newDates, setNewDates] = useState<Moment[]>([])
-	const [quantity, setQuantity] = useState<number>()
 
 	useEffect(() => {
 		fetchSlot({
 			url: `/delivery_slots/${deliverySlotId}/page`
 		})
-	}, [])
+	}, [reloadIncrement])
 
 	useEffect(() => {
 		if (deliverySlotPageData && quantity === undefined) {

@@ -25,6 +25,10 @@
 	flex: 1;
 }
 
+.App-Calendar__Nav > button {
+	margin-left: 2px;
+}
+
 .App-Calendar__Week,
 .App-Calendar__DayNames {
 	display: flex;

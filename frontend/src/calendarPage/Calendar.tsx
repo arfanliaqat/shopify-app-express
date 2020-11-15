@@ -63,10 +63,10 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 						<span>{calendarDates.monthStart.format("MMMM Y")}</span>
 					</div>
 					<div className="App-Calendar__Nav">
-						<Button size="slim" onClick={moveMonth(-1)} icon={<ChevronLeftMinor />} />{" "}
+						<Button size="slim" onClick={moveMonth(-1)} icon={<ChevronLeftMinor />} />
 						<Button size="slim" onClick={resetMonth}>
 							Today
-						</Button>{" "}
+						</Button>
 						<Button size="slim" onClick={moveMonth(1)} icon={<ChevronRightMinor />} />
 					</div>
 				</div>
