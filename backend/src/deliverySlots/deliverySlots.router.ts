@@ -1,14 +1,15 @@
 import { Request, Response, Router } from "express"
 import { loadConnectedShop } from "../shop/shop.middleware"
-import { HandledError, Forbidden, handleErrors, FormError, FormErrors, UnexpectedError } from "../util/error"
+import { HandledError, handleErrors, FormError, FormErrors, UnexpectedError } from "../util/error"
 import { getLocals } from "../util/locals"
 import moment, { Moment } from "moment"
-import { createDeliverySlot, findDeliverySlots } from "./deliverySlots.service"
+import { createDeliverySlot, findDeliverySlots, updateShopResource } from "./deliverySlots.service"
 import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
 import { DeliverySlot } from "./deliverySlots.model"
 import { loadDeliverySlot } from "./deliverySlots.middleware"
 import { findShopResourceById } from "../shopResource/shopResource.service"
+import { DATE_FORMAT } from "../util/constants"
 
 const router = Router()
 
@@ -52,14 +53,11 @@ function validateQuantity(errors: FormError[], quantity?: any): number | undefin
 
 router.post("/resources/:shopResourceId/slots", loadShopResource, async (req: Request, res: Response) => {
 	try {
-		const { connectedShop, shopResource } = getLocals(res)
+		const { shopResource } = getLocals(res)
 		const errors = [] as FormError[]
 		const dates = validateDates(errors, req.body.dates)
 		const quantity = validateQuantity(errors, req.body.quantity)
 		if (!dates || !quantity || errors.length > 0) throw new FormErrors(errors)
-		if (!connectedShop || !shopResource || shopResource.shopId != connectedShop.id) {
-			throw new Forbidden("The shop resource doesn't belong to the shop")
-		}
 		const deliverySlot = await createDeliverySlot(shopResource?.id || "", dates, quantity)
 		res.send(deliverySlot?.toViewModel())
 	} catch (error) {
@@ -67,7 +65,7 @@ router.post("/resources/:shopResourceId/slots", loadShopResource, async (req: Re
 	}
 })
 
-router.get("/delivery_slots/:deliverySlotId/page", [loadDeliverySlot], async (req: Request, res: Response) => {
+router.get("/delivery_slots/:deliverySlotId/page", loadDeliverySlot, async (req: Request, res: Response) => {
 	try {
 		const { deliverySlot } = getLocals(res)
 		if (!deliverySlot) {
@@ -83,20 +81,18 @@ router.get("/delivery_slots/:deliverySlotId/page", [loadDeliverySlot], async (re
 	}
 })
 
-router.post("/delivery_slots/:deliverySlotId", async (req: Request, res: Response) => {
+router.post("/delivery_slots/:deliverySlotId", loadDeliverySlot, async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
-		// $deliverySlot = DeliverySlot::find($deliverySlotId);
-
-		// $request->validate([
-		// 	"newDates" => "starts_with:[|ends_with:]",
-		// 	"size" => "required|numeric"
-		// ]);
-
-		// $newDates = collect(json_decode($request->input("newDates")));
-		// $deliverySlot->size = $request->input("size");
-		// $deliverySlot->addNewDates($newDates);
-		// $deliverySlot->save();
+		const { deliverySlot } = getLocals(res)
+		if (!deliverySlot) throw new UnexpectedError("deliverySlot cannot be undefined")
+		const errors = [] as FormError[]
+		const newDates = validateDates(errors, req.body.newDates)
+		const quantity = validateQuantity(errors, req.body.quantity)
+		if (!newDates || !quantity || errors.length > 0) throw new FormErrors(errors)
+		deliverySlot.addNewDates(newDates)
+		deliverySlot.quantity = quantity
+		await updateShopResource(deliverySlot)
+		res.send({})
 	} catch (error) {
 		handleErrors(res, error)
 	}

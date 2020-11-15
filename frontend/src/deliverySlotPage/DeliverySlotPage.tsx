@@ -69,7 +69,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 			method: "POST",
 			url: `/delivery_slots/${deliverySlotId}`,
 			postData: {
-				newDates: JSON.stringify(newDates.map((date) => moment(date).format("YYYY-MM-DD"))),
+				newDates: newDates.map((date) => moment(date).format("YYYY-MM-DD")),
 				quantity
 			}
 		})

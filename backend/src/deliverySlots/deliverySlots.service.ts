@@ -3,6 +3,7 @@ import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { DeliverySlot, DeliverySlotSchema } from "./deliverySlots.model"
 import { UnexpectedError } from "../util/error"
+import { DATE_FORMAT } from "../util/constants"
 
 export async function findDeliverySlots(shopResourceId: string, mFrom: Moment, mTo: Moment): Promise<DeliverySlot[]> {
 	if (!shopResourceId) return []
@@ -14,7 +15,7 @@ export async function findDeliverySlots(shopResourceId: string, mFrom: Moment, m
 		WHERE shop_resource_id = $1
 		AND start_date between $2 and $3
 		AND end_date between $2 and $3`,
-		[shopResourceId, mFrom.format("YYYY-MM-DD"), mTo.format("YYYY-MM-DD")]
+		[shopResourceId, mFrom.format(DATE_FORMAT), mTo.format(DATE_FORMAT)]
 	)
 	return DeliverySlot.createFromSchemas(result.rows)
 }
@@ -48,11 +49,27 @@ export async function createDeliverySlot(
 		[
 			shopResourceId,
 			quantity,
-			dates[0].format("YYYY-MM-DD"),
-			dates[dates.length - 1].format("YYYY-MM-DD"),
+			dates[0].format(DATE_FORMAT),
+			dates[dates.length - 1].format(DATE_FORMAT),
 			JSON.stringify(dates)
 		]
 	)
 	const schema = result.rows[0]
 	return schema ? DeliverySlot.createFromSchema(schema) : undefined
+}
+
+export async function updateShopResource(deliverySlot: DeliverySlot): Promise<void> {
+	const conn: Pool = await getConnection()
+	if (!deliverySlot.id) throw new UnexpectedError("`id` is required to update the delivery slot")
+	if (deliverySlot.dates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
+	await conn.query<DeliverySlotSchema>(
+		`UPDATE delivery_slots SET quantity = $1, start_date = $2, end_date = $3, dates = $4 WHERE id = $5`,
+		[
+			deliverySlot.quantity,
+			deliverySlot.getFirstDate()?.format(DATE_FORMAT),
+			deliverySlot.getLastDate()?.format(DATE_FORMAT),
+			JSON.stringify(deliverySlot.dates.map((d) => d.format(DATE_FORMAT))),
+			deliverySlot.id
+		]
+	)
 }

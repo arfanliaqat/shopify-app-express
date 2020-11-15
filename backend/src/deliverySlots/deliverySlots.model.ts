@@ -1,7 +1,6 @@
 import moment, { Moment } from "moment"
 import DeliverySlotViewModel from "../../../frontend/src/models/DeliverySlot"
 import { Shop } from "../shop/shop.model"
-import { ShopResource } from "../shopResource/shopResource.model"
 
 export interface DeliverySlotSchema {
 	id: string
@@ -25,6 +24,26 @@ export class DeliverySlot {
 		public createdDate: Moment,
 		private shopId?: string
 	) {}
+
+	addNewDates(newDates: Moment[]): void {
+		const filteredNewDates = newDates.filter((newDate) => !this.dates.find((d) => d.isSame(newDate, "day")))
+		if (newDates.length == 0) return
+		this.dates = this.dates.concat(filteredNewDates)
+		this.dates.sort((d1, d2) => {
+			if (d1.isBefore(d1)) return -1
+			else if (d1.isAfter(d2)) return 1
+			return 0
+		})
+	}
+
+	getLastDate(): Moment | undefined {
+		if (this.dates.length == 0) return undefined
+		return this.dates[this.dates.length - 1]
+	}
+
+	getFirstDate(): Moment | undefined {
+		return this.dates[0]
+	}
 
 	static createFromSchema(schema: DeliverySlotSchema): DeliverySlot {
 		return new DeliverySlot(
