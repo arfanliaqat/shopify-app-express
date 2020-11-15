@@ -3,13 +3,12 @@ import { loadConnectedShop } from "../shop/shop.middleware"
 import { HandledError, handleErrors, FormError, FormErrors, UnexpectedError } from "../util/error"
 import { getLocals } from "../util/locals"
 import moment, { Moment } from "moment"
-import { createDeliverySlot, findDeliverySlots, updateShopResource } from "./deliverySlots.service"
+import { createDeliverySlot, deleteDeliverySlot, findDeliverySlots, updateShopResource } from "./deliverySlots.service"
 import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
 import { DeliverySlot } from "./deliverySlots.model"
 import { loadDeliverySlot } from "./deliverySlots.middleware"
 import { findShopResourceById } from "../shopResource/shopResource.service"
-import { DATE_FORMAT } from "../util/constants"
 
 const router = Router()
 
@@ -98,11 +97,13 @@ router.post("/delivery_slots/:deliverySlotId", loadDeliverySlot, async (req: Req
 	}
 })
 
-router.delete("/delivery_slots/:deliverySlotId", async (req: Request, res: Response) => {
+router.delete("/delivery_slots/:deliverySlotId", loadDeliverySlot, async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
-		// $deliverySlot = DeliverySlot::find($deliverySlotId);
-		// $deliverySlot->delete();
+		const { deliverySlot } = getLocals(res)
+		if (!deliverySlot) throw new UnexpectedError("deliverySlot cannot be undefined")
+		// TODO: prevent deletion of there are orders...
+		await deleteDeliverySlot(deliverySlot)
+		res.send({})
 	} catch (error) {
 		handleErrors(res, error)
 	}

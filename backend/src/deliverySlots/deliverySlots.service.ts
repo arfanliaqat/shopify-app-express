@@ -73,3 +73,9 @@ export async function updateShopResource(deliverySlot: DeliverySlot): Promise<vo
 		]
 	)
 }
+
+export async function deleteDeliverySlot(deliverySlot: DeliverySlot): Promise<void> {
+	const conn: Pool = await getConnection()
+	if (!deliverySlot.id) throw new UnexpectedError("`id` is required to update the delivery slot")
+	await conn.query<DeliverySlotSchema>(`DELETE FROM delivery_slots WHERE id = $1`, [deliverySlot.id])
+}

@@ -30,7 +30,10 @@ export async function findShopResources(shop: Shop): Promise<ShopResource[]> {
 export async function insertShopResource(shopResource: ShopResource): Promise<void> {
 	const conn: Pool = await getConnection()
 	await conn.query<ShopResourceSchema>(
-		`insert into shop_resources (shop_id, resource_type, resource_id, title) values ($1, $2, $3, $4) on conflict do nothing`,
+		`
+		INSERT INTO shop_resources (shop_id, resource_type, resource_id, title)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT DO NOTHING`,
 		[shopResource.shopId, shopResource.resourceType, shopResource.resourceId, shopResource.title]
 	)
 }
