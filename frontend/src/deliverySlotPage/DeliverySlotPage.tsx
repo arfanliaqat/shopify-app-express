@@ -1,9 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { RouteChildrenProps } from "react-router"
-import { Page, ResourceList, Card, Layout, Button, TextField, PageActions } from "@shopify/polaris"
+import {
+	Page,
+	ResourceList,
+	Card,
+	Layout,
+	Button,
+	TextField,
+	PageActions,
+	isNewDesignLanguageColor
+} from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import DeliverySlot from "../models/DeliverySlot"
-import moment from "moment"
+import moment, { Moment } from "moment"
 import ShopResource from "../models/ShopResource"
 import _ from "lodash"
 import { Toast } from "@shopify/app-bridge-react"
@@ -49,7 +58,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 	})
 	const [addSlotModalOpen, setAddSlotModalOpen] = useState<boolean>()
 
-	const [newDates, setNewDates] = useState<Date[]>([])
+	const [newDates, setNewDates] = useState<Moment[]>([])
 	const [quantity, setQuantity] = useState<number>()
 
 	useEffect(() => {
@@ -82,6 +91,28 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 		})
 	}, [newDates, quantity])
 
+	const currentDeliveryDates = (deliverySlotPageData?.deliverySlot?.deliveryDates || []).map((d) => moment(d))
+
+	const handleSelectedDates = (selectedDates: Moment[]) => {
+		const filteredDates = selectedDates.filter((d) => !currentDeliveryDates.find((cd) => d.isSame(cd, "day")))
+		setNewDates(filteredDates)
+	}
+
+	const deliveryDates = useMemo(() => {
+		return []
+			.concat(currentDeliveryDates)
+			.concat(newDates)
+			.sort((d1, d2) => {
+				if (d1.isBefore(d2)) return -1
+				if (d1.isAfter(d2)) return 1
+				return 0
+			})
+	}, [deliverySlotPageData, newDates])
+
+	const isNewDate = (deliveryDate: Moment): boolean => {
+		return newDates.find((nd) => nd.isSame(deliveryDate, "day")) != undefined
+	}
+
 	if (isLoading || !deliverySlotPageData) {
 		return <div />
 	}
@@ -102,17 +133,20 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 				title={getTitle(deliverySlot)}
 			>
 				<Layout>
-					<Layout.Section></Layout.Section>
+					<Layout.Section />
 					<Layout.AnnotatedSection
 						title="Delivery dates"
 						description="You can either add or remove days sharing the same quantity. Orders will be attached to a day, but the stock is common."
 					>
 						<Card>
 							<ResourceList
-								items={[].concat(deliverySlot.deliveryDates).concat(newDates)}
+								items={deliveryDates}
 								renderItem={(deliveryDate) => (
 									<ResourceList.Item id="product" onClick={() => {}}>
-										<div className="date">{moment(deliveryDate).format("ddd D MMM")}</div>
+										<div className="deliveryDateItem">
+											<div className="date">{moment(deliveryDate).format("ddd D MMM")}</div>
+											{isNewDate(deliveryDate) && <div className="newDate">New</div>}
+										</div>
 									</ResourceList.Item>
 								)}
 							/>
@@ -154,8 +188,8 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 			</Page>
 			{addSlotModalOpen && (
 				<DeliveryDatePickerModal
-					date={moment(_.last(deliverySlot.deliveryDates)).add(1, "day").toDate()}
-					onDatesSelected={(selectedDates) => setNewDates(selectedDates)}
+					date={moment(_.last(deliverySlot.deliveryDates)).add(1, "day")}
+					onDatesSelected={handleSelectedDates}
 					onClose={() => setAddSlotModalOpen(false)}
 				/>
 			)}

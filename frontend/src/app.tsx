@@ -7,6 +7,7 @@ import { Provider } from "@shopify/app-bridge-react"
 import translations from "@shopify/polaris/locales/en.json"
 import DeliverySlotPage from "./deliverySlotPage/DeliverySlotPage"
 import CalendarPage from "./calendarPage/CalendarPage"
+import NotFoundPage from "./NotFoundPage"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -39,7 +40,7 @@ ReactDOM.render(
 					<Route exact path="/app" component={HomePage} />
 					<Route exact path="/app/resources/:shopResourceId/calendar/:year/:month" component={CalendarPage} />
 					<Route exact path="/app/delivery_slots/:deliverySlotId" component={DeliverySlotPage} />
-					<Route path="*">404</Route>
+					<Route path="*" component={NotFoundPage} />
 				</Switch>
 			</BrowserRouter>
 		</Provider>

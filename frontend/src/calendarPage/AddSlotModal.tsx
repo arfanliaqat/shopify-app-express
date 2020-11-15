@@ -10,18 +10,17 @@ interface Props {
 	date: Moment
 	onSuccess: () => void
 	onClose: () => void
-	onUnexpectedError?: () => void
 }
 
 export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose }: Props) {
 	const [active, setActive] = useState(true)
-	const [selectedDates, setSelectedDates] = useState<Date[]>([date.toDate()])
+	const [selectedDates, setSelectedDates] = useState<Moment[]>([date])
 	const [quantity, setQuantity] = useState<number>(10)
 
 	const { setApiRequest: submitForm, isLoading: isSubmitting } = useApi({
 		onSuccess: useCallback(() => {
 			onSuccess()
-		}, [])
+		}, [onSuccess])
 	})
 
 	const handleAddSlotClick = useCallback(() => {
@@ -33,11 +32,10 @@ export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose 
 				quantity
 			}
 		})
-	}, [selectedDates, quantity])
+	}, [submitForm, selectedDates, quantity, shopResourceId])
 
 	return (
 		<div
-			className="appModal"
 			onMouseDown={(e) => {
 				const className = (e.target as any).className || ""
 				if (_.isString(className) && className.includes("Polaris-Modal-Dialog")) {
@@ -59,7 +57,7 @@ export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose 
 				}}
 				loading={isSubmitting}
 			>
-				<div id="AddSlotModal">
+				<div id="AddSlotModal" className="appModal">
 					<DeliveryDatePicker
 						selectedDates={selectedDates}
 						onDatesSelected={(selectedDates) => setSelectedDates(selectedDates)}

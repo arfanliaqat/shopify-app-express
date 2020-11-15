@@ -1,27 +1,26 @@
-import React, { useCallback } from "react"
+import React, { useState } from "react"
 import _ from "lodash"
-import { useState } from "react"
 import { Modal } from "@shopify/polaris"
 import DeliveryDatePicker from "../common/DeliveryDatePicker"
+import moment, { Moment } from "moment"
 
 interface Props {
-	date: Date
-	onDatesSelected: (dates: Date[]) => void
+	date: Moment
+	onDatesSelected: (dates: Moment[]) => void
 	onClose: () => void
 }
 
 export default function DeliveryDatePickerModal({ date, onDatesSelected, onClose }: Props) {
 	const [active, setActive] = useState(true)
-	const [selectedDates, setSelectedDates] = useState<Date[]>([date])
+	const [selectedDates, setSelectedDates] = useState<Moment[]>([date])
 
-	const handleAddDates = useCallback(() => {
+	const handleAddDates = () => {
 		onDatesSelected(selectedDates)
 		onClose()
-	}, [selectedDates])
+	}
 
 	return (
 		<div
-			className="appModal"
 			onMouseDown={(e) => {
 				const className = (e.target as any).className || ""
 				if (_.isString(className) && className.includes("Polaris-Modal-Dialog")) {
@@ -42,9 +41,11 @@ export default function DeliveryDatePickerModal({ date, onDatesSelected, onClose
 					onAction: handleAddDates
 				}}
 			>
-				<div id="deliveryDatePickerModal">
+				<div id="deliveryDatePickerModal" className="appModal">
 					<DeliveryDatePicker
-						onDatesSelected={(dates) => setSelectedDates(dates)}
+						onDatesSelected={(dates) => {
+							setSelectedDates(dates.map((d) => moment(d)))
+						}}
 						selectedDates={selectedDates}
 					/>
 				</div>

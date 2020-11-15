@@ -66,7 +66,7 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 	const { shopResource, deliverySlots } = calendarPageData
 
 	return (
-		<Page breadcrumbs={[{ content: "Products", url: "/" }]} title={shopResource.title}>
+		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title={shopResource.title}>
 			<Calendar
 				slots={deliverySlots}
 				isLoading={false}
