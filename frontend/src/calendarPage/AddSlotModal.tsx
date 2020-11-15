@@ -62,7 +62,7 @@ export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose 
 				<div id="AddSlotModal">
 					<DeliveryDatePicker
 						selectedDates={selectedDates}
-						onDatesSelected={() => setSelectedDates(selectedDates)}
+						onDatesSelected={(selectedDates) => setSelectedDates(selectedDates)}
 					/>
 					<TextField
 						label="Quantity"

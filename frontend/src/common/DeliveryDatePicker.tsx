@@ -31,7 +31,7 @@ export default function DeliveryDatePicker({ selectedDates, onDatesSelected }: P
 	})
 	const [allowRange, setAllowRange] = useState(false)
 
-	const handleDatesSelected = useCallback((range: Range) => {
+	const handleDatesSelected = (range: Range) => {
 		const rangeStart = moment(range.start)
 		const rangeEnd = moment(range.end)
 		const dates = [] as Date[]
@@ -39,7 +39,7 @@ export default function DeliveryDatePicker({ selectedDates, onDatesSelected }: P
 			dates.push(cursor.toDate())
 		}
 		onDatesSelected(dates)
-	}, [])
+	}
 
 	return (
 		<div className="deliveryDatePicker">

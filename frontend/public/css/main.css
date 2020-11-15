@@ -1,161 +1,161 @@
 .Polaris-Button svg {
-    width: 20px;
+	width: 20px;
 }
 
 .App-Calendar {
-    padding: 1px;
+	padding: 1px;
 }
 
 .App-Calendar__Header {
-    padding: 5px 5px 15px 5px;
-    display: flex;
+	padding: 5px 5px 15px 5px;
+	display: flex;
 }
 
 .App-Calendar__CurrentMonth {
-    flex: 1;
-    font-size: 20px;
-    align-items: center;
-    display: flex;
-    padding-left: 10px;
+	flex: 1;
+	font-size: 20px;
+	align-items: center;
+	display: flex;
+	padding-left: 10px;
 }
 
 .App-Calendar__Nav {
-    display: flex;
-    justify-content: flex-end;
-    flex: 1;
+	display: flex;
+	justify-content: flex-end;
+	flex: 1;
 }
 
 .App-Calendar__Week,
 .App-Calendar__DayNames {
-    display: flex;
+	display: flex;
 }
 
 .App-Calendar__DayNames {
-    font-weight: 500;
-    text-align: center;
+	font-weight: 500;
+	text-align: center;
 }
 
 .App-Calendar__Day,
 .App-Calendar__HeaderDay {
-    margin: 2px;
-    flex: 1;
+	margin: 2px;
+	flex: 1;
 }
 
 .App-Calendar__Day {
-    border: 1px solid #e1e6ea;
-    padding-bottom: 11%;
-    position: relative;
+	border: 1px solid #e1e6ea;
+	padding-bottom: 11%;
+	position: relative;
 }
 
 .App-Calendar__DayNumber {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 12px;
-    font-weight: 500;
-    text-align: right;
-    padding: 0 5px;
-    color: #666;
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 12px;
+	font-weight: 500;
+	text-align: right;
+	padding: 0 5px;
+	color: #666;
 }
 
 .App-Calendar__Day--notSameMonth {
-    background: #fafafa;
+	background: #fafafa;
 }
 
 .App-Calendar__Day--notSameMonth .App-Calendar__DayNumber {
-    color: #aaa;
-    font-style: italic;
+	color: #aaa;
+	font-style: italic;
 }
 
 .App-Calendar__Day--isToday {
-    background: #fffbd3;
+	background: #fffbd3;
 }
 
 .App-Calendar__Day--isToday .App-Calendar__DayNumber {
-    color: #69621b;
+	color: #69621b;
 }
 
 .App-Calendar__AddInventoryPeriod,
 .App-Calendar__DeliveryDay {
-    color: rgba(0, 0, 0, 0.05);
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 50px;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: monospace;
-    cursor: pointer;
+	color: rgba(0, 0, 0, 0.05);
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 50px;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: monospace;
+	cursor: pointer;
 }
 
 .App-Calendar__AddInventoryPeriod:hover {
-    color: rgba(0, 0, 0, 0.2);
+	color: rgba(0, 0, 0, 0.2);
 }
 
 .App-Calendar__DeliveryDay {
-    color: rgba(0, 0, 0, 0.2);
+	color: rgba(0, 0, 0, 0.2);
 }
 
 .App-Calendar__DeliveryDay:hover {
-    color: rgba(0, 0, 0, 0.4);
+	color: rgba(0, 0, 0, 0.4);
 }
 
 .App-ResourceListTable__Header {
-    font-weight: 600;
-    display: flex;
+	font-weight: 600;
+	display: flex;
 }
 
 .App-ResourceListTable__Header__Cell {
-    flex: 1;
+	flex: 1;
 }
 
 .App-ResourceListTable__Row {
-    display: flex;
+	display: flex;
 }
 
 .App-ResourceListTable__Row__Cell {
-    flex: 1;
-    display: flex;
-    align-items: center;
+	flex: 1;
+	display: flex;
+	align-items: center;
 }
 
 .App-ResourceItem--noLink {
-    cursor: auto;
-    background-image: none !important;
+	cursor: auto;
+	background-image: none !important;
 }
 
 .Slot-ActionCell > * {
-    margin-left: auto;
+	margin-left: auto;
 }
 
 .cardLoader {
-    padding: 10px 10px 50px 10px;
+	padding: 10px 10px 50px 10px;
 }
 
 .CalendarPage__Loading {
-    min-height: 300px;
+	min-height: 300px;
 }
 
-.appModal {
-    padding: 20px;
+#AddSlotModal {
+	padding: 20px;
 }
 
-.appModal .field {
-    padding-bottom: 20px;
+#AddSlotModal .field {
+	padding-bottom: 20px;
 }
 
 #homePage .Polaris-Page-Header__MainContent {
-    display: flex;
+	display: flex;
 }
 
 #homePage .Polaris-Page-Header__PrimaryActionWrapper {
-    margin-top: 0;
+	margin-top: 0;
 }
 
 #deliverySlotPage .buttonHolder {
-    margin-top: 20px;
+	margin-top: 20px;
 }
