@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 	next()
 })
 
-app.set("views", __dirname + "/views")
+app.set("views", __dirname + "/../../../src/views")
 app.set("view engine", "ejs")
 
 app.get("/app*", loadConnectedShop, async (req, res) => {
