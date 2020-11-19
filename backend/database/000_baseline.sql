@@ -3,7 +3,7 @@ create table shops(
 	domain text not null,
 	email text not null,
 	raw_data jsonb not null,
-	created_date not null timestamp with time zone default now(),
+	created_date timestamp with time zone not null default now(),
 	primary key (id)
 );
 
