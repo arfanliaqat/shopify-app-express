@@ -16,7 +16,7 @@ import { loadConnectedShop } from "./shop/shop.middleware"
 const app: Application = express()
 
 let server: https.Server | http.Server
-if (process.env.MODE != "production") {
+if (process.env.NODE_ENV != "production") {
 	const httpsOptions = {
 		cert: fs.readFileSync("./certs/shopify-app.dev.crt"),
 		key: fs.readFileSync("./certs/shopify-app.dev.key")
@@ -61,7 +61,7 @@ app.use(
 	"/public",
 	express.static("../frontend/public", {
 		setHeaders: (res) => {
-			if (process.env.MODE != "production") {
+			if (process.env.NODE_ENV != "production") {
 				res.setHeader("Cache-Control", "no-cache")
 			}
 		}

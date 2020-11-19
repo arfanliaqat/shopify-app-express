@@ -24,7 +24,7 @@ export class BadParameter extends Error {}
 export class Forbidden extends Error {}
 export class HandledError extends Error {}
 
-const isDevMode = process.env.MODE != "PRODUCTION"
+const isDevMode = process.env.NODE_ENV != "PRODUCTION"
 
 export function handleErrors(res: Response, error: Error): void {
 	if (error instanceof AxiosCallError) {
