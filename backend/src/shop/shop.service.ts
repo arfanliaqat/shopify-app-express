@@ -19,7 +19,7 @@ export async function findShopById(shopId: string): Promise<Partial<Shop> | unde
 export async function createShop(shopData: ShopApiData): Promise<Partial<Shop> | undefined> {
 	const conn: Pool = await getConnection()
 	const result = await conn.query<Partial<ShopSchema>>(
-		`INSERT INTO shops (domain, email, raw_data) VALUES ($1, $2, $3, $4) RETURNING id, domain, email`,
+		`INSERT INTO shops (domain, email, raw_data) VALUES ($1, $2, $3) RETURNING id, domain, email`,
 		[shopData.domain, shopData.email, JSON.stringify(shopData)]
 	)
 	return result.rows.map(toShop)[0]
