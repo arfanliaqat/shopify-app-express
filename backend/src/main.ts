@@ -59,7 +59,7 @@ app.get("/app*", loadConnectedShop, async (req, res) => {
 
 app.use(
 	"/public",
-	express.static("../frontend/public", {
+	express.static("/../../../../frontend/public", {
 		setHeaders: (res) => {
 			if (process.env.NODE_ENV != "production") {
 				res.setHeader("Cache-Control", "no-cache")
