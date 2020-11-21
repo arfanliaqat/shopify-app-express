@@ -71,7 +71,6 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 					</div>
 				</div>
 			</div>
-
 			<div className="App-Calendar__DayNames">
 				{getDaysBetween(
 					calendarDates.calendarStart,
@@ -86,7 +85,6 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 					)
 				})}
 			</div>
-
 			{getDaysBetween(calendarDates.calendarStart, calendarDates.calendarEnd, "week").map((weekStart) => (
 				<div key={"week" + weekStart.format("YYYY-MM-DD")} className="App-Calendar__Week">
 					{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
