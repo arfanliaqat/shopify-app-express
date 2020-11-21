@@ -2,7 +2,7 @@
 	"name": "shopify-app-backend",
 	"version": "1.0.0",
 	"description": "",
-	"main": "./dist/main.js",
+	"main": "./dist/backend/src/main.js",
 	"scripts": {
 		"tsc": "tsc",
 		"start": "npm run tsc && node ./dist/backend/src/main.js",

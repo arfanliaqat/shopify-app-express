@@ -4,6 +4,7 @@ import * as https from "https"
 import * as fs from "fs"
 import cookieParser from "cookie-parser"
 import bodyParser from "body-parser"
+import path from "path"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -15,8 +16,10 @@ import { loadConnectedShop } from "./shop/shop.middleware"
 
 const app: Application = express()
 
+const isDev = process.env.NODE_ENV != "production"
+
 let server: https.Server | http.Server
-if (process.env.NODE_ENV != "production") {
+if (isDev) {
 	const httpsOptions = {
 		cert: fs.readFileSync("./certs/shopify-app.dev.crt"),
 		key: fs.readFileSync("./certs/shopify-app.dev.key")
@@ -42,11 +45,13 @@ app.use((req, res, next) => {
 })
 
 app.use((req, res, next) => {
-	console.log(`${req.method} ${req.url}`)
+	if (isDev) {
+		console.log(`${req.method} ${req.url}`)
+	}
 	next()
 })
 
-app.set("views", __dirname + "/../../../src/views")
+app.set("views", path.join(process.cwd(), "src/views"))
 app.set("view engine", "ejs")
 
 app.get("/app*", loadConnectedShop, async (req, res) => {
@@ -59,9 +64,9 @@ app.get("/app*", loadConnectedShop, async (req, res) => {
 
 app.use(
 	"/public",
-	express.static("../../../../frontend/public", {
+	express.static(path.join(process.cwd(), "../frontend/public"), {
 		setHeaders: (res) => {
-			if (process.env.NODE_ENV != "production") {
+			if (isDev) {
 				res.setHeader("Cache-Control", "no-cache")
 			}
 		}
