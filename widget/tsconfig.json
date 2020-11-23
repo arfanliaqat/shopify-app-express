@@ -4,10 +4,11 @@
 		"target": "es6",
 		"noImplicitAny": false,
 		"jsx": "react",
+		"jsxFactory": "h",
 		"allowJs": false,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"moduleResolution": "node",
-		"resolveJsonModule": true,
+		"resolveJsonModule": true
 	}
 }

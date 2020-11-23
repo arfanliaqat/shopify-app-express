@@ -73,6 +73,17 @@ app.use(
 	})
 )
 
+app.use(
+	"/widget",
+	express.static(path.join(process.cwd(), "../widget/build"), {
+		setHeaders: (res) => {
+			if (isDev) {
+				res.setHeader("Cache-Control", "no-cache")
+			}
+		}
+	})
+)
+
 app.use(authRouter)
 app.use(shopResourceRouter)
 app.use(deliverySlotsRouter)

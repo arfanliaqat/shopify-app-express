@@ -2,10 +2,7 @@ const path = require("path")
 const CopyPlugin = require("copy-webpack-plugin")
 
 module.exports = {
-	entry: {
-		back: "./src/back/app.tsx",
-		front: "./src/front/app.tsx"
-	},
+	entry: "./src/app.tsx",
 	mode: "development",
 	module: {
 		rules: [
@@ -13,10 +10,6 @@ module.exports = {
 				test: /\.tsx?$/,
 				use: "ts-loader",
 				exclude: /node_modules/
-			},
-			{
-				test: /\.css$/i,
-				use: ["style-loader", "css-loader"]
 			}
 		]
 	},
@@ -24,7 +17,7 @@ module.exports = {
 		extensions: [".tsx", ".ts", ".js"]
 	},
 	output: {
-		filename: "[name].js",
+		filename: "app.js",
 		path: path.resolve(__dirname, "public/build")
 	},
 	plugins: [
