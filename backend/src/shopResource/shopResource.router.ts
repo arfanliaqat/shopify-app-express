@@ -8,10 +8,7 @@ import { createShopifyResources, findShopResources } from "./shopResource.servic
 
 const router = Router()
 
-router.use("/resources", loadConnectedShop)
-router.use("/resources", loadAccessToken)
-
-router.get("/resources", async (req: Request, res: Response) => {
+router.get("/resources", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
 	try {
 		const connectedShop = res.locals.connectedShop as Shop
 		const resources = await findShopResources(connectedShop)
@@ -25,7 +22,7 @@ interface PostResourcesRequestBody {
 	resourceIds?: string[]
 }
 
-router.post("/resources", async (req: Request, res: Response) => {
+router.post("/resources", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
 	try {
 		const body = req.body as PostResourcesRequestBody
 		if (!body.resourceIds || body.resourceIds.length == 0) {

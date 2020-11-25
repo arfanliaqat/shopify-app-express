@@ -2,6 +2,7 @@ import express, { Application } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
+import cors from "cors"
 import cookieParser from "cookie-parser"
 import bodyParser from "body-parser"
 import path from "path"
@@ -12,6 +13,7 @@ dotenv.config()
 import authRouter from "./auth/auth.router"
 import shopResourceRouter from "./shopResource/shopResource.router"
 import deliverySlotsRouter from "./deliverySlots/deliverySlots.router"
+import widgetRouter from "./widget/widget.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
 
 const app: Application = express()
@@ -73,6 +75,11 @@ app.use(
 	})
 )
 
+app.use(authRouter)
+app.use(shopResourceRouter)
+app.use(deliverySlotsRouter)
+
+app.use(cors())
 app.use(
 	"/widget",
 	express.static(path.join(process.cwd(), "../widget/build"), {
@@ -83,10 +90,7 @@ app.use(
 		}
 	})
 )
-
-app.use(authRouter)
-app.use(shopResourceRouter)
-app.use(deliverySlotsRouter)
+app.use(widgetRouter)
 
 const port = parseInt(process.env.PORT || "3000")
 server.listen(port, () => {
