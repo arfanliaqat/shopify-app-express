@@ -6,6 +6,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import bodyParser from "body-parser"
 import path from "path"
+import morgan from "morgan"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -36,20 +37,15 @@ const sessionSecretKey = process.env.SESSION_SECRET_KEY || ""
 if (sessionSecretKey.length == 0) throw "Missing SESSION_SECRET_KEY"
 if (sessionSecretKey.length < 64) throw "SESSION_SECRET_KEY should be at least 64 chars"
 app.use(cookieParser(sessionSecretKey))
-
+if (isDev) {
+	app.use(morgan("[:date[clf]] :method :url :status :response-time ms"))
+}
 app.use(bodyParser.json())
 
 app.set("etag", false)
 
 app.use((req, res, next) => {
 	res.removeHeader("X-Powered-By")
-	next()
-})
-
-app.use((req, res, next) => {
-	if (isDev) {
-		console.log(`${req.method} ${req.url}`)
-	}
 	next()
 })
 
