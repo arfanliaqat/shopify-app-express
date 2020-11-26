@@ -18,6 +18,17 @@ export async function findShopResourceById(shopResourceId: string): Promise<Shop
 	return ShopResource.createFromSchema(row)
 }
 
+export async function findShopResourceIdByProductId(productId: number): Promise<string | undefined> {
+	const conn: Pool = await getConnection()
+	const result = await conn.query<{ id: string }>(
+		`
+		SELECT id FROM shop_resources
+		WHERE resource_type = 'Product' AND resource_id = $1`,
+		[productId]
+	)
+	return result.rows[0]?.id
+}
+
 export async function findShopResources(shop: Shop): Promise<ShopResource[]> {
 	const conn: Pool = await getConnection()
 	const result = await conn.query<ShopResourceSchema>(

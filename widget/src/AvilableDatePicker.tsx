@@ -1,10 +1,11 @@
+import moment, { Moment } from "moment"
 import { h } from "preact"
-import { useEffect } from "preact/hooks"
+import { useEffect, useMemo, useState } from "preact/hooks"
 import { SHOPIFY_APP_URL } from "./constants"
 
 interface ProductAvailabilityData {
 	config: any
-	availableDates: any[]
+	availableDates: string[]
 }
 
 function getProductId() {
@@ -30,12 +31,25 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 }
 
 export default function AvailableDatePicker() {
+	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(undefined)
+
 	useEffect(function () {
 		async function fetchData() {
-			await fetchAvailabilityForProduct()
+			setProductAvailabilityData(await fetchAvailabilityForProduct())
 		}
 		fetchData()
 	}, [])
 
-	return <div>TEST</div>
+	const availableDates: Moment[] = useMemo(() => {
+		if (!productAvailabilityData) return []
+		return productAvailabilityData.availableDates.map((srtDate) => moment(srtDate, "YYYY-MM-DD"))
+	}, [productAvailabilityData])
+
+	return (
+		<select name="deliveryDate" id="deliveryDate10a">
+			{availableDates.map((date) => (
+				<option value={date.format("YYYY-MM-DD")}>{date.format("dddd D MMMM")}</option>
+			))}
+		</select>
+	)
 }

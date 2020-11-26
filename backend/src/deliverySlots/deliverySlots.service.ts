@@ -1,4 +1,4 @@
-import { Moment } from "moment"
+import moment, { Moment } from "moment"
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { DeliverySlot, DeliverySlotSchema } from "./deliverySlots.model"
@@ -13,11 +13,21 @@ export async function findDeliverySlots(shopResourceId: string, mFrom: Moment, m
 		SELECT id, shop_resource_id, quantity, start_date, end_date, dates
 		FROM delivery_slots
 		WHERE shop_resource_id = $1
-		AND start_date between $2 and $3
-		AND end_date between $2 and $3`,
+		AND (start_date between $2 and $3 OR end_date between $2 and $3)`,
 		[shopResourceId, mFrom.format(DATE_FORMAT), mTo.format(DATE_FORMAT)]
 	)
 	return DeliverySlot.createFromSchemas(result.rows)
+}
+
+export async function findFutureAvailableDates(shopResourceId: string): Promise<Moment[]> {
+	const from = moment().startOf("day")
+	const to = moment().startOf("day").add(3, "months")
+	const slots = await findDeliverySlots(shopResourceId, from, to)
+	return slots
+		.map((slot) => slot.dates)
+		.flat()
+		.filter((date) => date.isSameOrAfter(from))
+		.sort((d1, d2) => d1.valueOf() - d2.valueOf())
 }
 
 export async function findDeliverySlotById(deliverySlotId: string): Promise<DeliverySlot | undefined> {
