@@ -22,9 +22,12 @@ interface UrlParams {
 	deliverySlotId: string
 }
 
+type OrdersPerDate = { [strDate: string]: number }
+
 interface DeliverySlotPageData {
 	shopResource: ShopResource
 	deliverySlot: DeliverySlot
+	ordersPerDate: OrdersPerDate
 }
 
 function getTitle(deliverySlot: DeliverySlot) {

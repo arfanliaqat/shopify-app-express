@@ -4,7 +4,6 @@ import * as https from "https"
 import * as fs from "fs"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import bodyParser from "body-parser"
 import path from "path"
 import morgan from "morgan"
 
@@ -15,14 +14,16 @@ import authRouter from "./auth/auth.router"
 import shopResourceRouter from "./shopResource/shopResource.router"
 import deliverySlotsRouter from "./deliverySlots/deliverySlots.router"
 import widgetRouter from "./widget/widget.router"
+import ordersRouter from "./orders/orders.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
+import { appUrl } from "./util/constants"
 
 const app: Application = express()
 
 const isDev = process.env.NODE_ENV != "production"
 
 let server: https.Server | http.Server
-if (isDev) {
+if (isDev && appUrl.indexOf("ngrok") == -1) {
 	const httpsOptions = {
 		cert: fs.readFileSync("./certs/shopify-app.dev.crt"),
 		key: fs.readFileSync("./certs/shopify-app.dev.key")
@@ -40,7 +41,7 @@ app.use(cookieParser(sessionSecretKey))
 if (isDev) {
 	app.use(morgan("[:date[clf]] :method :url :status :response-time ms"))
 }
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
 
 app.set("etag", false)
 
@@ -74,6 +75,7 @@ app.use(
 app.use(authRouter)
 app.use(shopResourceRouter)
 app.use(deliverySlotsRouter)
+app.use(ordersRouter)
 
 app.use(cors())
 app.use(

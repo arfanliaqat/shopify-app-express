@@ -4,7 +4,7 @@ export interface ShopSchema {
 	id: string
 	domain: string
 	email: string
-	raw_data: string
+	raw_data?: string
 	created_date: Date
 }
 
@@ -12,10 +12,10 @@ export interface Shop {
 	id: string
 	domain: string
 	email: string
-	rawData: any
+	rawData?: any
 }
 
-export function toShop(schema: Partial<ShopSchema>): Partial<Shop> {
+export function toShop(schema: ShopSchema): Shop {
 	return {
 		id: schema.id,
 		domain: schema.domain,

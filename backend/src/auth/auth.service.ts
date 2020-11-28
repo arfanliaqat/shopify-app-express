@@ -4,11 +4,7 @@ import * as crypto from "crypto"
 import { createShop, findShopByDomain } from "../shop/shop.service"
 import { findAccessTokenByShopId, storeAccessToken } from "../accessToken/accessToken.service"
 import { handleAxiosErrors } from "../util/error"
-
-const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY || ""
-const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY || ""
-const scopes = "write_products"
-const appUrl = process.env.SHOPIFY_APP_URL
+import { appUrl, scopes, shopifyApiPublicKey, shopifyApiSecretKey } from "../util/constants"
 
 export function buildRedirectUri(): string {
 	return `${appUrl}/auth/callback`

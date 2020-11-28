@@ -50,6 +50,7 @@ export function handleErrors(res: Response, error: Error): void {
 	} else if (error instanceof BadParameter) {
 		res.status(400)
 		if (isDevMode) {
+			console.error(error.message)
 			res.send(error.message)
 		} else {
 			res.send("Bad parameter")
