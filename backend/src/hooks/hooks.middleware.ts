@@ -5,11 +5,7 @@ import { getLocals, Locals } from "../util/locals"
 import crypto from "crypto"
 import { hooksSecret } from "../util/constants"
 
-const router = Router()
-
-router.use("/hooks", raw({ type: "application/json" }))
-
-function loadHookContext(req: Request, res: Response, next: NextFunction) {
+export function loadHookContext(req: Request, res: Response, next: NextFunction): void {
 	try {
 		const locals = res.locals as Locals
 		locals.hookContext = {
@@ -27,11 +23,12 @@ function loadHookContext(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-async function authenticateHook(req: Request, res: Response, next: NextFunction) {
+export async function authenticateHook(req: Request, res: Response, next: NextFunction): Promise<void> {
 	try {
 		const locals = getLocals(res)
 		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
 		if (!locals.hookContext.hmac) throw new BadParameter("`hmac` is missing from `hookContext`")
+		console.log({ hooksSecret })
 		const generatedHmac = crypto.createHmac("sha256", hooksSecret).update(req.body).digest("base64")
 		if (generatedHmac != locals.hookContext.hmac) {
 			throw new BadParameter("Incorrect HMAC")
@@ -42,7 +39,7 @@ async function authenticateHook(req: Request, res: Response, next: NextFunction)
 	}
 }
 
-async function loadConnectedShop(req: Request, res: Response, next: NextFunction) {
+export async function loadConnectedShop(req: Request, res: Response, next: NextFunction): Promise<void> {
 	try {
 		const locals = getLocals(res)
 		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
@@ -54,14 +51,3 @@ async function loadConnectedShop(req: Request, res: Response, next: NextFunction
 		handleErrors(res, error)
 	}
 }
-
-router.post("/hooks/orders", [loadHookContext, authenticateHook, loadConnectedShop], (req: Request, res: Response) => {
-	try {
-		console.log(JSON.parse(req.body))
-		res.end()
-	} catch (error) {
-		handleErrors(res, error)
-	}
-})
-
-export default router
