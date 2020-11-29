@@ -1,16 +1,16 @@
-import bodyParser from "body-parser"
-import { NextFunction, Request, Response, Router } from "express"
+import { NextFunction, Request, Response, Router, raw } from "express"
 import { findShopByDomain } from "../shop/shop.service"
-import { shopifyApiSecretKey } from "../util/constants"
 import { handleErrors, BadParameter } from "../util/error"
 import { getLocals, Locals } from "../util/locals"
 import crypto from "crypto"
+import { hooksSecret } from "../util/constants"
 
 const router = Router()
 
+router.use("/hooks", raw({ type: "application/json" }))
+
 function loadHookContext(req: Request, res: Response, next: NextFunction) {
 	try {
-		console.log("::loadHookContext")
 		const locals = res.locals as Locals
 		locals.hookContext = {
 			topic: req.header("X-Shopify-Topic"),
@@ -27,26 +27,13 @@ function loadHookContext(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-// function parseRawBody() {
-// 	console.log("::parseRawBody")
-// 	return bodyParser.json({
-// 		limit: "2mb",
-// 		verify: function (req: any, res: any, buf: any, encoding: string) {
-// 			req.textBody = buf.toString(encoding)
-// 		}
-// 	})
-// }
-
-function authenticateHook(req: Request, res: Response, next: NextFunction) {
-	console.log("::authenticateHook")
+async function authenticateHook(req: Request, res: Response, next: NextFunction) {
 	try {
 		const locals = getLocals(res)
 		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
 		if (!locals.hookContext.hmac) throw new BadParameter("`hmac` is missing from `hookContext`")
-		// const rawBody = (req as any).textBody
-		// if (!rawBody) throw new BadParameter("Missing `textBody`... Missing raw body parser?")
-		const generatedHmac = crypto.createHmac("sha256", shopifyApiSecretKey).update(req.body).digest("base64")
-		if (generatedHmac != locals.hookContext) {
+		const generatedHmac = crypto.createHmac("sha256", hooksSecret).update(req.body).digest("base64")
+		if (generatedHmac != locals.hookContext.hmac) {
 			throw new BadParameter("Incorrect HMAC")
 		}
 		next()
@@ -68,18 +55,13 @@ async function loadConnectedShop(req: Request, res: Response, next: NextFunction
 	}
 }
 
-router.post(
-	"/hooks/orders",
-	[loadHookContext, bodyParser.text({ type: "application/json" }), authenticateHook, loadConnectedShop],
-	(req: Request, res: Response) => {
-		console.log("::ROUTE!")
-		try {
-			console.log(JSON.parse(req.body))
-			res.end()
-		} catch (error) {
-			handleErrors(res, error)
-		}
+router.post("/hooks/orders", [loadHookContext, authenticateHook, loadConnectedShop], (req: Request, res: Response) => {
+	try {
+		console.log(JSON.parse(req.body))
+		res.end()
+	} catch (error) {
+		handleErrors(res, error)
 	}
-)
+})
 
 export default router

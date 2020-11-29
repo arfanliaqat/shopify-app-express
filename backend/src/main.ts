@@ -1,4 +1,4 @@
-import express, { Application } from "express"
+import express, { Application, json } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
@@ -41,7 +41,16 @@ app.use(cookieParser(sessionSecretKey))
 if (isDev) {
 	app.use(morgan("[:date[clf]] :method :url :status :response-time ms"))
 }
-// app.use(bodyParser.json())
+
+// JSON body parser
+app.use((req, res, next) => {
+	// Hooks need their own body parsing because of the HMAC verification
+	if (!req.url.startsWith("/hooks")) {
+		json()(req, res, next)
+	} else {
+		next()
+	}
+})
 
 app.set("etag", false)
 
