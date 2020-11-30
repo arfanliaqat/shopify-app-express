@@ -1,29 +1,19 @@
-import Axios from "axios"
-import { Moment } from "moment"
-import { Shop } from "../shop/shop.model"
-import { ShopResource } from "../shopResource/shopResource.model"
-import { Order } from "./productOrders.model"
+import { ProductOrder } from "./productOrders.model"
+import { WithTransaction } from "../util/database"
+import { ShopResourceSchema } from "../shopResource/shopResource.model"
 
-// async function fetchOrders(
-// 	shop: Shop,
-// 	shopResource: ShopResource,
-// 	from: Moment,
-// 	to: Moment
-// ): Promise<Order[] | undefined> {
-// 	try {
-// 		const response = await Axios({
-// 			method: "POST",
-// 			url: `https://${shop.domain}/admin/api/graphql.json`,
-// 			headers: {
-// 				"Content-Type": "application/json",
-// 				"X-Shopify-Access-Token": accessToken.token
-// 			},
-// 			data: {
-// 				query: `{ product(id: "${productGid}") { id, title } }`
-// 			}
-// 		})
-// 		return response.data.data.product as ShopifyResource
-// 	} catch (error) {
-// 		handleAxiosErrors(error)
-// 	}
-// }
+export class ProductOrderServiceWithTransaction extends WithTransaction {
+	async deleteByOrderId(orderId: number): Promise<void> {
+		await this.getConnection().query(`DELETE FROM product_orders WHERE order_id = $1`, [orderId])
+	}
+
+	async insert(productOrder: ProductOrder): Promise<void> {
+		await this.getConnection().query<ShopResourceSchema>(
+			`
+			INSERT INTO product_orders (shop_resource_id, order_id, delivery_date, quantity)
+			VALUES ($1, $2, $3, $4)
+			ON CONFLICT DO NOTHING`,
+			[productOrder.shopResourceId, productOrder.orderId, productOrder.deliveryDate, productOrder.quantity]
+		)
+	}
+}

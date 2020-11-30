@@ -3,8 +3,8 @@ export interface LineItem {
 	quantity: number
 }
 
-export interface OrderApiData {
+export interface OrderEventData {
 	id: number
 	line_items: LineItem[]
-	tags: string // e.g. tags: 'Delivery Date: 30/11/2020, Delivery Day: Monday',
+	tags?: string // e.g. tags: 'Delivery Date: 30/11/2020, Delivery Day: Monday',
 }

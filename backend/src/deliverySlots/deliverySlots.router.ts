@@ -8,7 +8,7 @@ import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
 import { DeliverySlot } from "./deliverySlots.model"
 import { loadDeliverySlot } from "./deliverySlots.middleware"
-import { findShopResourceById } from "../shopResource/shopResource.service"
+import { ShopResourceService } from "../shopResource/shopResource.service"
 
 const router = Router()
 
@@ -79,7 +79,7 @@ router.get(
 			if (!deliverySlot) {
 				throw new UnexpectedError("deliverySlot should be loaded")
 			}
-			const shopResource = await findShopResourceById(deliverySlot.shopResourceId)
+			const shopResource = await ShopResourceService.findShopResourceById(deliverySlot.shopResourceId)
 			if (!shopResource) {
 				throw new UnexpectedError("shopResource not found")
 			}

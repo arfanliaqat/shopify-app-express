@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { findShopResourceById } from "../shopResource/shopResource.service"
+import { ShopResourceService } from "../shopResource/shopResource.service"
 import { Forbidden, HandledError, handleErrors, UnexpectedError } from "../util/error"
 import { getLocals } from "../util/locals"
 
@@ -10,7 +10,7 @@ export async function loadShopResource(req: Request, res: Response, next: NextFu
 		if (!shopResourceId) {
 			throw new UnexpectedError("No shopResourceId provided")
 		}
-		const shopResource = await findShopResourceById(shopResourceId)
+		const shopResource = await ShopResourceService.findShopResourceById(shopResourceId)
 		if (!shopResource) {
 			throw new HandledError("Shop resource not found")
 		}

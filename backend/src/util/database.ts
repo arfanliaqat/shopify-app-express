@@ -17,3 +17,25 @@ export const getConnection = async (): Promise<Pool> => {
 	}
 	return dbPool
 }
+
+export class WithTransaction {
+	private conn?: Pool
+
+	getConnection(): Pool {
+		if (!this.conn) throw "this.conn should be defined"
+		return this.conn
+	}
+
+	async beginTransaction(): Promise<void> {
+		this.conn = await getConnection()
+		await this.conn.query("BEGIN")
+	}
+
+	async rollbackTransaction(): Promise<void> {
+		await this.getConnection().query("ROLLBACK")
+	}
+
+	async commitTransaction(): Promise<void> {
+		await this.getConnection().query("COMMIT")
+	}
+}
