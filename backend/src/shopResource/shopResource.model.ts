@@ -2,6 +2,8 @@ import ShopResourceViewModel from "../../../frontend/src/models/ShopResource"
 import { Shop } from "../shop/shop.model"
 import { ResourceId } from "./shopResource.util"
 
+export type ResourceType = "Product" | "ProductVariant" | "Collection"
+
 export interface ShopResourceSchema {
 	id: string
 	shop_id: string
@@ -15,7 +17,7 @@ export class ShopResource {
 	constructor(
 		public id: string | undefined,
 		public shopId: string,
-		public resourceType: string,
+		public resourceType: ResourceType,
 		public resourceId: number,
 		public title: string,
 		public createdDate?: Date
@@ -33,7 +35,7 @@ export class ShopResource {
 		return new ShopResource(
 			schema.id,
 			schema.shop_id,
-			schema.resource_type,
+			schema.resource_type as ResourceType,
 			schema.resource_id,
 			schema.title,
 			schema.created_date

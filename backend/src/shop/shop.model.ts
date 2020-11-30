@@ -1,5 +1,3 @@
-import { AccessToken } from "../accessToken/accessToken.model"
-
 export interface ShopSchema {
 	id: string
 	domain: string
@@ -8,20 +6,12 @@ export interface ShopSchema {
 	created_date: Date
 }
 
-export interface Shop {
-	id: string
-	domain: string
-	email: string
-	rawData?: any
+export class Shop {
+		constructor(public domain: string, public email: string, public rawData?: ShopApiData, public id?: string) {}
 }
 
 export function toShop(schema: ShopSchema): Shop {
-	return {
-		id: schema.id,
-		domain: schema.domain,
-		email: schema.email,
-		rawData: schema.raw_data ? JSON.parse(schema.raw_data) : undefined
-	}
+	return new Shop(schema.domain, schema.email, schema.raw_data ? JSON.parse(schema.raw_data) : undefined, schema.id)
 }
 
 export interface ShopApiData {

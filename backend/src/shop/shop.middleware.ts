@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { getSession } from "../util/session"
-import { findShopById } from "./shop.service"
+import { ShopService } from "./shop.service"
 
 export async function loadConnectedShop(req: Request, res: Response, next: NextFunction): Promise<void> {
 	const { shopId } = getSession(req)
@@ -9,7 +9,7 @@ export async function loadConnectedShop(req: Request, res: Response, next: NextF
 		res.status(403).send("Forbidden")
 		return
 	}
-	const shop = await findShopById(shopId)
+	const shop = await ShopService.findById(shopId)
 	if (!shop) {
 		console.error("Shop not found")
 		res.status(403).send("Forbidden")

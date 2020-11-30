@@ -4,8 +4,6 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { Pool } from "pg"
-import { getConnection } from "../util/database"
 
 function logPrefix(orderEvent: OrderEventData) {
 	return `[Order: ${orderEvent.id}]`
@@ -35,7 +33,7 @@ export class HooksService {
 			}
 
 			const productIds = new Set<number>(orderEvent.line_items.map((item) => item.product_id))
-			const eventShopResources = await ShopResourceService.findByProductIds(Array.from(productIds))
+			const eventShopResources = await ShopResourceService.findGroupedByProductIds(Array.from(productIds))
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 

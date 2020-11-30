@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response, Router, raw } from "express"
-import { findShopByDomain } from "../shop/shop.service"
+import { NextFunction, Request, Response } from "express"
 import { handleErrors, BadParameter } from "../util/error"
 import { getLocals, Locals } from "../util/locals"
 import crypto from "crypto"
 import { hooksSecret } from "../util/constants"
+import { ShopService } from "../shop/shop.service"
 
 export function loadHookContext(req: Request, res: Response, next: NextFunction): void {
 	try {
@@ -28,7 +28,6 @@ export async function authenticateHook(req: Request, res: Response, next: NextFu
 		const locals = getLocals(res)
 		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
 		if (!locals.hookContext.hmac) throw new BadParameter("`hmac` is missing from `hookContext`")
-		console.log({ hooksSecret })
 		const generatedHmac = crypto.createHmac("sha256", hooksSecret).update(req.body).digest("base64")
 		if (generatedHmac != locals.hookContext.hmac) {
 			throw new BadParameter("Incorrect HMAC")
@@ -44,7 +43,7 @@ export async function loadConnectedShop(req: Request, res: Response, next: NextF
 		const locals = getLocals(res)
 		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
 		if (!locals.hookContext.shopDomain) throw new BadParameter("`shopDomain` is missing from `hookContext`")
-		locals.connectedShop = await findShopByDomain(locals.hookContext.shopDomain)
+		locals.connectedShop = await ShopService.findByDomain(locals.hookContext.shopDomain)
 		if (!locals.connectedShop) throw new BadParameter("Shop not found")
 		next()
 	} catch (error) {

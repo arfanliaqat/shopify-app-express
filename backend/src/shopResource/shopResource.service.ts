@@ -3,10 +3,9 @@ import { Shop } from "../shop/shop.model"
 import { getConnection } from "../util/database"
 import { ShopResource, ShopResourceSchema } from "./shopResource.model"
 import { parseResourceGid } from "./shopResource.util"
-import { BadParameter, handleAxiosErrors } from "../util/error"
+import { BadParameter, handleAxiosErrors, UnexpectedError } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import Axios from "axios"
-import _ from "lodash"
 
 export interface ShopifyResource {
 	id: string
@@ -42,8 +41,8 @@ export class ShopResourceService {
 		return result.rows[0]?.id
 	}
 
-	static async findByProductIds(productIds: number[]): Promise<ShopResourceById> {
-		if (productIds.length == 0) return {}
+	static async findByProductIds(productIds: number[]): Promise<ShopResource[]> {
+		if (productIds.length == 0) return []
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
 			`
@@ -53,7 +52,12 @@ export class ShopResourceService {
 			AND resource_id in (${productIds.join(",")})`,
 			[productIds]
 		)
-		return result.rows.map(ShopResource.createFromSchema).reduce((acc, sr) => {
+		return result.rows.map(ShopResource.createFromSchema)
+	}
+
+	static async findGroupedByProductIds(productIds: number[]): Promise<ShopResourceById> {
+		const shopResources = await this.findByProductIds(productIds)
+		return shopResources.reduce((acc, sr) => {
 			acc[sr.resourceId] = sr
 			return acc
 		}, {} as ShopResourceById)
@@ -71,15 +75,19 @@ export class ShopResourceService {
 		return result.rows.map(ShopResource.createFromSchema)
 	}
 
-	static async insert(shopResource: ShopResource): Promise<void> {
+	static async insert(shopResource: ShopResource): Promise<ShopResource | undefined> {
 		const conn: Pool = await getConnection()
-		await conn.query<ShopResourceSchema>(
+		const result = await conn.query<ShopResourceSchema>(
 			`
 			INSERT INTO shop_resources (shop_id, resource_type, resource_id, title)
 			VALUES ($1, $2, $3, $4)
-			ON CONFLICT DO NOTHING`,
+			ON CONFLICT DO NOTHING
+			RETURNING id, shop_id, resource_type, resource_id, title`,
 			[shopResource.shopId, shopResource.resourceType, shopResource.resourceId, shopResource.title]
 		)
+		const row = result.rows[0]
+		if (!row) return undefined
+		return ShopResource.createFromSchema(row)
 	}
 
 	static async fetchShopifyProduct(
@@ -122,6 +130,7 @@ export class ShopResourceService {
 			if (!title) {
 				throw new BadParameter("`title` should be defined")
 			} else {
+				if (!shop.id) throw new UnexpectedError("shop.id cannot be undefined")
 				const shopResource = ShopResource.create(shop.id, resourceId, title)
 				await this.insert(shopResource)
 			}

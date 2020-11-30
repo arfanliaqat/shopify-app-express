@@ -1,7 +1,7 @@
 import axios from "axios"
 import { Shop, ShopApiData } from "../shop/shop.model"
 import * as crypto from "crypto"
-import { createShop, findShopByDomain } from "../shop/shop.service"
+import { ShopService } from "../shop/shop.service"
 import { findAccessTokenByShopId, storeAccessToken } from "../accessToken/accessToken.service"
 import { handleAxiosErrors } from "../util/error"
 import { appUrl, scopes, shopifyApiPublicKey, shopifyApiSecretKey } from "../util/constants"
@@ -61,7 +61,7 @@ async function installApp(shopDomain: string, code: string): Promise<Partial<Sho
 		if (shopData) {
 			let dbShop
 			if (shopData.shop) {
-				dbShop = await createShop(shopData.shop)
+				dbShop = await ShopService.createFromApi(shopData.shop)
 			}
 			if (dbShop && dbShop.id) {
 				await storeAccessToken({
@@ -76,7 +76,7 @@ async function installApp(shopDomain: string, code: string): Promise<Partial<Sho
 }
 
 export async function findShopOrInstallApp(shopDomain: string, code: string): Promise<Partial<Shop> | undefined> {
-	const dbShop = await findShopByDomain(shopDomain)
+	const dbShop = await ShopService.findByDomain(shopDomain)
 	if (dbShop && dbShop.id) {
 		const accessToken = await findAccessTokenByShopId(dbShop.id)
 		if (!accessToken) {
