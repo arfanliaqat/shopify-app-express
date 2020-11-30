@@ -1,4 +1,4 @@
-import { Pool } from "pg"
+import { Pool, PoolClient } from "pg"
 
 let dbPool: Pool | null = null
 
@@ -19,23 +19,38 @@ export const getConnection = async (): Promise<Pool> => {
 }
 
 export class WithTransaction {
-	private conn?: Pool
+	private client?: PoolClient
 
-	getConnection(): Pool {
-		if (!this.conn) throw "this.conn should be defined"
-		return this.conn
+	getClient(): PoolClient {
+		if (!this.client) throw "`this.client` should be defined"
+		return this.client
 	}
 
 	async beginTransaction(): Promise<void> {
-		this.conn = await getConnection()
-		await this.conn.query("BEGIN")
+		const connection = await getConnection()
+		this.client = await connection.connect()
+		try {
+			await this.client.query("BEGIN")
+		} finally {
+			this.client.release()
+		}
 	}
 
 	async rollbackTransaction(): Promise<void> {
-		await this.getConnection().query("ROLLBACK")
+		const client = this.getClient()
+		try {
+			await client.query("ROLLBACK")
+		} finally {
+			client.release()
+		}
 	}
 
 	async commitTransaction(): Promise<void> {
-		await this.getConnection().query("COMMIT")
+		const client = this.getClient()
+		try {
+			await client.query("COMMIT")
+		} finally {
+			client.release()
+		}
 	}
 }

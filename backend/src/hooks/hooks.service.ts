@@ -31,7 +31,7 @@ export class HooksService {
 
 			const deliveryDate = getDeliveryDate(orderEvent)
 			if (!deliveryDate) {
-				return // if no delivery can be extracted, no need to ingest
+				return // if no delivery date can be extracted, no need to ingest
 			}
 
 			const productIds = new Set<number>(orderEvent.line_items.map((item) => item.product_id))
