@@ -15,13 +15,13 @@ export interface DeliverySlotSchema {
 
 export class DeliverySlot {
 	constructor(
-		public id: string,
+		public id: string | undefined,
 		public shopResourceId: string,
 		public quantity: number,
 		public startDate: Moment,
 		public endDate: Moment,
 		public dates: Moment[],
-		public createdDate: Moment,
+		public createdDate?: Moment,
 		private shopId?: string
 	) {}
 
@@ -64,7 +64,7 @@ export class DeliverySlot {
 
 	toViewModel(): DeliverySlotViewModel {
 		return {
-			id: this.id,
+			id: this.id!,
 			resourceId: this.shopResourceId,
 			deliveryDates: this.dates.map((date) => date.format("YYYY-MM-DD")),
 			quantity: this.quantity

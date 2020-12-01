@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express"
 import { Forbidden, HandledError, handleErrors } from "../util/error"
 import { getLocals } from "../util/locals"
-import { findDeliverySlotById } from "./deliverySlots.service"
+import { DeliverySlotService } from "./deliverySlots.service"
 
 export async function loadDeliverySlot(req: Request, res: Response, next: NextFunction): Promise<void> {
 	try {
 		const { connectedShop } = getLocals(res)
 		const { deliverySlotId } = req.params
-		const deliverySlot = await findDeliverySlotById(deliverySlotId)
+		const deliverySlot = await DeliverySlotService.findDeliverySlotById(deliverySlotId)
 		if (!deliverySlot) {
 			throw new HandledError("Delivery slot not found")
 		}

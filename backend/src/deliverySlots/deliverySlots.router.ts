@@ -3,7 +3,7 @@ import { loadConnectedShop } from "../shop/shop.middleware"
 import { HandledError, handleErrors, FormError, FormErrors, UnexpectedError } from "../util/error"
 import { getLocals } from "../util/locals"
 import moment, { Moment } from "moment"
-import { createDeliverySlot, deleteDeliverySlot, findDeliverySlots, updateShopResource } from "./deliverySlots.service"
+import { DeliverySlotService } from "./deliverySlots.service"
 import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
 import { DeliverySlot } from "./deliverySlots.model"
@@ -27,7 +27,7 @@ router.get(
 			if (mFrom.diff(mTo, "days") > 45) {
 				throw new HandledError("Incorrect from/to parameters")
 			}
-			const slots = await findDeliverySlots(shopResource?.id || "", mFrom, mTo)
+			const slots = await DeliverySlotService.findDeliverySlots(shopResource?.id || "", mFrom, mTo)
 			res.send({ shopResource, deliverySlots: DeliverySlot.toViewModels(slots) })
 		} catch (error) {
 			handleErrors(res, error)
@@ -62,7 +62,7 @@ router.post(
 			const dates = validateDates(errors, req.body.dates)
 			const quantity = validateQuantity(errors, req.body.quantity)
 			if (!dates || !quantity || errors.length > 0) throw new FormErrors(errors)
-			const deliverySlot = await createDeliverySlot(shopResource?.id || "", dates, quantity)
+			const deliverySlot = await DeliverySlotService.createDeliverySlot(shopResource?.id || "", dates, quantity)
 			res.send(deliverySlot?.toViewModel())
 		} catch (error) {
 			handleErrors(res, error)
@@ -103,7 +103,7 @@ router.post(
 			if (!newDates || !quantity || errors.length > 0) throw new FormErrors(errors)
 			deliverySlot.addNewDates(newDates)
 			deliverySlot.quantity = quantity
-			await updateShopResource(deliverySlot)
+			await DeliverySlotService.updateShopResource(deliverySlot)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)
@@ -119,7 +119,7 @@ router.delete(
 			const { deliverySlot } = getLocals(res)
 			if (!deliverySlot) throw new UnexpectedError("deliverySlot cannot be undefined")
 			// TODO: prevent deletion of there are orders...
-			await deleteDeliverySlot(deliverySlot)
+			await DeliverySlotService.deleteDeliverySlot(deliverySlot)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)
