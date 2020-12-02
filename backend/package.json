@@ -7,12 +7,30 @@
 		"tsc": "tsc",
 		"start": "npm run tsc && node ./dist/backend/src/main.js",
 		"watch": "nodemon",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest",
+		"coverage": "jest --coverage",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
 	},
 	"author": "",
 	"license": "ISC",
+	"jest": {
+		"setupFiles": [
+			"./testEnvVars.js"
+		],
+		"transform": {
+			"^.+\\.tsx?$": "ts-jest"
+		},
+		"testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js",
+			"jsx",
+			"json",
+			"node"
+		]
+	},
 	"devDependencies": {
 		"@types/cookie-parser": "^1.4.2",
 		"@types/express": "^4.17.8",
@@ -44,6 +62,7 @@
 		"lodash": "^4.17.20",
 		"moment": "^2.29.1",
 		"morgan": "^1.10.0",
-		"pg": "^8.4.2"
+		"pg": "^8.4.2",
+		"ts-jest": "^26.4.4"
 	}
 }

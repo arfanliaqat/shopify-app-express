@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg"
+import { databaseName, isDev } from "./constants"
 
 let dbPool: Pool | null = null
 
@@ -7,7 +8,7 @@ export const getConnection = async (): Promise<Pool> => {
 		dbPool = new Pool({
 			host: process.env.DB_HOST || "localhost",
 			port: parseInt(process.env.DB_PORT || "5432"),
-			database: process.env.DB_DATABASE || "shopify_app",
+			database: databaseName,
 			user: process.env.DB_USER || "postgres",
 			password: process.env.DB_PASSWORD || "postgres",
 			max: 20,
@@ -26,29 +27,44 @@ export class WithTransaction {
 		return this.client
 	}
 
+	releaseClient(): void {
+		this.getClient().release()
+	}
+
 	async beginTransaction(): Promise<void> {
 		const connection = await getConnection()
 		this.client = await connection.connect()
-		try {
-			await this.client.query("BEGIN")
-		} finally {
-			this.client.release()
-		}
+		await this.client.query("BEGIN")
 	}
 
 	async rollbackTransaction(): Promise<void> {
 		const client = this.getClient()
-		try {
-			await client.query("ROLLBACK")
-		} finally {
-			client.release()
-		}
+		await client.query("ROLLBACK")
 	}
 
 	async commitTransaction(): Promise<void> {
 		const client = this.getClient()
+		await client.query("COMMIT")
+	}
+}
+
+export class DatabaseTestService {
+	static async clearDatabase() {
+		if (!isDev) throw "You can only clear the database in dev mode"
+		if (databaseName.indexOf("test") == -1) {
+			throw (
+				"Clearing the database should only be used when running the test... " +
+				"The database name needs to contains the word 'test'."
+			)
+		}
+
+		const client: PoolClient = await (await getConnection()).connect()
 		try {
-			await client.query("COMMIT")
+			await client.query("DELETE FROM delivery_slots")
+			await client.query("DELETE FROM product_orders")
+			await client.query("DELETE FROM shop_resources")
+			await client.query("DELETE FROM access_tokens")
+			await client.query("DELETE FROM shops")
 		} finally {
 			client.release()
 		}

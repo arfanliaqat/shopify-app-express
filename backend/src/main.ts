@@ -16,11 +16,9 @@ import deliverySlotsRouter from "./deliverySlots/deliverySlots.router"
 import widgetRouter from "./widget/widget.router"
 import hooksRouter from "./hooks/hooks.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
-import { appUrl } from "./util/constants"
+import { appUrl, isDev } from "./util/constants"
 
 const app: Application = express()
-
-const isDev = process.env.NODE_ENV != "production"
 
 let server: https.Server | http.Server
 if (isDev && appUrl.indexOf("ngrok") == -1) {

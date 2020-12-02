@@ -1,4 +1,4 @@
-import { Pool } from "pg"
+import { Pool, PoolClient } from "pg"
 import { Shop } from "../shop/shop.model"
 import { getConnection } from "../util/database"
 import { ShopResource, ShopResourceSchema } from "./shopResource.model"
@@ -41,22 +41,19 @@ export class ShopResourceService {
 		return result.rows[0]?.id
 	}
 
-	static async findByProductIds(productIds: number[]): Promise<ShopResource[]> {
+	static async findByProductIds(productIds: number[], client: PoolClient): Promise<ShopResource[]> {
 		if (productIds.length == 0) return []
-		const conn: Pool = await getConnection()
-		const result = await conn.query<ShopResourceSchema>(
+		const result = await client.query<ShopResourceSchema>(
 			`
 			SELECT id, shop_id, resource_type, resource_id, title
 			FROM shop_resources
 			WHERE resource_type = 'Product'
-			AND resource_id in (${productIds.join(",")})`,
-			[productIds]
+			AND resource_id in (${productIds.join(",")})`
 		)
 		return result.rows.map(ShopResource.createFromSchema)
 	}
 
-	static async findGroupedByProductIds(productIds: number[]): Promise<ShopResourceById> {
-		const shopResources = await this.findByProductIds(productIds)
+	static groupByResourceId(shopResources: ShopResource[]): ShopResourceById {
 		return shopResources.reduce((acc, sr) => {
 			acc[sr.resourceId] = sr
 			return acc

@@ -12,8 +12,8 @@ export class ProductOrderService {
 			SELECT id, shop_resource_id, order_id, delivery_date, quantity
 			FROM product_orders
 			WHERE shop_resource_id = $1
-			AND delivery_date`,
-			[shopResource.id]
+			AND delivery_date = $2`,
+			[shopResource.id, deliveryDate.toDate()]
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
 	}

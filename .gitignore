@@ -4,6 +4,7 @@
 /backend/dist
 /backend/certs
 /backend/.env
+/backend/coverage
 
 /frontend/node_modules
 /frontend/public/build

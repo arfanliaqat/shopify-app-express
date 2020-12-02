@@ -5,35 +5,46 @@ import { HooksService } from "./hooks.service"
 import { OrderEventData } from "./hooks.model"
 import moment from "moment"
 import { ProductOrderService } from "../productOrders/productOrders.service"
+import { DatabaseTestService } from "../util/database"
 
-test("Orders get properly ingested", async () => {
-	const deliveryDate = moment("01/12/2020", "DD/MM/YYYY")
+describe("HooksService", () => {
+	beforeEach(async () => {
+		await DatabaseTestService.clearDatabase()
+	})
 
-	const shop = await new ShopBuilder().buildAndSave()
-	const shopResource = await new ShopResourceBuilder().forShop(shop!).buildAndSave()
+	test("Orders get properly ingested", async () => {
+		const deliveryDate = moment("01/12/2020", "DD/MM/YYYY")
 
-	await new DeliverySlotBuilder()
-		.forShopResource(shopResource!)
-		.withDates([deliveryDate])
-		.withQuantity(5)
-		.buildAndSave()
+		const shop = await new ShopBuilder().buildAndSave()
 
-	const orderEventData: OrderEventData = {
-		id: 1234,
-		tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-		line_items: [
-			{
-				quantity: 1,
-				product_id: 4321
-			}
-		]
-	}
+		const shopResource = await new ShopResourceBuilder()
+			.forShop(shop!)
+			.withResourceId("Product", 4321)
+			.buildAndSave()
 
-	await HooksService.ingestOrderEvent(shop!, orderEventData)
+		await new DeliverySlotBuilder()
+			.forShopResource(shopResource!)
+			.withDates([deliveryDate])
+			.withQuantity(5)
+			.buildAndSave()
 
-	const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
-	expect(productOrders).toHaveLength(1)
+		const orderEventData: OrderEventData = {
+			id: 1234,
+			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 4321
+				}
+			]
+		}
 
-	const productOrder = productOrders[0]
-	expect(productOrder.quantity).toBe(1)
+		await HooksService.ingestOrderEvent(shop!, orderEventData)
+
+		const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+		expect(productOrders).toHaveLength(1)
+
+		const productOrder = productOrders[0]
+		expect(productOrder.quantity).toBe(1)
+	})
 })

@@ -4,6 +4,7 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
+import { tagDateFormat } from "../util/constants"
 
 function logPrefix(orderEvent: OrderEventData) {
 	return `[Order: ${orderEvent.id}]`
@@ -14,7 +15,7 @@ function getDeliveryDate(orderEvent: OrderEventData): Moment | undefined {
 	const matches = orderEvent.tags.match(/Delivery Date: ([^,$]+)/)
 	if (!matches || !matches.length) return
 	try {
-		return moment(matches[1])
+		return moment(matches[1], tagDateFormat)
 	} catch (error) {
 		console.error(`${logPrefix(orderEvent)} ${error} (date: ${matches})`)
 	}
@@ -29,11 +30,14 @@ export class HooksService {
 
 			const deliveryDate = getDeliveryDate(orderEvent)
 			if (!deliveryDate) {
-				return // if no delivery date can be extracted, no need to ingest
+				// if no delivery date can be extracted
+				await service.commitTransaction()
+				return
 			}
 
-			const productIds = new Set<number>(orderEvent.line_items.map((item) => item.product_id))
-			const eventShopResources = await ShopResourceService.findGroupedByProductIds(Array.from(productIds))
+			const productIds = Array.from(new Set<number>(orderEvent.line_items.map((item) => item.product_id)))
+			const eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
+			const eventShopResources = ShopResourceService.groupByResourceId(eventShopResourcesArray)
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 
@@ -57,10 +61,13 @@ export class HooksService {
 			Object.values(newProductOrdersById).map(async (productOrder) => {
 				await service.insert(productOrder)
 			})
+
+			await service.commitTransaction()
 		} catch (e) {
 			await service.rollbackTransaction()
 			throw e
+		} finally {
+			service.releaseClient()
 		}
-		await service.commitTransaction()
 	}
 }
