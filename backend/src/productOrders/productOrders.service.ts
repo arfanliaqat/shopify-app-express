@@ -17,6 +17,18 @@ export class ProductOrderService {
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
 	}
+
+	static async findByShopResource(shopResource: ShopResource) {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<ProductOrderSchema>(
+			`
+			SELECT id, shop_resource_id, order_id, delivery_date, quantity
+			FROM product_orders
+			WHERE shop_resource_id = $1`,
+			[shopResource.id]
+		)
+		return result.rows.map(ProductOrder.createFromSchema)
+	}
 }
 
 export class ProductOrderServiceWithTransaction extends WithTransaction {
