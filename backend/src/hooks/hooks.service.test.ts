@@ -83,7 +83,7 @@ describe("HooksService", () => {
 		}
 	})
 
-	test("When the event is of type cancellation it removes the product order", async () => {
+	test("When the event is of type cancellation it removes the product orders", async () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
 			expect(productOrders).toHaveLength(1)
@@ -102,7 +102,7 @@ describe("HooksService", () => {
 		}
 	})
 
-	test("When the event is of type deletion it removes the product order", async () => {
+	test("When the event is of type deletion it removes the product orders", async () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
 			expect(productOrders).toHaveLength(1)
@@ -111,6 +111,26 @@ describe("HooksService", () => {
 
 		await HooksService.ingestOrderEvent("deletion", shop!, {
 			id: 1234,
+			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
+			line_items: [{ quantity: 1, product_id: 4321 }]
+		})
+
+		{
+			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
+			expect(productOrders).toHaveLength(0)
+		}
+	})
+
+	test("When the event cancelled_at property is not null it removes the product orders", async () => {
+		{
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			expect(productOrders).toHaveLength(1)
+			expect(productOrders[0].quantity).toBe(1)
+		}
+
+		await HooksService.ingestOrderEvent("update", shop!, {
+			id: 1234,
+			cancelled_at: "2020-12-03T16:10:47-05:00",
 			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
 			line_items: [{ quantity: 1, product_id: 4321 }]
 		})

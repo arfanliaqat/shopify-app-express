@@ -32,7 +32,7 @@ export class HooksService {
 		try {
 			await service.deleteByOrderId(orderEvent.id)
 
-			if (eventType == "cancellation" || eventType == "deletion") {
+			if (eventType == "cancellation" || eventType == "deletion" || orderEvent.cancelled_at) {
 				await service.commitTransaction()
 				return
 			}
