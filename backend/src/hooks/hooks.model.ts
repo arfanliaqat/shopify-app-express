@@ -1,3 +1,5 @@
+export type OrderEventType = "creation" | "update" | "cancellation" | "deletion"
+
 export interface LineItem {
 	product_id: number
 	quantity: number

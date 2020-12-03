@@ -21,21 +21,21 @@ describe("HooksService", () => {
 		shop = await new ShopBuilder().buildAndSave()
 
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
-	})
 
-	test("Orders get properly ingested", async () => {
 		await new DeliverySlotBuilder()
 			.forShopResource(shopResource!)
 			.withDates([deliveryDate])
 			.withQuantity(5)
 			.buildAndSave()
 
-		await HooksService.ingestOrderEvent(shop!, {
+		await HooksService.ingestOrderEvent("creation", shop!, {
 			id: 1234,
 			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
 			line_items: [{ quantity: 1, product_id: 4321 }]
 		})
+	})
 
+	test("Orders get properly ingested", async () => {
 		const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
 		expect(productOrders).toHaveLength(1)
 
@@ -44,25 +44,13 @@ describe("HooksService", () => {
 	})
 
 	test("If the order changes with another product, it doesn't retain the previously ingested product order", async () => {
-		await new DeliverySlotBuilder()
-			.forShopResource(shopResource!)
-			.withDates([deliveryDate])
-			.withQuantity(5)
-			.buildAndSave()
-
-		await HooksService.ingestOrderEvent(shop!, {
-			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 4321 }] // Matches an existing product
-		})
-
 		{
 			// So it creates a product orders record for it
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
 			expect(productOrders).toHaveLength(1)
 		}
 
-		await HooksService.ingestOrderEvent(shop!, {
+		await HooksService.ingestOrderEvent("update", shop!, {
 			id: 1234,
 			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
 			line_items: [{ quantity: 1, product_id: 6666 }] // This product doesn't exist
@@ -76,25 +64,13 @@ describe("HooksService", () => {
 	})
 
 	test("If the quantity of a product changes in an order, the product order quantity for that date gets updated", async () => {
-		await new DeliverySlotBuilder()
-			.forShopResource(shopResource!)
-			.withDates([deliveryDate])
-			.withQuantity(5)
-			.buildAndSave()
-
-		await HooksService.ingestOrderEvent(shop!, {
-			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 4321 }]
-		})
-
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent(shop!, {
+		await HooksService.ingestOrderEvent("update", shop!, {
 			id: 1234,
 			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
 			line_items: [{ quantity: 3, product_id: 4321 }]
@@ -104,6 +80,44 @@ describe("HooksService", () => {
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(3)
+		}
+	})
+
+	test("When the event is of type cancellation it removes the product order", async () => {
+		{
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			expect(productOrders).toHaveLength(1)
+			expect(productOrders[0].quantity).toBe(1)
+		}
+
+		await HooksService.ingestOrderEvent("cancellation", shop!, {
+			id: 1234,
+			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
+			line_items: [{ quantity: 1, product_id: 4321 }]
+		})
+
+		{
+			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
+			expect(productOrders).toHaveLength(0)
+		}
+	})
+
+	test("When the event is of type deletion it removes the product order", async () => {
+		{
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			expect(productOrders).toHaveLength(1)
+			expect(productOrders[0].quantity).toBe(1)
+		}
+
+		await HooksService.ingestOrderEvent("deletion", shop!, {
+			id: 1234,
+			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
+			line_items: [{ quantity: 1, product_id: 4321 }]
+		})
+
+		{
+			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
+			expect(productOrders).toHaveLength(0)
 		}
 	})
 })

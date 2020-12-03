@@ -1,4 +1,4 @@
-import { OrderEventData } from "./hooks.model"
+import { OrderEventData, OrderEventType } from "./hooks.model"
 import { Shop } from "../shop/shop.model"
 import { ProductOrderServiceWithTransaction } from "../productOrders/productOrders.service"
 import { ProductOrder } from "../productOrders/productOrders.model"
@@ -22,11 +22,20 @@ function getDeliveryDate(orderEvent: OrderEventData): Moment | undefined {
 }
 
 export class HooksService {
-	static async ingestOrderEvent(connectedShop: Shop, orderEvent: OrderEventData): Promise<void> {
+	static async ingestOrderEvent(
+		eventType: OrderEventType,
+		connectedShop: Shop,
+		orderEvent: OrderEventData
+	): Promise<void> {
 		const service = new ProductOrderServiceWithTransaction()
 		await service.beginTransaction()
 		try {
 			await service.deleteByOrderId(orderEvent.id)
+
+			if (eventType == "cancellation" || eventType == "deletion") {
+				await service.commitTransaction()
+				return
+			}
 
 			const deliveryDate = getDeliveryDate(orderEvent)
 			if (!deliveryDate) {
