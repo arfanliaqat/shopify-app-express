@@ -4,11 +4,10 @@ import { ShopResource } from "../shopResource/shopResource.model"
 import { DatabaseTestService } from "../util/database"
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { HooksService } from "../hooks/hooks.service"
 import { ProductOrderService } from "./productOrders.service"
 import { ProductOrderBuilder } from "./productOrder.builder"
 
-describe("HooksService", () => {
+describe("ProductOrderService", () => {
 	let refDate: Moment
 	let shop: Shop | undefined
 	let shopResource: ShopResource | undefined

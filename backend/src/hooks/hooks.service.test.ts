@@ -15,18 +15,9 @@ describe("HooksService", () => {
 
 	beforeEach(async () => {
 		await DatabaseTestService.clearDatabase()
-
 		deliveryDate = moment("01/12/2020", "DD/MM/YYYY")
-
 		shop = await new ShopBuilder().buildAndSave()
-
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
-
-		await new DeliverySlotBuilder()
-			.forShopResource(shopResource!)
-			.withDates([deliveryDate])
-			.withQuantity(5)
-			.buildAndSave()
 
 		await HooksService.ingestOrderEvent("creation", shop!, {
 			id: 1234,
