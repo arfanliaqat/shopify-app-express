@@ -28,6 +28,7 @@ export class HooksService {
 		orderEvent: OrderEventData
 	): Promise<void> {
 		const service = new ProductOrderServiceWithTransaction()
+		await service.initClient()
 		await service.beginTransaction()
 		try {
 			await service.deleteByOrderId(orderEvent.id)
@@ -56,6 +57,7 @@ export class HooksService {
 					const newProductOrder = newProductOrdersById[shopResource.id]
 					if (!newProductOrder) {
 						newProductOrdersById[shopResource.id] = new ProductOrder(
+							undefined,
 							shopResource.id,
 							orderEvent.id,
 							deliveryDate,

@@ -36,7 +36,11 @@ describe("HooksService", () => {
 	})
 
 	test("Orders get properly ingested", async () => {
-		const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+		const productOrders = await ProductOrderService.findByShopResourceAndDate(
+			shopResource!,
+			deliveryDate,
+			deliveryDate
+		)
 		expect(productOrders).toHaveLength(1)
 
 		const productOrder = productOrders[0]
@@ -46,7 +50,11 @@ describe("HooksService", () => {
 	test("If the order changes with another product, it doesn't retain the previously ingested product order", async () => {
 		{
 			// So it creates a product orders record for it
-			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!,
+				deliveryDate,
+				deliveryDate
+			)
 			expect(productOrders).toHaveLength(1)
 		}
 
@@ -65,7 +73,11 @@ describe("HooksService", () => {
 
 	test("If the quantity of a product changes in an order, the product order quantity for that date gets updated", async () => {
 		{
-			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!,
+				deliveryDate,
+				deliveryDate
+			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
 		}
@@ -85,7 +97,11 @@ describe("HooksService", () => {
 
 	test("When the event is of type cancellation it removes the product orders", async () => {
 		{
-			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!,
+				deliveryDate,
+				deliveryDate
+			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
 		}
@@ -104,7 +120,11 @@ describe("HooksService", () => {
 
 	test("When the event is of type deletion it removes the product orders", async () => {
 		{
-			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!,
+				deliveryDate,
+				deliveryDate
+			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
 		}
@@ -123,7 +143,11 @@ describe("HooksService", () => {
 
 	test("When the event cancelled_at property is not null it removes the product orders", async () => {
 		{
-			const productOrders = await ProductOrderService.findByShopResourceAndDate(shopResource!, deliveryDate)
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!,
+				deliveryDate,
+				deliveryDate
+			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
 		}

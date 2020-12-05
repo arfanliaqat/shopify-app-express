@@ -1,35 +1,51 @@
 import moment, { Moment } from "moment"
+import { DATE_FORMAT } from "../util/constants"
 
 export interface ProductOrderSchema {
-	id: number
+	id: string
 	shop_resource_id: string
 	order_id: number
 	delivery_date: Date
 	quantity: number
-	update_date: Date
 	created_date: Date
+}
+
+export interface ProductOrderViewModel {
+	id: string
+	shopResourceId: string
+	orderId: number
+	deliveryDate: string
+	quantity: number
 }
 
 export class ProductOrder {
 	constructor(
+		public id: string | undefined,
 		public shopResourceId: string,
 		public orderId: number,
 		public deliveryDate: Moment,
 		public quantity: number,
-		public updateDate?: Moment,
-		public createdDate?: Moment,
-		public id?: number
+		public createdDate?: Moment
 	) {}
 
 	static createFromSchema(schema: ProductOrderSchema): ProductOrder {
 		return new ProductOrder(
+			schema.id,
 			schema.shop_resource_id,
 			schema.order_id,
 			moment(schema.delivery_date),
 			schema.quantity,
-			moment(schema.update_date),
-			moment(schema.created_date),
-			schema.id
+			moment(schema.created_date)
 		)
+	}
+
+	static toViewModel(productOrder: ProductOrder): ProductOrderViewModel {
+		return {
+			id: productOrder.id!,
+			shopResourceId: productOrder.shopResourceId,
+			orderId: productOrder.orderId,
+			deliveryDate: productOrder.deliveryDate.format(DATE_FORMAT),
+			quantity: productOrder.quantity
+		}
 	}
 }

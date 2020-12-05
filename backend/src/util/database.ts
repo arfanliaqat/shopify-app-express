@@ -27,14 +27,18 @@ export class WithTransaction {
 		return this.client
 	}
 
+	async initClient(): Promise<void> {
+		const connection = await getConnection()
+		this.client = await connection.connect()
+	}
+
 	releaseClient(): void {
 		this.getClient().release()
 	}
 
 	async beginTransaction(): Promise<void> {
-		const connection = await getConnection()
-		this.client = await connection.connect()
-		await this.client.query("BEGIN")
+		const client = this.getClient()
+		await client.query("BEGIN")
 	}
 
 	async rollbackTransaction(): Promise<void> {

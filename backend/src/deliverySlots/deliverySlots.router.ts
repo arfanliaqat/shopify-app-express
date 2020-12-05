@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express"
 import { loadConnectedShop } from "../shop/shop.middleware"
-import { HandledError, handleErrors, FormError, FormErrors, UnexpectedError } from "../util/error"
+import { HandledError, handleErrors, FormError, FormErrors, UnexpectedError, Forbidden } from "../util/error"
 import { getLocals } from "../util/locals"
 import moment, { Moment } from "moment"
 import { DeliverySlotService } from "./deliverySlots.service"
@@ -9,6 +9,8 @@ import { loadShopResource } from "../shopResource/shopResource.middleware"
 import { DeliverySlot } from "./deliverySlots.model"
 import { loadDeliverySlot } from "./deliverySlots.middleware"
 import { ShopResourceService } from "../shopResource/shopResource.service"
+import { ProductOrderService } from "../productOrders/productOrders.service"
+import { ProductOrder } from "../productOrders/productOrders.model"
 
 const router = Router()
 
@@ -75,7 +77,10 @@ router.get(
 	[loadConnectedShop, loadDeliverySlot],
 	async (req: Request, res: Response) => {
 		try {
-			const { deliverySlot } = getLocals(res)
+			const { connectedShop, deliverySlot } = getLocals(res)
+			if (!connectedShop) {
+				throw new UnexpectedError("connectedShop should be loaded")
+			}
 			if (!deliverySlot) {
 				throw new UnexpectedError("deliverySlot should be loaded")
 			}
@@ -83,7 +88,19 @@ router.get(
 			if (!shopResource) {
 				throw new UnexpectedError("shopResource not found")
 			}
-			res.send({ shopResource: shopResource.toViewModel(), deliverySlot: deliverySlot.toViewModel() })
+			if (!shopResource.belongsTo(connectedShop)) {
+				throw new Forbidden("Shop resource doesn't not belong to the shop")
+			}
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource,
+				deliverySlot.startDate,
+				deliverySlot.endDate
+			)
+			res.send({
+				shopResource: shopResource.toViewModel(),
+				deliverySlot: deliverySlot.toViewModel(),
+				productOrders: productOrders.map(ProductOrder.toViewModel)
+			})
 		} catch (error) {
 			handleErrors(res, error)
 		}
