@@ -1,7 +1,7 @@
 import moment, { Moment } from "moment"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { DatabaseTestService } from "../util/database"
+import { DatabaseTestService, getConnection } from "../util/database"
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
 import { DeliverySlotBuilder } from "./deliverySlots.builder"
@@ -34,5 +34,9 @@ describe("DeliverySlotService", () => {
 		expect(futureAvailableDates).toHaveLength(2)
 		expect(futureAvailableDates[0].isSame(deliveryDate1)).toBeTruthy()
 		expect(futureAvailableDates[1].isSame(deliveryDate2)).toBeTruthy()
+	})
+
+	afterAll(async () => {
+		await (await getConnection()).end()
 	})
 })

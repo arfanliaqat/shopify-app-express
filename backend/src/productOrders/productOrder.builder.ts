@@ -1,7 +1,7 @@
 import { ProductOrder } from "./productOrders.model"
 import moment, { Moment } from "moment"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { ProductOrderServiceWithTransaction } from "./productOrders.service"
+import { ProductOrderService, ProductOrderServiceWithTransaction } from "./productOrders.service"
 
 export class ProductOrderBuilder {
 	private shopResource?: ShopResource
@@ -44,14 +44,8 @@ export class ProductOrderBuilder {
 			this.quantity = 1
 		}
 
-		const service = new ProductOrderServiceWithTransaction()
-		try {
-			await service.initClient()
-			return await service.insert(
-				new ProductOrder(undefined, this.shopResource.id, this.orderId, this.deliveryDate, this.quantity)
-			)
-		} finally {
-			service.releaseClient()
-		}
+		return await ProductOrderService.insert(
+			new ProductOrder(undefined, this.shopResource.id, this.orderId, this.deliveryDate, this.quantity)
+		)
 	}
 }

@@ -1,7 +1,7 @@
 import moment, { Moment } from "moment"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { DatabaseTestService } from "../util/database"
+import { DatabaseTestService, getConnection } from "../util/database"
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
 import { ProductOrderService } from "./productOrders.service"
@@ -74,5 +74,9 @@ describe("ProductOrderService", () => {
 		)
 		expect(productOrders["2020-12-01"]).toBe(1)
 		expect(productOrders["2020-12-02"]).toBe(5)
+	})
+
+	afterAll(async () => {
+		await (await getConnection()).end()
 	})
 })

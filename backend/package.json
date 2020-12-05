@@ -7,8 +7,8 @@
 		"tsc": "tsc",
 		"start": "npm run tsc && node ./dist/backend/src/main.js",
 		"watch": "nodemon",
-		"test": "jest",
-		"coverage": "jest --coverage",
+		"test": "jest --runInBand",
+		"coverage": "jest --coverage --runInBand",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
 	},

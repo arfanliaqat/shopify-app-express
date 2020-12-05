@@ -59,6 +59,16 @@ export class ProductOrderService {
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
 	}
+
+	static async insert(productOrder: ProductOrder): Promise<ProductOrder | undefined> {
+		const serviceWithTransaction = new ProductOrderServiceWithTransaction()
+		try {
+			await serviceWithTransaction.initClient()
+			return await serviceWithTransaction.insert(productOrder)
+		} finally {
+			serviceWithTransaction.releaseClient()
+		}
+	}
 }
 
 export class ProductOrderServiceWithTransaction extends WithTransaction {

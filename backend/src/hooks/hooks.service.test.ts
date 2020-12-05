@@ -1,10 +1,9 @@
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { DeliverySlotBuilder } from "../deliverySlots/deliverySlots.builder"
 import { HooksService } from "./hooks.service"
 import moment, { Moment } from "moment"
 import { ProductOrderService } from "../productOrders/productOrders.service"
-import { DatabaseTestService } from "../util/database"
+import { DatabaseTestService, getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
 
@@ -154,5 +153,9 @@ describe("HooksService", () => {
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
 			expect(productOrders).toHaveLength(0)
 		}
+	})
+
+	afterAll(async () => {
+		await (await getConnection()).end()
 	})
 })
