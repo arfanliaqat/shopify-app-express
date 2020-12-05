@@ -150,11 +150,13 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 							<ResourceList
 								items={deliveryDates}
 								renderItem={(deliveryDate) => (
-									<DeliveryDateItem
-										deliveryDate={deliveryDate}
-										orders={getOrdersForDate(deliveryDate)}
-										isNew={isNewDate(deliveryDate)}
-									/>
+									<ResourceList.Item id="product" onClick={() => {}}>
+										<DeliveryDateItem
+											deliveryDate={deliveryDate}
+											orders={getOrdersForDate(deliveryDate)}
+											isNew={isNewDate(deliveryDate)}
+										/>
+									</ResourceList.Item>
 								)}
 							/>
 						</Card>
