@@ -91,7 +91,7 @@ router.get(
 			if (!shopResource.belongsTo(connectedShop)) {
 				throw new Forbidden("Shop resource doesn't not belong to the shop")
 			}
-			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+			const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(
 				shopResource,
 				deliverySlot.startDate,
 				deliverySlot.endDate
@@ -99,7 +99,7 @@ router.get(
 			res.send({
 				shopResource: shopResource.toViewModel(),
 				deliverySlot: deliverySlot.toViewModel(),
-				productOrders: productOrders.map(ProductOrder.toViewModel)
+				ordersPerDate
 			})
 		} catch (error) {
 			handleErrors(res, error)

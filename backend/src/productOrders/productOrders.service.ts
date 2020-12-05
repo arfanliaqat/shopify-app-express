@@ -1,9 +1,10 @@
-import { ProductOrder, ProductOrderSchema } from "./productOrders.model"
+import { OrdersPerDate, ProductOrder, ProductOrderSchema } from "./productOrders.model"
 import { getConnection, WithTransaction } from "../util/database"
-import { ShopResource, ShopResourceSchema } from "../shopResource/shopResource.model"
+import { ShopResource } from "../shopResource/shopResource.model"
 import { Moment } from "moment"
 import { Pool } from "pg"
 import { UnexpectedError } from "../util/error"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 export class ProductOrderService {
 	static async findByShopResourceAndDate(
@@ -24,6 +25,27 @@ export class ProductOrderService {
 			[shopResource.id, fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")]
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
+	}
+
+	static sumPerDate(productOrders: ProductOrder[]): OrdersPerDate {
+		const sumPerDate = {} as OrdersPerDate
+		productOrders.forEach((order) => {
+			const strDate = order.deliveryDate.format(SYSTEM_DATE_FORMAT)
+			if (!sumPerDate[strDate]) {
+				sumPerDate[strDate] = 0
+			}
+			sumPerDate[strDate] += order.quantity
+		})
+		return sumPerDate
+	}
+
+	static async findOrdersSummedPerDate(
+		shopResource: ShopResource,
+		fromDate: Moment,
+		toDate: Moment
+	): Promise<OrdersPerDate> {
+		const productOrders = await this.findByShopResourceAndDate(shopResource, fromDate, toDate)
+		return this.sumPerDate(productOrders)
 	}
 
 	static async findByShopResource(shopResource: ShopResource) {

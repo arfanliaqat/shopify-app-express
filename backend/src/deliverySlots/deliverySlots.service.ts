@@ -3,7 +3,7 @@ import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { DeliverySlot, DeliverySlotSchema } from "./deliverySlots.model"
 import { UnexpectedError } from "../util/error"
-import { DATE_FORMAT } from "../util/constants"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 export class DeliverySlotService {
 	static async findDeliverySlots(shopResourceId: string, mFrom: Moment, mTo: Moment): Promise<DeliverySlot[]> {
@@ -15,7 +15,7 @@ export class DeliverySlotService {
 			FROM delivery_slots
 			WHERE shop_resource_id = $1
 			AND (start_date between $2 and $3 OR end_date between $2 and $3)`,
-			[shopResourceId, mFrom.format(DATE_FORMAT), mTo.format(DATE_FORMAT)]
+			[shopResourceId, mFrom.format(SYSTEM_DATE_FORMAT), mTo.format(SYSTEM_DATE_FORMAT)]
 		)
 		return DeliverySlot.createFromSchemas(result.rows)
 	}
@@ -60,8 +60,8 @@ export class DeliverySlotService {
 			[
 				shopResourceId,
 				quantity,
-				dates[0].format(DATE_FORMAT),
-				dates[dates.length - 1].format(DATE_FORMAT),
+				dates[0].format(SYSTEM_DATE_FORMAT),
+				dates[dates.length - 1].format(SYSTEM_DATE_FORMAT),
 				JSON.stringify(dates)
 			]
 		)
@@ -79,9 +79,9 @@ export class DeliverySlotService {
 			 WHERE id = $5`,
 			[
 				deliverySlot.quantity,
-				deliverySlot.getFirstDate()?.format(DATE_FORMAT),
-				deliverySlot.getLastDate()?.format(DATE_FORMAT),
-				JSON.stringify(deliverySlot.dates.map((d) => d.format(DATE_FORMAT))),
+				deliverySlot.getFirstDate()?.format(SYSTEM_DATE_FORMAT),
+				deliverySlot.getLastDate()?.format(SYSTEM_DATE_FORMAT),
+				JSON.stringify(deliverySlot.dates.map((d) => d.format(SYSTEM_DATE_FORMAT))),
 				deliverySlot.id
 			]
 		)

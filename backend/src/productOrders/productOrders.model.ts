@@ -1,5 +1,5 @@
 import moment, { Moment } from "moment"
-import { DATE_FORMAT } from "../util/constants"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 export interface ProductOrderSchema {
 	id: string
@@ -17,6 +17,8 @@ export interface ProductOrderViewModel {
 	deliveryDate: string
 	quantity: number
 }
+
+export type OrdersPerDate = { [strDate: string]: number }
 
 export class ProductOrder {
 	constructor(
@@ -44,7 +46,7 @@ export class ProductOrder {
 			id: productOrder.id!,
 			shopResourceId: productOrder.shopResourceId,
 			orderId: productOrder.orderId,
-			deliveryDate: productOrder.deliveryDate.format(DATE_FORMAT),
+			deliveryDate: productOrder.deliveryDate.format(SYSTEM_DATE_FORMAT),
 			quantity: productOrder.quantity
 		}
 	}

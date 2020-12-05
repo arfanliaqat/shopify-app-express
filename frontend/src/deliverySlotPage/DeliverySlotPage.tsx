@@ -1,15 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { RouteChildrenProps } from "react-router"
-import {
-	Page,
-	ResourceList,
-	Card,
-	Layout,
-	Button,
-	TextField,
-	PageActions,
-	isNewDesignLanguageColor
-} from "@shopify/polaris"
+import { Page, ResourceList, Card, Layout, Button, TextField, PageActions } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import DeliverySlot from "../models/DeliverySlot"
 import moment, { Moment } from "moment"
@@ -17,6 +8,8 @@ import ShopResource from "../models/ShopResource"
 import _ from "lodash"
 import { Toast } from "@shopify/app-bridge-react"
 import DeliveryDatePickerModal from "./DeliveryDatePickerModal"
+import DeliveryDateItem from "./DeliveryDateItem"
+import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 
 interface UrlParams {
 	deliverySlotId: string
@@ -122,6 +115,12 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 		return newDates.find((nd) => nd.isSame(deliveryDate, "day")) != undefined
 	}
 
+	const getOrdersForDate = (deliveryDate: Moment): number => {
+		if (!deliverySlotPageData) return 0
+		const strDate = deliveryDate.format(SYSTEM_DATE_FORMAT)
+		return deliverySlotPageData.ordersPerDate[strDate] || 0
+	}
+
 	if (isLoading || !deliverySlotPageData) {
 		return <div />
 	}
@@ -151,12 +150,11 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 							<ResourceList
 								items={deliveryDates}
 								renderItem={(deliveryDate) => (
-									<ResourceList.Item id="product" onClick={() => {}}>
-										<div className="deliveryDateItem">
-											<div className="date">{moment(deliveryDate).format("ddd D MMM")}</div>
-											{isNewDate(deliveryDate) && <div className="newDate">New</div>}
-										</div>
-									</ResourceList.Item>
+									<DeliveryDateItem
+										deliveryDate={deliveryDate}
+										orders={getOrdersForDate(deliveryDate)}
+										isNew={isNewDate(deliveryDate)}
+									/>
 								)}
 							/>
 						</Card>

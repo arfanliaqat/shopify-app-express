@@ -1,5 +1,5 @@
 export const isDev = process.env.NODE_ENV != "production"
-export const DATE_FORMAT = "YYYY-MM-DD"
+export const SYSTEM_DATE_FORMAT = "YYYY-MM-DD"
 export const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY || ""
 export const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY || ""
 export const scopes = "write_products,read_orders"
