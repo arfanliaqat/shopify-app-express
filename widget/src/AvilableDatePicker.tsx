@@ -1,11 +1,13 @@
-import moment, { Moment } from "moment"
+import moment from "moment"
 import { h } from "preact"
-import { useEffect, useMemo, useState } from "preact/hooks"
+import { useEffect, useState } from "preact/hooks"
 import { SHOPIFY_APP_URL } from "./constants"
+import { AvailableDate } from "./models/AvailableDate"
+import { SYSTEM_DATE_FORMAT } from "../../backend/src/util/constants"
 
 interface ProductAvailabilityData {
 	config: any
-	availableDates: string[]
+	availableDates: AvailableDate[]
 }
 
 function getProductId() {
@@ -40,16 +42,17 @@ export default function AvailableDatePicker() {
 		fetchData()
 	}, [])
 
-	const availableDates: Moment[] = useMemo(() => {
-		if (!productAvailabilityData) return []
-		return productAvailabilityData.availableDates.map((srtDate) => moment(srtDate, "YYYY-MM-DD"))
-	}, [productAvailabilityData])
+	const availableDates = productAvailabilityData?.availableDates || []
 
 	return (
 		<select name="deliveryDate" id="deliveryDate10a">
-			{availableDates.map((date) => (
-				<option value={date.format("YYYY-MM-DD")}>{date.format("dddd D MMMM")}</option>
-			))}
+			{availableDates.map((availableDate) => {
+				const momentDate = moment(availableDate.date, SYSTEM_DATE_FORMAT)
+				return <option value={availableDate.date} disabled={availableDate.isSoldOut}>
+					{momentDate.format("dddd D MMMM")}
+					{availableDate.isSoldOut ? " (sold out)" : ""}
+				</option>
+			})}
 		</select>
 	)
 }

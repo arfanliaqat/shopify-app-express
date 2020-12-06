@@ -1,6 +1,8 @@
 import moment, { Moment } from "moment"
 import DeliverySlotViewModel from "../../../frontend/src/models/DeliverySlot"
 import { Shop } from "../shop/shop.model"
+import { AvailableDate as AvailableDateViewModel } from "../../../widget/src/models/AvailableDate"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 export interface DeliverySlotSchema {
 	id: string
@@ -80,8 +82,13 @@ export class DeliverySlot {
 	}
 }
 
-export interface AvailableDate {
-	deliverySlotId: string
-	date: Moment
-	isSoldOut: boolean
+export class AvailableDate {
+	constructor(public deliverySlotId: string, public date: Moment, public isSoldOut: boolean) {}
+
+	static toViewModel(availableDate: AvailableDate): AvailableDateViewModel {
+		return {
+			date: availableDate.date.format(SYSTEM_DATE_FORMAT),
+			isSoldOut: availableDate.isSoldOut
+		}
+	}
 }

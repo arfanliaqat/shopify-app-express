@@ -36,11 +36,7 @@ export class DeliverySlotService {
 		const availableDates: AvailableDate[] = []
 		slots.forEach((slot) => {
 			slot.dates.forEach((date) => {
-				availableDates.push({
-					deliverySlotId: slot.id!,
-					date,
-					isSoldOut: false
-				})
+				availableDates.push(new AvailableDate(slot.id!, date, false))
 			})
 		})
 		if (!availableDates.length) {

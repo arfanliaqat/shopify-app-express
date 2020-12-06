@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express"
 import { DeliverySlotService } from "../deliverySlots/deliverySlots.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { handleErrors } from "../util/error"
+import { AvailableDate } from "../deliverySlots/deliverySlots.model"
 
 const router = Router()
 
@@ -14,7 +15,7 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			return
 		}
 		const availableDates = await DeliverySlotService.findFutureAvailableDates(shopResourceId)
-		res.send({ availableDates: availableDates.map((availableDate) => availableDate.date.format("YYYY-MM-DD")) })
+		res.send({ availableDates: availableDates.map(AvailableDate.toViewModel) })
 	} catch (error) {
 		handleErrors(res, error)
 	}

@@ -18,9 +18,10 @@ export class ShopResourceService {
 	static async findShopResourceById(shopResourceId: string): Promise<ShopResource | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
-			`SELECT id, shop_id, resource_type, resource_id, title
-                 FROM shop_resources
-                 WHERE id = $1`,
+			`
+			SELECT id, shop_id, resource_type, resource_id, title
+			FROM shop_resources
+			WHERE id = $1`,
 			[shopResourceId]
 		)
 		const row = result.rows[0]
@@ -35,7 +36,7 @@ export class ShopResourceService {
 			SELECT id
 			FROM shop_resources
 			WHERE resource_type = 'Product'
-			AND resource_id in $1`,
+			AND resource_id = $1`,
 			[productId]
 		)
 		return result.rows[0]?.id
