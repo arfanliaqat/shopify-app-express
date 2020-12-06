@@ -8,7 +8,7 @@ import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 export class ProductOrderService {
 	static async findByShopResourceAndDate(
-		shopResource: ShopResource,
+		shopResourceId: string,
 		fromDate: Moment,
 		toDate: Moment
 	): Promise<ProductOrder[]> {
@@ -22,7 +22,7 @@ export class ProductOrderService {
 			FROM product_orders
 			WHERE shop_resource_id = $1
 			AND delivery_date between $2 and $3`,
-			[shopResource.id, fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")]
+			[shopResourceId, fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")]
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
 	}
@@ -40,11 +40,11 @@ export class ProductOrderService {
 	}
 
 	static async findOrdersSummedPerDate(
-		shopResource: ShopResource,
+		shopResourceId: string,
 		fromDate: Moment,
 		toDate: Moment
 	): Promise<OrdersPerDate> {
-		const productOrders = await this.findByShopResourceAndDate(shopResource, fromDate, toDate)
+		const productOrders = await this.findByShopResourceAndDate(shopResourceId, fromDate, toDate)
 		return this.sumPerDate(productOrders)
 	}
 

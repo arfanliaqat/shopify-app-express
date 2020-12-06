@@ -37,7 +37,7 @@ describe("ProductOrderService", () => {
 			.buildAndSave()
 
 		const productOrders = await ProductOrderService.findByShopResourceAndDate(
-			shopResource!,
+			shopResource!.id!,
 			deliveryDate1!,
 			deliveryDate2!
 		)
@@ -68,7 +68,7 @@ describe("ProductOrderService", () => {
 			.buildAndSave()
 
 		const productOrders = await ProductOrderService.findOrdersSummedPerDate(
-			shopResource!,
+			shopResource!.id!,
 			deliveryDate1!,
 			deliveryDate2!
 		)

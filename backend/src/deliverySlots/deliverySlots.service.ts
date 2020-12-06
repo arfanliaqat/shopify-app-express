@@ -1,9 +1,10 @@
 import moment, { Moment } from "moment"
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
-import { DeliverySlot, DeliverySlotSchema } from "./deliverySlots.model"
+import { AvailableDate, DeliverySlot, DeliverySlotSchema } from "./deliverySlots.model"
 import { UnexpectedError } from "../util/error"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
+import { ProductOrderService } from "../productOrders/productOrders.service"
 
 export class DeliverySlotService {
 	static async findDeliverySlots(shopResourceId: string, mFrom: Moment, mTo: Moment): Promise<DeliverySlot[]> {
@@ -20,15 +21,58 @@ export class DeliverySlotService {
 		return DeliverySlot.createFromSchemas(result.rows)
 	}
 
-	static async findFutureAvailableDates(shopResourceId: string): Promise<Moment[]> {
+	static async findFutureAvailableDates(shopResourceId: string): Promise<AvailableDate[]> {
 		const from = moment().startOf("day")
 		const to = moment().startOf("day").add(3, "months")
+
+		// Fetched future delivery slots for this shop resource
 		const slots = await this.findDeliverySlots(shopResourceId, from, to)
-		return slots
-			.map((slot) => slot.dates)
-			.flat()
-			.filter((date) => date.isSameOrAfter(from))
-			.sort((d1, d2) => d1.valueOf() - d2.valueOf())
+		const slotsById = slots.reduce<{ [id: string]: DeliverySlot }>((acc, slot) => {
+			acc[slot.id!] = slot
+			return acc
+		}, {})
+
+		// Get all the available dates in ascending ordered
+		const availableDates: AvailableDate[] = []
+		slots.forEach((slot) => {
+			slot.dates.forEach((date) => {
+				availableDates.push({
+					deliverySlotId: slot.id!,
+					date,
+					isSoldOut: false
+				})
+			})
+		})
+		if (!availableDates.length) {
+			return []
+		}
+		availableDates.sort((ad1, ad2) => ad1.date.valueOf() - ad2.date.valueOf())
+
+		// Fetched number orders per date for this shop resource
+		const firstDate = availableDates[0].date
+		const lastDate = availableDates[availableDates.length - 1].date
+		const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(shopResourceId, firstDate, lastDate)
+
+		// Calculate the number of orders per delivery slot
+		const ordersPerDeliverySlotId = {} as { [slotId: string]: number }
+		availableDates.forEach((availableDate) => {
+			const numberOfOrders = ordersPerDate[availableDate.date.format(SYSTEM_DATE_FORMAT)]
+			if (!numberOfOrders) return
+			if (!ordersPerDeliverySlotId[availableDate.deliverySlotId]) {
+				ordersPerDeliverySlotId[availableDate.deliverySlotId] = 0
+			}
+			ordersPerDeliverySlotId[availableDate.deliverySlotId] += numberOfOrders
+		})
+
+		// Set isSoldOut flag on the available dates
+		availableDates.forEach((availableDate) => {
+			const slot = slotsById[availableDate.deliverySlotId]
+			if (!slot) return
+			const numberOfOrders = ordersPerDeliverySlotId[availableDate.deliverySlotId] || 0
+			availableDate.isSoldOut = numberOfOrders >= slot.quantity
+		})
+
+		return availableDates
 	}
 
 	static async findDeliverySlotById(deliverySlotId: string): Promise<DeliverySlot | undefined> {

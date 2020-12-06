@@ -27,7 +27,7 @@ describe("HooksService", () => {
 
 	test("Orders get properly ingested", async () => {
 		const productOrders = await ProductOrderService.findByShopResourceAndDate(
-			shopResource!,
+			shopResource!.id!,
 			deliveryDate,
 			deliveryDate
 		)
@@ -41,7 +41,7 @@ describe("HooksService", () => {
 		{
 			// So it creates a product orders record for it
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
-				shopResource!,
+				shopResource!.id!,
 				deliveryDate,
 				deliveryDate
 			)
@@ -64,7 +64,7 @@ describe("HooksService", () => {
 	test("If the quantity of a product changes in an order, the product order quantity for that date gets updated", async () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
-				shopResource!,
+				shopResource!.id!,
 				deliveryDate,
 				deliveryDate
 			)
@@ -88,7 +88,7 @@ describe("HooksService", () => {
 	test("When the event is of type cancellation it removes the product orders", async () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
-				shopResource!,
+				shopResource!.id!,
 				deliveryDate,
 				deliveryDate
 			)
@@ -111,7 +111,7 @@ describe("HooksService", () => {
 	test("When the event is of type deletion it removes the product orders", async () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
-				shopResource!,
+				shopResource!.id!,
 				deliveryDate,
 				deliveryDate
 			)
@@ -134,7 +134,7 @@ describe("HooksService", () => {
 	test("When the event cancelled_at property is not null it removes the product orders", async () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
-				shopResource!,
+				shopResource!.id!,
 				deliveryDate,
 				deliveryDate
 			)

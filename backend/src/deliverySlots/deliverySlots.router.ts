@@ -85,14 +85,14 @@ router.get(
 				throw new UnexpectedError("deliverySlot should be loaded")
 			}
 			const shopResource = await ShopResourceService.findShopResourceById(deliverySlot.shopResourceId)
-			if (!shopResource) {
+			if (!shopResource || !shopResource.id) {
 				throw new UnexpectedError("shopResource not found")
 			}
 			if (!shopResource.belongsTo(connectedShop)) {
 				throw new Forbidden("Shop resource doesn't not belong to the shop")
 			}
 			const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(
-				shopResource,
+				shopResource.id,
 				deliverySlot.startDate,
 				deliverySlot.endDate
 			)

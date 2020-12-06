@@ -79,3 +79,9 @@ export class DeliverySlot {
 		return !!this.shopId && !!shop?.id && this.shopId == shop.id
 	}
 }
+
+export interface AvailableDate {
+	deliverySlotId: string
+	date: Moment
+	isSoldOut: boolean
+}

@@ -14,7 +14,7 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			return
 		}
 		const availableDates = await DeliverySlotService.findFutureAvailableDates(shopResourceId)
-		res.send({ availableDates: availableDates.map((date) => date.format("YYYY-MM-DD")) })
+		res.send({ availableDates: availableDates.map((availableDate) => availableDate.date.format("YYYY-MM-DD")) })
 	} catch (error) {
 		handleErrors(res, error)
 	}
