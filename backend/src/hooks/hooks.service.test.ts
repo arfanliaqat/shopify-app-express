@@ -20,8 +20,18 @@ describe("HooksService", () => {
 
 		await HooksService.ingestOrderEvent("creation", shop!, {
 			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 4321 }]
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 4321,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
 		})
 	})
 
@@ -50,8 +60,18 @@ describe("HooksService", () => {
 
 		await HooksService.ingestOrderEvent("update", shop!, {
 			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 6666 }] // This product doesn't exist
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 6666,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate.format("DD/MM/YYYY")
+						}
+					]
+				}
+			] // This product doesn't exist
 		})
 
 		{
@@ -74,8 +94,18 @@ describe("HooksService", () => {
 
 		await HooksService.ingestOrderEvent("update", shop!, {
 			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 3, product_id: 4321 }]
+			line_items: [
+				{
+					quantity: 3,
+					product_id: 4321,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
 		})
 
 		{
@@ -98,8 +128,18 @@ describe("HooksService", () => {
 
 		await HooksService.ingestOrderEvent("cancellation", shop!, {
 			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 4321 }]
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 4321,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
 		})
 
 		{
@@ -121,8 +161,18 @@ describe("HooksService", () => {
 
 		await HooksService.ingestOrderEvent("deletion", shop!, {
 			id: 1234,
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 4321 }]
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 4321,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
 		})
 
 		{
@@ -145,14 +195,28 @@ describe("HooksService", () => {
 		await HooksService.ingestOrderEvent("update", shop!, {
 			id: 1234,
 			cancelled_at: "2020-12-03T16:10:47-05:00",
-			tags: `Delivery Date: ${deliveryDate.format("DD/MM/YYYY")}`,
-			line_items: [{ quantity: 1, product_id: 4321 }]
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 4321,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
 		})
 
 		{
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
 			expect(productOrders).toHaveLength(0)
 		}
+	})
+
+	test("It handles multiple delivery dates in the same order", async () => {
+		// TODO
 	})
 
 	afterAll(async () => {

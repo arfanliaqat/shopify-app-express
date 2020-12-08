@@ -14,7 +14,7 @@ router.post(
 	[loadHookContext, authenticateHook, loadConnectedShop],
 	async (req: Request, res: Response) => {
 		try {
-			console.log(JSON.parse(req.body))
+			console.log(req.body.toString())
 			const eventType = req.params.eventType as OrderEventType
 			const { connectedShop } = getLocals(res)
 			if (!connectedShop) {

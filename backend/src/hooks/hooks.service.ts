@@ -1,24 +1,21 @@
-import { OrderEventData, OrderEventType } from "./hooks.model"
+import { LineItem, OrderEventData, OrderEventType, Property } from "./hooks.model"
 import { Shop } from "../shop/shop.model"
 import { ProductOrderServiceWithTransaction } from "../productOrders/productOrders.service"
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { tagDateFormat } from "../util/constants"
+import { TAG_DATE_FORMAT } from "../util/constants"
 
 function logPrefix(orderEvent: OrderEventData) {
 	return `[Order: ${orderEvent.id}]`
 }
 
-function getDeliveryDate(orderEvent: OrderEventData): Moment | undefined {
-	if (!orderEvent.tags) return
-	const matches = orderEvent.tags.match(/Delivery Date: ([^,$]+)/)
-	if (!matches || !matches.length) return
-	try {
-		return moment(matches[1], tagDateFormat)
-	} catch (error) {
-		console.error(`${logPrefix(orderEvent)} ${error} (date: ${matches})`)
-	}
+function getDeliveryDate(lineItem: LineItem): Moment | undefined {
+	const deliveryDateProperty = lineItem.properties.find((property: Property) => {
+		return property.name?.toLowerCase() == "delivery date"
+	})
+	if (!deliveryDateProperty?.value) return undefined
+	return moment(deliveryDateProperty.value, TAG_DATE_FORMAT)
 }
 
 export class HooksService {
@@ -38,13 +35,6 @@ export class HooksService {
 				return
 			}
 
-			const deliveryDate = getDeliveryDate(orderEvent)
-			if (!deliveryDate) {
-				// if no delivery date can be extracted
-				await service.commitTransaction()
-				return
-			}
-
 			const productIds = Array.from(new Set<number>(orderEvent.line_items.map((item) => item.product_id)))
 			const eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
 			const eventShopResources = ShopResourceService.groupByResourceId(eventShopResourcesArray)
@@ -52,11 +42,14 @@ export class HooksService {
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 
 			orderEvent.line_items.forEach((item) => {
+				const deliveryDate = getDeliveryDate(item)
+				if (!deliveryDate) return
 				const shopResource = eventShopResources[item.product_id]
 				if (shopResource && shopResource.id) {
-					const newProductOrder = newProductOrdersById[shopResource.id]
+					const key = shopResource + ":" + deliveryDate
+					const newProductOrder = newProductOrdersById[key]
 					if (!newProductOrder) {
-						newProductOrdersById[shopResource.id] = new ProductOrder(
+						newProductOrdersById[key] = new ProductOrder(
 							undefined,
 							shopResource.id,
 							orderEvent.id,
