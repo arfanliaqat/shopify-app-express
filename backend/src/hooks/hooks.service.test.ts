@@ -216,7 +216,58 @@ describe("HooksService", () => {
 	})
 
 	test("It handles multiple delivery dates in the same order", async () => {
-		// TODO
+		const shopResource2 = await new ShopResourceBuilder()
+			.forShop(shop!)
+			.withResourceId("Product", 5555)
+			.buildAndSave()
+
+		const deliveryDate1 = deliveryDate.clone().add(1, "day")
+		const deliveryDate2 = deliveryDate.clone().add(2, "day")
+
+		await HooksService.ingestOrderEvent("update", shop!, {
+			id: 1234,
+			cancelled_at: "2020-12-03T16:10:47-05:00",
+			line_items: [
+				{
+					quantity: 1,
+					product_id: 4321,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate1.format("DD/MM/YYYY")
+						}
+					]
+				},
+				{
+					quantity: 5,
+					product_id: 5555,
+					properties: [
+						{
+							name: "Delivery Date",
+							value: deliveryDate2.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
+		})
+
+		const productOrders1 = await ProductOrderService.findByShopResourceAndDate(
+			shopResource!.id!,
+			deliveryDate1,
+			deliveryDate1
+		)
+		expect(productOrders1).toHaveLength(1)
+		expect(productOrders1[0].deliveryDate.isSame(deliveryDate1)).toBeTruthy()
+		expect(productOrders1[0].quantity).toBe(1)
+
+		const productOrders2 = await ProductOrderService.findByShopResourceAndDate(
+			shopResource2!.id!,
+			deliveryDate2,
+			deliveryDate2
+		)
+		expect(productOrders2).toHaveLength(1)
+		expect(productOrders2[0].deliveryDate.isSame(deliveryDate2)).toBeTruthy()
+		expect(productOrders2[0].quantity).toBe(5)
 	})
 
 	afterAll(async () => {
