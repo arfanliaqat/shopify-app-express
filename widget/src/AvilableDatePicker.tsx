@@ -1,4 +1,4 @@
-import moment from "moment"
+import moment  from "moment"
 import { h } from "preact"
 import { useEffect, useState } from "preact/hooks"
 import { SHOPIFY_APP_URL } from "./constants"
@@ -34,8 +34,10 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 
 export default function AvailableDatePicker() {
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(undefined)
+	const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string>(undefined)
+	const [formError, setFormError] = useState<string>(undefined)
 
-	useEffect(function () {
+	useEffect(() => {
 		async function fetchData() {
 			setProductAvailabilityData(await fetchAvailabilityForProduct())
 		}
@@ -44,15 +46,53 @@ export default function AvailableDatePicker() {
 
 	const availableDates = productAvailabilityData?.availableDates || []
 
+	useEffect(() => {
+		const datePickerDiv = document.getElementById("available-date-picker-10a")
+		const form = datePickerDiv.closest("form")
+		const onSubmit = (e) => {
+			if (e.target.type == "submit") {
+				if (!selectedDeliveryDate) {
+					setFormError("Please select a delivery date before adding to cart")
+					e.preventDefault()
+					return false
+				}
+			}
+		}
+		if (form) {
+			form.addEventListener("click", onSubmit)
+		}
+		return () => {
+			form.removeEventListener("click", onSubmit)
+		}
+	}, [selectedDeliveryDate])
+
+	const handleDeliveryDateSelect = (e) => {
+		if (e.target.value) {
+			setSelectedDeliveryDate(e.target.value)
+		} else {
+			setSelectedDeliveryDate(undefined)
+		}
+	}
+
 	return (
-		<select name="properties[Delivery Date]" id="deliveryDate10a">
-			{availableDates.map((availableDate) => {
-				const momentDate = moment(availableDate.date, SYSTEM_DATE_FORMAT)
-				return <option value={momentDate.format(TAG_DATE_FORMAT)} disabled={availableDate.isSoldOut}>
-					{momentDate.format("dddd D MMMM")}
-					{availableDate.isSoldOut ? " (sold out)" : ""}
-				</option>
-			})}
-		</select>
+		<div>
+			{formError && <div style={{ color: "red", marginBottom: "20px", padding: "0 20%", textAlign: "center" }}>{formError}</div>}
+			<select name="properties[Delivery Date]" id="deliveryDate10a" onChange={handleDeliveryDateSelect} style={{ width: "100%" }}>
+				{availableDates.map((availableDate) => {
+					const momentDate = moment(availableDate.date, SYSTEM_DATE_FORMAT)
+					const valueDate = momentDate.format(TAG_DATE_FORMAT)
+						return (
+						<option
+							value={valueDate}
+							disabled={availableDate.isSoldOut}
+							selected={valueDate == selectedDeliveryDate}
+						>
+							{momentDate.format("dddd D MMMM")}
+							{availableDate.isSoldOut ? " (sold out)" : ""}
+						</option>
+					)
+				})}
+			</select>
+		</div>
 	)
 }
