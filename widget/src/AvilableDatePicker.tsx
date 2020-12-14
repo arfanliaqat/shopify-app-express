@@ -39,7 +39,12 @@ export default function AvailableDatePicker() {
 
 	useEffect(() => {
 		async function fetchData() {
-			setProductAvailabilityData(await fetchAvailabilityForProduct())
+			const data = await fetchAvailabilityForProduct()
+			setProductAvailabilityData(data)
+			const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
+			if (firstAvailableDate) {
+				setSelectedDeliveryDate(firstAvailableDate.date)
+			}
 		}
 		fetchData()
 	}, [])

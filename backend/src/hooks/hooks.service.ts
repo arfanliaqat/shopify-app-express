@@ -4,16 +4,12 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { TAG_DATE_FORMAT } from "../util/constants"
+import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 
-function logPrefix(orderEvent: OrderEventData) {
-	return `[Order: ${orderEvent.id}]`
-}
-
-function getDeliveryDate(lineItem: LineItem): Moment | undefined {
+export function getDeliveryDate(lineItem: LineItem): Moment | undefined {
 	const deliveryDateProperty = lineItem.properties.find((property: Property) => {
 		return property.name?.toLowerCase() == "delivery date"
 	})
@@ -52,11 +48,30 @@ export class HooksService {
 		}
 	}
 
+	static async deleteHook(shop: Shop, accessToken: AccessToken, webhook: Webhook): Promise<void> {
+		try {
+			return await axios.delete(`https://${shop.domain}/admin/api/2020-10/webhooks/${webhook.id}.json`, {
+				headers: {
+					"X-Shopify-Access-Token": accessToken.token
+				}
+			})
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
+
+	static async deleteAllHooks(shop: Shop, accessToken: AccessToken) {
+		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
+		currentWebhooks.map((webhook) => this.deleteHook(shop, accessToken, webhook))
+	}
+
 	static async subscribeHooks(shop: Shop, accessToken: AccessToken): Promise<void> {
 		console.log(`[subscribeHooks|shop:${shop.domain}] Synchronising hooks...`)
 		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
 		const webhooksToCreate = getSubscribedHooks().filter((webhook) => {
-			return !currentWebhooks.find((currentWebhook) => currentWebhook.topic == webhook.topic)
+			return !currentWebhooks.find(
+				(currentWebhook) => currentWebhook.topic == webhook.topic && currentWebhook.address == webhook.address
+			)
 		})
 		await webhooksToCreate.map(async (webhook) => {
 			return this.subscribeHook(shop, accessToken, webhook)
@@ -90,7 +105,7 @@ export class HooksService {
 				if (!deliveryDate) return
 				const shopResource = eventShopResources[item.product_id]
 				if (shopResource && shopResource.id) {
-					const key = shopResource + ":" + deliveryDate
+					const key = shopResource.id + ":" + deliveryDate
 					const newProductOrder = newProductOrdersById[key]
 					if (!newProductOrder) {
 						newProductOrdersById[key] = new ProductOrder(

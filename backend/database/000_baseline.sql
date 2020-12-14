@@ -51,7 +51,7 @@ create table product_orders(
 	id uuid default uuid_generate_v4(),
 	shop_resource_id uuid not null references shop_resources(id),
 	order_id bigint not null,
-	delivery_date timestamp with time zone not null,
+	delivery_date date,
 	quantity integer not null,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)

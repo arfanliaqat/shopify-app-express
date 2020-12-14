@@ -37,7 +37,7 @@ export interface Webhook {
 export function getSubscribedHooks(): Webhook[] {
 	const allOrderEventTypes: OrderEventType[] = ["cancelled", "create", "delete", "edited", "paid", "updated"]
 	return allOrderEventTypes.map((eventType) => ({
-		address: `${SHOPIFY_APP_URL}/orders/${eventType}`,
+		address: `${SHOPIFY_APP_URL}/hooks/orders/${eventType}`,
 		topic: `orders/${eventType}`,
 		format: "json"
 	}))

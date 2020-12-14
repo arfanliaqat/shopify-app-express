@@ -26,7 +26,7 @@ export function loadHookContext(req: Request, res: Response, next: NextFunction)
 export async function authenticateHook(req: Request, res: Response, next: NextFunction): Promise<void> {
 	try {
 		const locals = getLocals(res)
-		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
+		if (!locals.hookContext) throw new BadParameter("`hookContext` is missing")
 		if (!locals.hookContext.hmac) throw new BadParameter("`hmac` is missing from `hookContext`")
 		const generatedHmac = crypto.createHmac("sha256", shopifyApiSecretKey).update(req.body).digest("base64")
 		if (generatedHmac != locals.hookContext.hmac) {

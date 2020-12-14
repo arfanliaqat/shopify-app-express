@@ -22,7 +22,7 @@ export class ProductOrderService {
 			FROM product_orders
 			WHERE shop_resource_id = $1
 			AND delivery_date between $2 and $3`,
-			[shopResourceId, fromDate.format("YYYY-MM-DD"), toDate.format("YYYY-MM-DD")]
+			[shopResourceId, fromDate.format(SYSTEM_DATE_FORMAT), toDate.format(SYSTEM_DATE_FORMAT)]
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
 	}
@@ -83,7 +83,12 @@ export class ProductOrderServiceWithTransaction extends WithTransaction {
 			VALUES ($1, $2, $3, $4)
 			ON CONFLICT DO NOTHING
 			RETURNING id`,
-			[productOrder.shopResourceId, productOrder.orderId, productOrder.deliveryDate, productOrder.quantity]
+			[
+				productOrder.shopResourceId,
+				productOrder.orderId,
+				productOrder.deliveryDate.format(SYSTEM_DATE_FORMAT),
+				productOrder.quantity
+			]
 		)
 		if (results.rows.length == 1) {
 			productOrder.id = results.rows[0].id

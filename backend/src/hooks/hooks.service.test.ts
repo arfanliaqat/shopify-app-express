@@ -1,11 +1,12 @@
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { HooksService } from "./hooks.service"
+import { getDeliveryDate, HooksService } from "./hooks.service"
 import moment, { Moment } from "moment"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import { DatabaseTestService, getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 describe("HooksService", () => {
 	let deliveryDate: Moment
@@ -18,7 +19,7 @@ describe("HooksService", () => {
 		shop = await new ShopBuilder().buildAndSave()
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 
-		await HooksService.ingestOrderEvent("creation", shop!, {
+		await HooksService.ingestOrderEvent("create", shop!, {
 			id: 1234,
 			line_items: [
 				{
@@ -58,7 +59,7 @@ describe("HooksService", () => {
 			expect(productOrders).toHaveLength(1)
 		}
 
-		await HooksService.ingestOrderEvent("update", shop!, {
+		await HooksService.ingestOrderEvent("updated", shop!, {
 			id: 1234,
 			line_items: [
 				{
@@ -92,7 +93,7 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("update", shop!, {
+		await HooksService.ingestOrderEvent("updated", shop!, {
 			id: 1234,
 			line_items: [
 				{
@@ -126,7 +127,7 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("cancellation", shop!, {
+		await HooksService.ingestOrderEvent("cancelled", shop!, {
 			id: 1234,
 			line_items: [
 				{
@@ -159,7 +160,7 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("deletion", shop!, {
+		await HooksService.ingestOrderEvent("delete", shop!, {
 			id: 1234,
 			line_items: [
 				{
@@ -192,7 +193,7 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("update", shop!, {
+		await HooksService.ingestOrderEvent("updated", shop!, {
 			id: 1234,
 			cancelled_at: "2020-12-03T16:10:47-05:00",
 			line_items: [
@@ -224,9 +225,8 @@ describe("HooksService", () => {
 		const deliveryDate1 = deliveryDate.clone().add(1, "day")
 		const deliveryDate2 = deliveryDate.clone().add(2, "day")
 
-		await HooksService.ingestOrderEvent("update", shop!, {
+		await HooksService.ingestOrderEvent("updated", shop!, {
 			id: 1234,
-			cancelled_at: "2020-12-03T16:10:47-05:00",
 			line_items: [
 				{
 					quantity: 1,
@@ -257,7 +257,7 @@ describe("HooksService", () => {
 			deliveryDate1
 		)
 		expect(productOrders1).toHaveLength(1)
-		expect(productOrders1[0].deliveryDate.isSame(deliveryDate1)).toBeTruthy()
+		expect(productOrders1[0].deliveryDate.isSame(deliveryDate1, "day")).toBeTruthy()
 		expect(productOrders1[0].quantity).toBe(1)
 
 		const productOrders2 = await ProductOrderService.findByShopResourceAndDate(
@@ -266,8 +266,23 @@ describe("HooksService", () => {
 			deliveryDate2
 		)
 		expect(productOrders2).toHaveLength(1)
-		expect(productOrders2[0].deliveryDate.isSame(deliveryDate2)).toBeTruthy()
+		expect(productOrders2[0].deliveryDate.isSame(deliveryDate2, "day")).toBeTruthy()
 		expect(productOrders2[0].quantity).toBe(5)
+	})
+
+	test("Date is parsed correctly", () => {
+		const deliveryDate = getDeliveryDate({
+			product_id: 123,
+			quantity: 2,
+			properties: [
+				{
+					name: "Delivery Date",
+					value: "20/12/2020"
+				}
+			]
+		})
+
+		expect(deliveryDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
 	})
 
 	afterAll(async () => {
