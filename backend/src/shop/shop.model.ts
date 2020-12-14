@@ -7,7 +7,7 @@ export interface ShopSchema {
 }
 
 export class Shop {
-		constructor(public domain: string, public email: string, public rawData?: ShopApiData, public id?: string) {}
+	constructor(public domain: string, public email: string, public rawData?: ShopApiData, public id?: string) {}
 }
 
 export function toShop(schema: ShopSchema): Shop {

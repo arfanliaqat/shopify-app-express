@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import { handleErrors, BadParameter } from "../util/error"
 import { getLocals, Locals } from "../util/locals"
 import crypto from "crypto"
-import { hooksSecret } from "../util/constants"
+import { hooksSecret, shopifyApiSecretKey } from "../util/constants"
 import { ShopService } from "../shop/shop.service"
 
 export function loadHookContext(req: Request, res: Response, next: NextFunction): void {
@@ -28,7 +28,7 @@ export async function authenticateHook(req: Request, res: Response, next: NextFu
 		const locals = getLocals(res)
 		if (!locals.hookContext) throw new BadParameter("hookContext` is missing")
 		if (!locals.hookContext.hmac) throw new BadParameter("`hmac` is missing from `hookContext`")
-		const generatedHmac = crypto.createHmac("sha256", hooksSecret).update(req.body).digest("base64")
+		const generatedHmac = crypto.createHmac("sha256", shopifyApiSecretKey).update(req.body).digest("base64")
 		if (generatedHmac != locals.hookContext.hmac) {
 			throw new BadParameter("Incorrect HMAC")
 		}

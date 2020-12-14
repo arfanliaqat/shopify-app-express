@@ -1,10 +1,13 @@
-import { LineItem, OrderEventData, OrderEventType, Property } from "./hooks.model"
+import { getSubscribedHooks, LineItem, OrderEventData, OrderEventType, Property, Webhook } from "./hooks.model"
 import { Shop } from "../shop/shop.model"
 import { ProductOrderServiceWithTransaction } from "../productOrders/productOrders.service"
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
 import { TAG_DATE_FORMAT } from "../util/constants"
+import axios from "axios"
+import { handleAxiosErrors } from "../util/error"
+import { AccessToken } from "../accessToken/accessToken.model"
 
 function logPrefix(orderEvent: OrderEventData) {
 	return `[Order: ${orderEvent.id}]`
@@ -19,6 +22,47 @@ function getDeliveryDate(lineItem: LineItem): Moment | undefined {
 }
 
 export class HooksService {
+	static async fetchAllHooks(shop: Shop, accessToken: AccessToken): Promise<Webhook[] | undefined> {
+		try {
+			return (
+				await axios.get<{ webhooks: Webhook[] }>(`https://${shop.domain}/admin/api/2020-10/webhooks.json`, {
+					headers: {
+						"X-Shopify-Access-Token": accessToken.token
+					}
+				})
+			).data.webhooks
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
+
+	static async subscribeHook(shop: Shop, accessToken: AccessToken, webhook: Webhook): Promise<void> {
+		try {
+			return await axios.post(
+				`https://${shop.domain}/admin/api/2020-10/webhooks.json`,
+				{ webhook },
+				{
+					headers: {
+						"X-Shopify-Access-Token": accessToken.token
+					}
+				}
+			)
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
+
+	static async subscribeHooks(shop: Shop, accessToken: AccessToken): Promise<void> {
+		console.log(`[subscribeHooks|shop:${shop.domain}] Synchronising hooks...`)
+		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
+		const webhooksToCreate = getSubscribedHooks().filter((webhook) => {
+			return !currentWebhooks.find((currentWebhook) => currentWebhook.topic == webhook.topic)
+		})
+		await webhooksToCreate.map(async (webhook) => {
+			return this.subscribeHook(shop, accessToken, webhook)
+		})
+	}
+
 	static async ingestOrderEvent(
 		eventType: OrderEventType,
 		connectedShop: Shop,
@@ -30,7 +74,7 @@ export class HooksService {
 		try {
 			await service.deleteByOrderId(orderEvent.id)
 
-			if (eventType == "cancellation" || eventType == "deletion" || orderEvent.cancelled_at) {
+			if (eventType == "cancelled" || eventType == "delete" || orderEvent.cancelled_at) {
 				await service.commitTransaction()
 				return
 			}

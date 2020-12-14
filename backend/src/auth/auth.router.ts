@@ -4,7 +4,8 @@ import querystring from "querystring"
 import { handleErrors } from "../util/error"
 import { getSession, updateSession } from "../util/session"
 import { generateNonce } from "../util/tools"
-import { buildInstallUrl, buildRedirectUri, generateEncryptedHash, findShopOrInstallApp } from "./auth.service"
+import { AuthService } from "./auth.service"
+import { HooksService } from "../hooks/hooks.service"
 
 const router = Router()
 
@@ -15,7 +16,7 @@ router.get("/auth", (req: Request, res: Response) => {
 			return res.status(400).send("Shop is missing")
 		}
 		const nonce = generateNonce(16)
-		const installShopUrl = buildInstallUrl(shop.toString(), nonce, buildRedirectUri())
+		const installShopUrl = AuthService.buildInstallUrl(shop.toString(), nonce, AuthService.buildRedirectUri())
 		updateSession(req, res, { state: nonce })
 		res.redirect(installShopUrl)
 	} catch (error) {
@@ -36,16 +37,17 @@ router.get("/auth/callback", async (req: Request, res: Response) => {
 
 		const { hmac, ...params } = req.query
 		const queryParams = querystring.stringify(params as any)
-		const hash = generateEncryptedHash(queryParams)
+		const hash = AuthService.generateEncryptedHash(queryParams)
 
 		if (hash !== hmac) {
 			return res.status(400).send("HMAC validation failed")
 		}
 
-		const dbShop = await findShopOrInstallApp(shop.toString(), code.toString())
+		const [dbShop, accessToken] = await AuthService.findShopOrInstallApp(shop.toString(), code.toString())
 		if (!dbShop || !dbShop.id) {
 			throw "Missing 'dbShop' or 'dbShop.id'"
 		}
+		await HooksService.subscribeHooks(dbShop, accessToken)
 		updateSession(req, res, { shopId: dbShop.id, state: undefined })
 		res.redirect("/app")
 	} catch (error) {

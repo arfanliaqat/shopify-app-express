@@ -18,3 +18,8 @@ export function toAccessToken(schema: AccessTokenSchema): AccessToken {
 		scope: schema.scope
 	}
 }
+
+export interface AccessTokenApiData {
+	access_token: string
+	scope: string
+}
