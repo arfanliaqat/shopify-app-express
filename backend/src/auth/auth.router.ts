@@ -6,6 +6,7 @@ import { getSession, updateSession } from "../util/session"
 import { generateNonce } from "../util/tools"
 import { AuthService } from "./auth.service"
 import { HooksService } from "../hooks/hooks.service"
+import { ScriptTagService } from "../scriptTags/scriptTags.service"
 
 const router = Router()
 
@@ -48,6 +49,7 @@ router.get("/auth/callback", async (req: Request, res: Response) => {
 			throw "Missing 'dbShop' or 'dbShop.id'"
 		}
 		await HooksService.subscribeHooks(dbShop, accessToken)
+		await ScriptTagService.createScriptTags(dbShop, accessToken)
 		updateSession(req, res, { shopId: dbShop.id, state: undefined })
 		res.redirect("/app")
 	} catch (error) {

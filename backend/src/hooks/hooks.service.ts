@@ -34,6 +34,7 @@ export class HooksService {
 
 	static async subscribeHook(shop: Shop, accessToken: AccessToken, webhook: Webhook): Promise<void> {
 		try {
+			console.log(`[subscribeHook|shop:${shop.domain}] Subscribe ${webhook.topic}, ${webhook.address}...`)
 			return await axios.post(
 				`https://${shop.domain}/admin/api/2020-10/webhooks.json`,
 				{ webhook },
@@ -50,6 +51,7 @@ export class HooksService {
 
 	static async deleteHook(shop: Shop, accessToken: AccessToken, webhook: Webhook): Promise<void> {
 		try {
+			console.log(`[deleteHook|shop:${shop.domain}] Delete ${webhook.topic}, ${webhook.address}...`)
 			return await axios.delete(`https://${shop.domain}/admin/api/2020-10/webhooks/${webhook.id}.json`, {
 				headers: {
 					"X-Shopify-Access-Token": accessToken.token
@@ -60,9 +62,9 @@ export class HooksService {
 		}
 	}
 
-	static async deleteAllHooks(shop: Shop, accessToken: AccessToken) {
+	static async deleteAllHooks(shop: Shop, accessToken: AccessToken): Promise<void> {
 		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
-		currentWebhooks.map((webhook) => this.deleteHook(shop, accessToken, webhook))
+		await currentWebhooks.forEach((webhook) => this.deleteHook(shop, accessToken, webhook))
 	}
 
 	static async subscribeHooks(shop: Shop, accessToken: AccessToken): Promise<void> {

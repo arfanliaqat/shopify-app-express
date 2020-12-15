@@ -15,6 +15,7 @@ import shopResourceRouter from "./shopResource/shopResource.router"
 import deliverySlotsRouter from "./deliverySlots/deliverySlots.router"
 import widgetRouter from "./widget/widget.router"
 import hooksRouter from "./hooks/hooks.router"
+import scriptTagsRouter from "./scriptTags/scriptTags.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
 import { appUrl, isDev } from "./util/constants"
 
@@ -83,6 +84,7 @@ app.use(authRouter)
 app.use(shopResourceRouter)
 app.use(deliverySlotsRouter)
 app.use(hooksRouter)
+app.use(scriptTagsRouter)
 
 app.use(cors())
 app.use(
