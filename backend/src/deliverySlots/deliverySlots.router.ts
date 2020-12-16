@@ -10,7 +10,6 @@ import { DeliverySlot } from "./deliverySlots.model"
 import { loadDeliverySlot } from "./deliverySlots.middleware"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { ProductOrderService } from "../productOrders/productOrders.service"
-import { ProductOrder } from "../productOrders/productOrders.model"
 
 const router = Router()
 
@@ -116,9 +115,11 @@ router.post(
 			if (!deliverySlot) throw new UnexpectedError("deliverySlot cannot be undefined")
 			const errors = [] as FormError[]
 			const newDates = validateDates(errors, req.body.newDates)
+			const deletedDates = validateDates(errors, req.body.deletedDates)
 			const quantity = validateQuantity(errors, req.body.quantity)
-			if (!newDates || !quantity || errors.length > 0) throw new FormErrors(errors)
+			if (!quantity || errors.length > 0) throw new FormErrors(errors)
 			deliverySlot.addNewDates(newDates)
+			deliverySlot.deleteDates(deletedDates)
 			deliverySlot.quantity = quantity
 			await DeliverySlotService.updateShopResource(deliverySlot)
 			res.send({})

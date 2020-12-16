@@ -27,7 +27,8 @@ export class DeliverySlot {
 		private shopId?: string
 	) {}
 
-	addNewDates(newDates: Moment[]): void {
+	addNewDates(newDates: Moment[] | undefined): void {
+		if (!newDates || newDates.length == 0) return
 		const filteredNewDates = newDates.filter((newDate) => !this.dates.find((d) => d.isSame(newDate, "day")))
 		if (newDates.length == 0) return
 		this.dates = this.dates.concat(filteredNewDates)
@@ -36,6 +37,11 @@ export class DeliverySlot {
 			else if (d1.isAfter(d2)) return 1
 			return 0
 		})
+	}
+
+	deleteDates(deletedDates: Moment[] | undefined): void {
+		if (!deletedDates || deletedDates.length == 0) return
+		this.dates = this.dates.filter((deletedDate) => !deletedDates.find((d) => d.isSame(deletedDate, "day")))
 	}
 
 	getLastDate(): Moment | undefined {

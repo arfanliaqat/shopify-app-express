@@ -41,6 +41,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 	const { deliverySlotId } = match.params
 
 	const [newDates, setNewDates] = useState<Moment[]>([])
+	const [deletedDates, setDeletedDates] = useState<Moment[]>([])
 	const [quantity, setQuantity] = useState<number>()
 	const [successMessage, setSuccessMessage] = useState<string>()
 	const [addSlotModalOpen, setAddSlotModalOpen] = useState<boolean>()
@@ -80,11 +81,12 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 			method: "POST",
 			url: `/delivery_slots/${deliverySlotId}`,
 			postData: {
-				newDates: newDates.map((date) => moment(date).format("YYYY-MM-DD")),
+				newDates: newDates.map((date) => moment(date).format(SYSTEM_DATE_FORMAT)),
+				deletedDates: deletedDates.map((date) => moment(date).format(SYSTEM_DATE_FORMAT)),
 				quantity
 			}
 		})
-	}, [newDates, quantity])
+	}, [newDates, deletedDates, quantity])
 
 	const handleDeleteSlot = useCallback(() => {
 		deleteSlot({
@@ -115,11 +117,31 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 		return newDates.find((nd) => nd.isSame(deliveryDate, "day")) != undefined
 	}
 
+	const isDeletedDate = (deliveryDate: Moment): boolean => {
+		return deletedDates.find((deletedDate) => deletedDate.isSame(deliveryDate, "day")) != undefined
+	}
+
+	const handleDeleteDateClick = (deliveryDate: Moment) => () => {
+		const newDateIndex = newDates.findIndex((date) => date.isSame(deliveryDate, "day"))
+		if (newDateIndex >= 0) {
+			const newDatesCopy = [...newDates]
+			newDatesCopy.splice(newDateIndex, 1)
+			setNewDates(newDatesCopy)
+		} else if (!deletedDates.find((date) => date.isSame(deliveryDate, "day"))) {
+			setDeletedDates(deletedDates.concat([deliveryDate]))
+		}
+	}
+
 	const getOrdersForDate = (deliveryDate: Moment): number => {
 		if (!deliverySlotPageData) return 0
 		const strDate = deliveryDate.format(SYSTEM_DATE_FORMAT)
 		return deliverySlotPageData.ordersPerDate[strDate] || 0
 	}
+
+	const isDirty =
+		(deliverySlotPageData && deliverySlotPageData.deliverySlot.quantity != quantity) ||
+		newDates.length > 0 ||
+		deletedDates.length > 0
 
 	if (isLoading || !deliverySlotPageData) {
 		return <div />
@@ -155,6 +177,8 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 											deliveryDate={deliveryDate}
 											orders={getOrdersForDate(deliveryDate)}
 											isNew={isNewDate(deliveryDate)}
+											onDeleteClick={handleDeleteDateClick(deliveryDate)}
+											isDeleted={isDeletedDate(deliveryDate)}
 										/>
 									</ResourceList.Item>
 								)}
@@ -183,7 +207,8 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 					primaryAction={{
 						content: "Save",
 						onAction: handleSaveSlot,
-						loading: isSavingSlot
+						loading: isSavingSlot,
+						disabled: !isDirty
 					}}
 					secondaryActions={[
 						{
