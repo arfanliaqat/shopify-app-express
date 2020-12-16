@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { RouteChildrenProps } from "react-router"
-import { Page, ResourceList, Card, Layout, Button, TextField, PageActions } from "@shopify/polaris"
+import { Page, ResourceList, Card, Layout, Button, TextField, PageActions, Badge } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import DeliverySlot from "../models/DeliverySlot"
 import moment, { Moment } from "moment"
@@ -35,6 +35,10 @@ function getTitle(deliverySlot: DeliverySlot) {
 
 function getBackUrl(shopResource: ShopResource) {
 	return `/app/resources/${shopResource.id}/calendar/${moment().format("YYYY/MM")}`
+}
+
+function getTotalOrders(ordersPerDate: OrdersPerDate) {
+	return Object.values(ordersPerDate).reduce((total, orders) => total + orders, 0)
 }
 
 export default function DeliverySlotPage({ match, history }: RouteChildrenProps<UrlParams>) {
@@ -147,7 +151,11 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 		return <div />
 	}
 
-	const { shopResource, deliverySlot } = deliverySlotPageData
+	const { shopResource, deliverySlot, ordersPerDate } = deliverySlotPageData
+
+	const totalOrders = getTotalOrders(ordersPerDate)
+	const remainingQuantity = Math.max(0, deliverySlot.quantity - totalOrders)
+	const isSoldOut = remainingQuantity == 0
 
 	return (
 		<div id="deliverySlotPage">
@@ -161,6 +169,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 					}
 				]}
 				title={getTitle(deliverySlot)}
+				titleMetadata={isSoldOut && <Badge status="warning">Sold out</Badge>}
 			>
 				<Layout>
 					<Layout.Section />
@@ -201,6 +210,21 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 								setQuantity(parseInt(value))
 							}}
 						/>
+					</Layout.AnnotatedSection>
+
+					<Layout.AnnotatedSection
+						title="Remaining quantity"
+						description="Number of items available on these dates"
+					>
+						<div>
+							{totalOrders == 0 ? "No" : totalOrders} order{totalOrders == 1 ? "" : "s"} made out of{" "}
+							{deliverySlot.quantity} available.
+						</div>
+						<div>
+							<strong>
+								{remainingQuantity} order{remainingQuantity == 1 ? "" : "s"} remaining
+							</strong>
+						</div>
 					</Layout.AnnotatedSection>
 				</Layout>
 				<PageActions
