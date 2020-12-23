@@ -2,11 +2,11 @@
 	width: 20px;
 }
 
-.App-Calendar {
+.calendar {
 	padding: 20px;
 }
 
-.App-Calendar__Grid {
+.calendarGrid {
 	width: 100%;
 	height: 600px;
 	display: flex;
@@ -15,13 +15,13 @@
 	flex-wrap: wrap;
 }
 
-.App-Calendar__Header {
+.calendarHeader {
 	padding: 0 0 20px 0;
 	display: flex;
 	height: 50px
 }
 
-.App-Calendar__CurrentMonth {
+.calendarCurrentMonth {
 	flex: 2;
 	font-size: 20px;
 	align-items: center;
@@ -29,22 +29,22 @@
 	padding-left: 10px;
 }
 
-.App-Calendar__Nav {
+.calendarNav {
 	display: flex;
 	justify-content: flex-end;
 	flex-grow: 1;
 }
 
-.App-Calendar__Nav > button {
+.calendarNav > button {
 	margin-left: 2px;
 }
 
-.App-Calendar__Week,
-.App-Calendar__DayNames {
+.calendarWeek,
+.calendarDayNames {
 	display: flex;
 }
 
-.App-Calendar__DayNames {
+.calendarDayNames {
 	height: 30px;
 	text-align: center;
 	justify-content: stretch;
@@ -52,32 +52,32 @@
 	font-weight: 500;
 }
 
-.App-Calendar__HeaderDay {
+.calendarHeaderDay {
 	justify-content: center;
 }
 
-.App-Calendar__Week {
+.calendarWeek {
 	display: flex;
 	flex-grow: 1;
 	margin-right: -1px;
 	margin-bottom: -1px;
 }
 
-.App-Calendar__Day,
-.App-Calendar__HeaderDay {
+.calendarDay,
+.calendarHeaderDay {
 	margin-left: -1px;
 	flex-grow: 1;
 	display: flex;
 	flex-basis: 14.28%;
 }
 
-.App-Calendar__Day {
+.calendarDay {
 	border: 1px solid #e1e6ea;
 	position: relative;
 	flex-direction: column;
 }
 
-.App-Calendar__DayNumber {
+.calendarDayNumber {
 	text-align: right;
 	font-size: 12px;
 	font-weight: 500;
@@ -86,56 +86,51 @@
 	flex-grow: 0;
 }
 
-.App-Calendar__Day--notSameMonth {
+.calendarDayNotSameMonth {
 	background: #fafafa;
 }
 
-.App-Calendar__Day--notSameMonth .App-Calendar__DayNumber {
+.calendarDayNotSameMonth .calendarDayNumber {
 	color: #aaa;
 	font-style: italic;
 }
 
-.App-Calendar__Day--isToday {
+.calendarDayIsToday {
 	background: #fffbd3;
 }
 
-.App-Calendar__Day--isToday .App-Calendar__DayNumber {
+.calendarDayIsToday .calendarDayNumber {
 	color: #69621b;
 }
 
-.App-Calendar__AddInventoryPeriod,
-.App-Calendar__DeliveryDay {
+.calendarAddInventoryPeriod {
 	color: rgba(0, 0, 0, 0.05);
 	text-decoration: none;
 	font-weight: bold;
 	font-size: 50px;
+	font-family: monospace;
+}
+
+.calendarAddInventoryPeriod,
+.calendarAvailabilityPeriodElement {
 	text-align: center;
 	display: flex;
 	align-content: stretch;
 	align-items: center;
 	justify-content: center;
-	font-family: monospace;
 	cursor: pointer;
 	flex-grow: 1;
 }
 
-.App-Calendar__DeliveryDay {
+.calendarAvailabilityPeriodElement {
 	background: #F4F5FD;
 	border: 1px solid #C0C8D1;
 	margin: 5px;
 	border-radius: 3px;
 }
 
-.App-Calendar__AddInventoryPeriod:hover {
+.calendarAddInventoryPeriod:hover {
 	color: rgba(0, 0, 0, 0.2);
-}
-
-.App-Calendar__DeliveryDay {
-	color: rgba(0, 0, 0, 0.2);
-}
-
-.App-Calendar__DeliveryDay:hover {
-	color: rgba(0, 0, 0, 0.4);
 }
 
 .App-ResourceListTable__Header {
@@ -170,7 +165,7 @@
 	padding: 10px 10px 50px 10px;
 }
 
-.CalendarPage__Loading {
+.CalendarPageLoading {
 	min-height: 300px;
 }
 

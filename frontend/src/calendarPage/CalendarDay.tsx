@@ -14,18 +14,18 @@ interface Props {
 export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick }: Props) {
 	return (
 		<div
-			className={classNames("App-Calendar__Day", {
-				"App-Calendar__Day--notSameMonth": !day.isSame(monthStart, "month"),
-				"App-Calendar__Day--isToday": day.isSame(moment(), "day")
+			className={classNames("calendarDay", {
+				calendarDayNotSameMonth: !day.isSame(monthStart, "month"),
+				calendarDayIsToday: day.isSame(moment(), "day")
 			})}
 		>
-			<div className="App-Calendar__DayNumber">{day.format("D")}</div>
+			<div className="calendarDayNumber">{day.format("D")}</div>
 			{deliverySlot ? (
-				<Link className="App-Calendar__DeliveryDay" to={`/app/delivery_slots/${deliverySlot.id}`}>
+				<Link className="calendarAvailabilityPeriodElement" to={`/app/delivery_slots/${deliverySlot.id}`}>
 					{deliverySlot.quantity}
 				</Link>
 			) : (
-				<div className="App-Calendar__AddInventoryPeriod" onClick={onAddClick}>
+				<div className="calendarAddInventoryPeriod" onClick={onAddClick}>
 					+
 				</div>
 			)}
