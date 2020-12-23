@@ -50,7 +50,7 @@ export function useApi<T>({ onSuccess, onError }: UseApiParams<T>): UseApiState<
 		if (apiRequest) {
 			fetchData()
 		}
-	}, [apiRequest, onSuccess])
+	}, [apiRequest])
 
 	return {
 		setApiRequest,

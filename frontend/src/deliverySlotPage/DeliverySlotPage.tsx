@@ -60,7 +60,7 @@ export default function DeliverySlotPage({ match, history }: RouteChildrenProps<
 		onSuccess: useCallback(() => {
 			setSuccessMessage("Delivery slot saved!")
 			setReloadIncrement(reloadIncrement + 1)
-		}, [])
+		}, [reloadIncrement])
 	})
 	const { setApiRequest: deleteSlot, isLoading: isDeletingSlot } = useApi({
 		onSuccess: useCallback(() => {
