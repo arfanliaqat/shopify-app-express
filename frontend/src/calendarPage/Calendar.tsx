@@ -58,48 +58,50 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 	return (
 		<Card>
 			<div className="App-Calendar">
-				<div className="App-Calendar__Header">
-					<div className="App-Calendar__CurrentMonth">
-						<span>{calendarDates.monthStart.format("MMMM Y")}</span>
+				<div className="App-Calendar__Grid">
+					<div className="App-Calendar__Header">
+						<div className="App-Calendar__CurrentMonth">
+							<span>{calendarDates.monthStart.format("MMMM Y")}</span>
+						</div>
+						<div className="App-Calendar__Nav">
+							<Button size="slim" onClick={moveMonth(-1)} icon={<ChevronLeftMinor />} />
+							<Button size="slim" onClick={resetMonth}>
+								Today
+							</Button>
+							<Button size="slim" onClick={moveMonth(1)} icon={<ChevronRightMinor />} />
+						</div>
 					</div>
-					<div className="App-Calendar__Nav">
-						<Button size="slim" onClick={moveMonth(-1)} icon={<ChevronLeftMinor />} />
-						<Button size="slim" onClick={resetMonth}>
-							Today
-						</Button>
-						<Button size="slim" onClick={moveMonth(1)} icon={<ChevronRightMinor />} />
-					</div>
-				</div>
-				<div className="App-Calendar__DayNames">
-					{getDaysBetween(
-						calendarDates.calendarStart,
-						calendarDates.calendarStart.clone().endOf("week"),
-						"day"
-					).map((day) => {
-						const formattedDay = day.format("ddd")
-						return (
-							<div key={formattedDay} className="App-Calendar__HeaderDay">
-								{formattedDay}
-							</div>
-						)
-					})}
-				</div>
-				{getDaysBetween(calendarDates.calendarStart, calendarDates.calendarEnd, "week").map((weekStart) => (
-					<div key={"week" + weekStart.format("YYYY-MM-DD")} className="App-Calendar__Week">
-						{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
-							const strDay = day.format("YYYY-MM-DD")
+					<div className="App-Calendar__DayNames">
+						{getDaysBetween(
+							calendarDates.calendarStart,
+							calendarDates.calendarStart.clone().endOf("week"),
+							"day"
+						).map((day) => {
+							const formattedDay = day.format("ddd")
 							return (
-								<CalendarDay
-									key={"day" + strDay}
-									monthStart={calendarDates.monthStart}
-									day={day}
-									deliverySlot={slotsByDate[strDay]}
-									onAddClick={() => onAddSlotClick(day)}
-								/>
+								<div key={formattedDay} className="App-Calendar__HeaderDay">
+									{formattedDay}
+								</div>
 							)
 						})}
 					</div>
-				))}
+					{getDaysBetween(calendarDates.calendarStart, calendarDates.calendarEnd, "week").map((weekStart) => (
+						<div key={"week" + weekStart.format("YYYY-MM-DD")} className="App-Calendar__Week">
+							{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
+								const strDay = day.format("YYYY-MM-DD")
+								return (
+									<CalendarDay
+										key={"day" + strDay}
+										monthStart={calendarDates.monthStart}
+										day={day}
+										deliverySlot={slotsByDate[strDay]}
+										onAddClick={() => onAddSlotClick(day)}
+									/>
+								)
+							})}
+						</div>
+					))}
+				</div>
 			</div>
 		</Card>
 	)
