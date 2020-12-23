@@ -1,0 +1,124 @@
+.availabilityCalendar {
+  padding: 20px;
+
+  .grid {
+    width: 100%;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    flex-wrap: wrap;
+
+    .header {
+      padding: 0 0 20px 0;
+      display: flex;
+      height: 50px
+    }
+
+    .currentMonth {
+      flex: 2;
+      font-size: 20px;
+      align-items: center;
+      display: flex;
+      padding-left: 10px;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: flex-end;
+      flex-grow: 1;
+      > button {
+        margin-left: 2px;
+      }
+    }
+
+    .dayNames {
+      display: flex;
+      height: 30px;
+      text-align: center;
+      justify-content: stretch;
+      align-content: center;
+      font-weight: 500;
+    }
+
+    .week {
+      display: flex;
+      flex-grow: 1;
+      margin-right: -1px;
+      margin-bottom: -1px;
+    }
+
+    .headerDay {
+      justify-content: center;
+    }
+
+    .day, .headerDay {
+      margin-left: -1px;
+      flex-grow: 1;
+      display: flex;
+      flex-basis: 14.28%;
+    }
+
+    .day {
+      border: 1px solid #e1e6ea;
+      position: relative;
+      flex-direction: column;
+
+      .number {
+        text-align: right;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 0 5px;
+        color: #666;
+        flex-grow: 0;
+      }
+
+      &.notSameMonth {
+        background: #fafafa;
+        .number {
+          color: #aaa;
+          font-style: italic;
+        }
+      }
+
+      &.isToday {
+        background: #fffbd3;
+        .number {
+          color: #69621b;
+          font-style: italic;
+        }
+      }
+
+    }
+
+    .addInventoryPeriod {
+      color: rgba(0, 0, 0, 0.05);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 50px;
+      font-family: monospace;
+    }
+
+    .addInventoryPeriod,
+    .availabilityPeriodElement {
+      text-align: center;
+      display: flex;
+      align-content: stretch;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-grow: 1;
+    }
+
+    .availabilityPeriodElement {
+      background: #F4F5FD;
+      border: 1px solid #C0C8D1;
+      margin: 5px;
+      border-radius: 3px;
+    }
+
+    .addInventoryPeriod:hover {
+      color: rgba(0, 0, 0, 0.2);
+    }
+  }
+}

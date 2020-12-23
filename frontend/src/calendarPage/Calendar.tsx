@@ -57,13 +57,13 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 
 	return (
 		<Card>
-			<div className="calendar">
-				<div className="calendarGrid">
-					<div className="calendarHeader">
-						<div className="calendarCurrentMonth">
+			<div className="availabilityCalendar">
+				<div className="grid">
+					<div className="header">
+						<div className="currentMonth">
 							<span>{calendarDates.monthStart.format("MMMM Y")}</span>
 						</div>
-						<div className="calendarNav">
+						<div className="nav">
 							<Button size="slim" onClick={moveMonth(-1)} icon={<ChevronLeftMinor />} />
 							<Button size="slim" onClick={resetMonth}>
 								Today
@@ -71,7 +71,7 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 							<Button size="slim" onClick={moveMonth(1)} icon={<ChevronRightMinor />} />
 						</div>
 					</div>
-					<div className="calendarDayNames">
+					<div className="dayNames">
 						{getDaysBetween(
 							calendarDates.calendarStart,
 							calendarDates.calendarStart.clone().endOf("week"),
@@ -79,14 +79,14 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 						).map((day) => {
 							const formattedDay = day.format("ddd")
 							return (
-								<div key={formattedDay} className="calendarHeaderDay">
+								<div key={formattedDay} className="headerDay">
 									{formattedDay}
 								</div>
 							)
 						})}
 					</div>
 					{getDaysBetween(calendarDates.calendarStart, calendarDates.calendarEnd, "week").map((weekStart) => (
-						<div key={"week" + weekStart.format("YYYY-MM-DD")} className="calendarWeek">
+						<div key={"week" + weekStart.format("YYYY-MM-DD")} className="week">
 							{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
 								const strDay = day.format("YYYY-MM-DD")
 								return (

@@ -9,6 +9,8 @@ import DeliverySlotPage from "./deliverySlotPage/DeliverySlotPage"
 import CalendarPage from "./calendarPage/CalendarPage"
 import NotFoundPage from "./NotFoundPage"
 
+import "./styles/main.less"
+
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
 function Link({ children, url = "", external, ref, ...rest }: any) {
