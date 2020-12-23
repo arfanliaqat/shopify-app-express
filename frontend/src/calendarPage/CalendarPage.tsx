@@ -7,6 +7,8 @@ import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
 import { Page } from "@shopify/polaris"
 import ShopResource from "../models/ShopResource"
+import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
+import { forEachInEnum } from "@shopify/app-bridge/actions/helper"
 
 interface Params {
 	shopResourceId: string
@@ -60,10 +62,23 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 		setRequestIncrement(requestIncrement + 1)
 	}, [requestIncrement])
 
+	const deliverySlots = useMemo(() => {
+		if (!calendarPageData || !calendarPageData.deliverySlots) return []
+		const deliverySlots = [...calendarPageData.deliverySlots]
+		deliverySlots.forEach((deliverySlot) => {
+			deliverySlot.fromDate = moment(deliverySlot.deliveryDates[0], SYSTEM_DATE_FORMAT)
+			deliverySlot.toDate = moment(
+				deliverySlot.deliveryDates[deliverySlot.deliveryDates.length - 1],
+				SYSTEM_DATE_FORMAT
+			)
+		})
+		return deliverySlots
+	}, [calendarPageData])
+
 	if (calendarPageData == undefined) {
 		return <div />
 	}
-	const { shopResource, deliverySlots } = calendarPageData
+	const { shopResource } = calendarPageData
 
 	return (
 		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title={shopResource.title}>

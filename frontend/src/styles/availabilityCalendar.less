@@ -100,7 +100,7 @@
     }
 
     .addInventoryPeriod,
-    .availabilityPeriodElement {
+    .availabilityPeriodDate {
       text-align: center;
       display: flex;
       align-content: stretch;
@@ -110,11 +110,31 @@
       flex-grow: 1;
     }
 
-    .availabilityPeriodElement {
+    .availabilityPeriodDate {
       background: #F4F5FD;
       border: 1px solid #C0C8D1;
-      margin: 5px;
-      border-radius: 3px;
+      margin: 5px 0;
+      text-decoration: none;
+      color: #212B36;
+      &.periodDateNotAvailable {
+        background: #FFFFFF;
+        color: #637381;
+        font-style: italic;
+      }
+      &.periodFirstDate {
+        margin-left: 5px;
+        border-radius: 3px 0 0 3px;
+      }
+      &.periodLastDate {
+        margin-right: 5px;
+        border-radius: 0 3px 3px 0;
+      }
+      &:not(.periodFirstDate) {
+        margin-left: -1px;
+      }
+      &:not(.periodLastDate) {
+        margin-right: -1px;
+      }
     }
 
     .addInventoryPeriod:hover {

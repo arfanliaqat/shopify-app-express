@@ -5,6 +5,7 @@ import { Button, Card, Spinner } from "@shopify/polaris"
 import { ChevronLeftMinor, ChevronRightMinor } from "@shopify/polaris-icons"
 import DeliverySlot from "../models/DeliverySlot"
 import { CalendarDates, currentStartOfMonth } from "./CalendarPage"
+import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 
 interface Props {
 	slots: DeliverySlot[]
@@ -29,9 +30,11 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 		}
 		const result = {}
 		slots.forEach((slot) => {
-			slot.deliveryDates.forEach((date) => {
-				result[date] = slot
-			})
+			if (slot.fromDate && slot.toDate) {
+				for (const cursor = slot.fromDate.clone(); !cursor.isAfter(slot.toDate); cursor.add(1, "day")) {
+					result[cursor.format(SYSTEM_DATE_FORMAT)] = slot
+				}
+			}
 		})
 		return result
 	}, [slots])
