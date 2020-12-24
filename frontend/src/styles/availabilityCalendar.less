@@ -116,33 +116,67 @@
 
     .availabilityPeriodDate {
       background: #F4F5FD;
-      border: 1px solid #C0C8D1;
+      border-top: 1px solid #C0C8D1;
+      border-bottom: 1px solid #C0C8D1;
       margin: 5px 0;
-      padding: 0 5px;
       text-decoration: none;
       color: #212B36;
-      &.periodDateNotAvailable {
-        background: #FFFFFF;
-        color: #637381;
-        font-style: italic;
-        em {
-          width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-items: stretch;
+      font-size: 12px;
+      .itemHeader {
+        border-bottom: 1px solid #C0C8D1;
+        flex-grow: 0;
+        height: 25px;
+        width: 100%;
+        font-weight: 500;
+        text-align: left;
+        padding-left: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        span {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
           display: block;
         }
       }
+      .itemBody {
+        flex-grow: 1;
+        padding: 0 5px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        em, span {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          display: block;
+        }
+      }
+      &.periodDateNotAvailable .itemBody {
+        background: #FFFFFF;
+        color: #637381;
+        font-style: italic;
+      }
       &.periodFirstDate {
+        border-left: 1px solid #C0C8D1;
         margin-left: 5px;
         border-radius: 3px 0 0 3px;
       }
       &.periodLastDate {
+        border-right: 1px solid #C0C8D1;
         margin-right: 5px;
         border-radius: 0 3px 3px 0;
       }
       &:not(.periodFirstDate) {
         margin-left: -1px;
+        .itemBody {
+          border-left: 1px solid #C0C8D1;
+        }
       }
       &:not(.periodLastDate) {
         margin-right: -1px;

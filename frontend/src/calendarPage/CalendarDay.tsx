@@ -22,6 +22,9 @@ export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick 
 		() => !deliverySlot?.deliveryDates?.find((strDate) => strDate == currentStrDay),
 		[currentStrDay, deliverySlot]
 	)
+	const nbOrders = Math.round(0.4)
+	const nbOrdersTxt = `${nbOrders} order${nbOrders != 1 ? "s" : ""}`
+	const headerText = deliverySlot ? `${nbOrders} out of ${deliverySlot.quantity} orders` : ""
 	return (
 		<div className={classNames("day", { notSameMonth, isToday })}>
 			<div className="number">{day.format("D")}</div>
@@ -33,9 +36,17 @@ export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick 
 						periodDateNotAvailable
 					})}
 					to={`/app/delivery_slots/${deliverySlot.id}`}
-					title="Not available"
 				>
-					{periodDateNotAvailable ? <em>Not available</em> : deliverySlot.quantity}
+					<span className="itemHeader">
+						{periodFirstDate && <span title={headerText}>{headerText}</span>}
+					</span>
+					<span className="itemBody">
+						{periodDateNotAvailable ? (
+							<em title="Not available">Not available</em>
+						) : (
+							<span>{nbOrdersTxt}</span>
+						)}
+					</span>
 				</Link>
 			) : (
 				<div className="addInventoryPeriod" onClick={onAddClick}>
