@@ -33,8 +33,9 @@ export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick 
 						periodDateNotAvailable
 					})}
 					to={`/app/delivery_slots/${deliverySlot.id}`}
+					title="Not available"
 				>
-					{periodDateNotAvailable ? "Not available" : deliverySlot.quantity}
+					{periodDateNotAvailable ? <em>Not available</em> : deliverySlot.quantity}
 				</Link>
 			) : (
 				<div className="addInventoryPeriod" onClick={onAddClick}>

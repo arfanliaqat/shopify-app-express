@@ -58,7 +58,8 @@
       margin-left: -1px;
       flex-grow: 1;
       display: flex;
-      flex-basis: 14.28%;
+      flex-basis: 0;
+      width: 14.28%;
     }
 
     .day {
@@ -117,12 +118,20 @@
       background: #F4F5FD;
       border: 1px solid #C0C8D1;
       margin: 5px 0;
+      padding: 0 5px;
       text-decoration: none;
       color: #212B36;
       &.periodDateNotAvailable {
         background: #FFFFFF;
         color: #637381;
         font-style: italic;
+        em {
+          width: 100%;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          display: block;
+        }
       }
       &.periodFirstDate {
         margin-left: 5px;
