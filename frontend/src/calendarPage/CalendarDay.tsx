@@ -10,9 +10,10 @@ interface Props {
 	day: Moment
 	deliverySlot?: DeliverySlot
 	onAddClick: () => void
+	orders: number
 }
 
-export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick }: Props) {
+export default function CalendarDay({ monthStart, day, deliverySlot, orders, onAddClick }: Props) {
 	const currentStrDay = useMemo(() => day.format(SYSTEM_DATE_FORMAT), [day])
 	const notSameMonth = useMemo(() => !day.isSame(monthStart, "month"), [day])
 	const isToday = useMemo(() => day.isSame(moment(), "day"), [day])
@@ -22,9 +23,9 @@ export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick 
 		() => !deliverySlot?.deliveryDates?.find((strDate) => strDate == currentStrDay),
 		[currentStrDay, deliverySlot]
 	)
-	const nbOrders = Math.round(0.4)
-	const nbOrdersTxt = `${nbOrders} order${nbOrders != 1 ? "s" : ""}`
-	const headerText = deliverySlot ? `${nbOrders} out of ${deliverySlot.quantity} orders` : ""
+	const nbOrdersTxt = `${orders} order${orders != 1 ? "s" : ""}`
+	const headerText = deliverySlot ? `${orders} / ${deliverySlot.quantity} orders` : ""
+	const headerTextTitle = deliverySlot ? `${orders} orders out of ${deliverySlot.quantity} planned` : ""
 	return (
 		<div className={classNames("day", { notSameMonth, isToday })}>
 			<div className="number">{day.format("D")}</div>
@@ -38,7 +39,7 @@ export default function CalendarDay({ monthStart, day, deliverySlot, onAddClick 
 					to={`/app/delivery_slots/${deliverySlot.id}`}
 				>
 					<span className="itemHeader">
-						{periodFirstDate && <span title={headerText}>{headerText}</span>}
+						{periodFirstDate && <span title={headerTextTitle}>{headerText}</span>}
 					</span>
 					<span className="itemBody">
 						{periodDateNotAvailable ? (

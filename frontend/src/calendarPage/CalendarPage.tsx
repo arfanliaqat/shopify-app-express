@@ -8,7 +8,7 @@ import { RouteChildrenProps } from "react-router"
 import { Page } from "@shopify/polaris"
 import ShopResource from "../models/ShopResource"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
-import { forEachInEnum } from "@shopify/app-bridge/actions/helper"
+import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Params {
 	shopResourceId: string
@@ -34,6 +34,7 @@ export function getCalendarDatesFromParams(params: Params) {
 interface CalendarPageData {
 	shopResource: ShopResource
 	deliverySlots: DeliverySlot[]
+	ordersPerDate: OrdersPerDate
 }
 
 export const currentStartOfMonth = moment().startOf("month")
@@ -78,7 +79,7 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 	if (calendarPageData == undefined) {
 		return <div />
 	}
-	const { shopResource } = calendarPageData
+	const { shopResource, ordersPerDate } = calendarPageData
 
 	return (
 		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title={shopResource.title}>
@@ -86,6 +87,7 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 				slots={deliverySlots}
 				isLoading={false}
 				calendarDates={calendarDates}
+				ordersPerDate={ordersPerDate}
 				onDateChange={(year, month) => {
 					const strMonth = month < 10 ? "0" + month : "" + month
 					const url = `/app/resources/${params.shopResourceId}/calendar/${year}/${strMonth}`

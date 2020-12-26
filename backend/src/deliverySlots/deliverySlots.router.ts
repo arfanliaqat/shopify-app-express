@@ -19,6 +19,9 @@ router.get(
 	async (req: Request, res: Response) => {
 		try {
 			const { shopResource } = getLocals(res)
+			if (!shopResource) {
+				throw new HandledError("Missing shopResource")
+			}
 			const { from, to } = req.query
 			if (!from || !to) {
 				throw new HandledError("Missing from/to parameters")
@@ -28,8 +31,9 @@ router.get(
 			if (mFrom.diff(mTo, "days") > 45) {
 				throw new HandledError("Incorrect from/to parameters")
 			}
-			const slots = await DeliverySlotService.findDeliverySlots(shopResource?.id || "", mFrom, mTo)
-			res.send({ shopResource, deliverySlots: DeliverySlot.toViewModels(slots) })
+			const slots = await DeliverySlotService.findDeliverySlots(shopResource.id || "", mFrom, mTo)
+			const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(shopResource.id || "", mFrom, mTo)
+			res.send({ shopResource, deliverySlots: DeliverySlot.toViewModels(slots), ordersPerDate })
 		} catch (error) {
 			handleErrors(res, error)
 		}

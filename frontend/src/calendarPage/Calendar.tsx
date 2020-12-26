@@ -6,11 +6,13 @@ import { ChevronLeftMinor, ChevronRightMinor } from "@shopify/polaris-icons"
 import DeliverySlot from "../models/DeliverySlot"
 import { CalendarDates, currentStartOfMonth } from "./CalendarPage"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
+import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Props {
 	slots: DeliverySlot[]
 	isLoading: boolean
 	calendarDates: CalendarDates
+	ordersPerDate?: OrdersPerDate
 	onDateChange: (year: number, month: number) => void
 	onAddSlotClick: (Moment) => void
 }
@@ -23,7 +25,14 @@ function getDaysBetween(start: Moment, end: Moment, unit: "day" | "week"): Momen
 	return days
 }
 
-export default function Calendar({ slots, isLoading, calendarDates, onDateChange, onAddSlotClick }: Props) {
+export default function Calendar({
+	slots,
+	isLoading,
+	calendarDates,
+	onDateChange,
+	onAddSlotClick,
+	ordersPerDate
+}: Props) {
 	const slotsByDate: { [date: string]: DeliverySlot } = useMemo(() => {
 		if (!slots) {
 			return {}
@@ -98,6 +107,7 @@ export default function Calendar({ slots, isLoading, calendarDates, onDateChange
 										monthStart={calendarDates.monthStart}
 										day={day}
 										deliverySlot={slotsByDate[strDay]}
+										orders={ordersPerDate[strDay] || 0}
 										onAddClick={() => onAddSlotClick(day)}
 									/>
 								)
