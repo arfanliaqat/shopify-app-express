@@ -164,17 +164,14 @@
       &.periodFirstDate {
         border-left: 1px solid #C0C8D1;
         margin-left: 5px;
-        border-radius: 3px 0 0 3px;
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
       }
       &.periodLastDate {
         border-right: 1px solid #C0C8D1;
         margin-right: 5px;
-        border-radius: 0 3px 3px 0;
-      }
-      &.isSoldOut {
-        border-color: #D2CEBD;
-        color: #595130;
-        background-color: #FFFBEC;
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
       }
       &:not(.periodFirstDate) {
         margin-left: -1px;
@@ -184,6 +181,14 @@
       }
       &:not(.periodLastDate) {
         margin-right: -1px;
+      }
+      &.isSoldOut {
+        border-color: #D2CEBD;
+        color: #595130;
+        background-color: #FFFBEC;
+        .itemHeader, .itemBody {
+          border-color: #D2CEBD;
+        }
       }
     }
 

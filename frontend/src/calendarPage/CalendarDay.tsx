@@ -24,11 +24,11 @@ export default function CalendarDay({ monthStart, day, deliverySlot, orders, onA
 		[currentStrDay, deliverySlot]
 	)
 	const nbOrdersTxt = `${orders} order${orders != 1 ? "s" : ""}`
+	const isSoldOut = deliverySlot && deliverySlot.totalOrders >= deliverySlot.quantity
 	const headerText = deliverySlot ? `${deliverySlot.totalOrders} / ${deliverySlot.quantity} orders` : ""
 	const headerTextTitle = deliverySlot
-		? `${deliverySlot.totalOrders} orders out of ${deliverySlot.quantity} planned`
+		? `${deliverySlot.totalOrders} orders out of ${deliverySlot.quantity} planned ${isSoldOut ? " (Sold out)" : ""}`
 		: ""
-	const isSoldOut = deliverySlot && deliverySlot.totalOrders >= deliverySlot.quantity
 	return (
 		<div className={classNames("day", { notSameMonth, isToday })}>
 			<div className="number">{day.format("D")}</div>
@@ -43,7 +43,17 @@ export default function CalendarDay({ monthStart, day, deliverySlot, orders, onA
 					to={`/app/delivery_slots/${deliverySlot.id}`}
 				>
 					<span className="itemHeader">
-						{periodFirstDate && <span title={headerTextTitle}>{headerText}</span>}
+						{periodFirstDate && (
+							<span title={headerTextTitle}>
+								{isSoldOut ? (
+									<>
+										<strong>Sold out</strong> ({deliverySlot.totalOrders} orders)
+									</>
+								) : (
+									headerText
+								)}
+							</span>
+						)}
 					</span>
 					<span className="itemBody">
 						{periodDateNotAvailable ? (
