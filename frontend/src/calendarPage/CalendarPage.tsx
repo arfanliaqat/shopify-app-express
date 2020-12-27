@@ -72,6 +72,10 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 				deliverySlot.deliveryDates[deliverySlot.deliveryDates.length - 1],
 				SYSTEM_DATE_FORMAT
 			)
+			deliverySlot.totalOrders = deliverySlot.deliveryDates.reduce(
+				(acc, date) => acc + (calendarPageData.ordersPerDate[date] || 0),
+				0
+			)
 		})
 		return deliverySlots
 	}, [calendarPageData])

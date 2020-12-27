@@ -8,4 +8,5 @@ export default interface DeliverySlot {
 
 	fromDate?: Moment
 	toDate?: Moment
+	totalOrders?: number
 }
