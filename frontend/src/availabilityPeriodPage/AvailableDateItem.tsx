@@ -3,18 +3,18 @@ import { Button } from "@shopify/polaris"
 import moment, { Moment } from "moment"
 
 interface Props {
-	deliveryDate: Moment
+	availableDate: Moment
 	orders: number
 	isNew: boolean
 	onDeleteClick: () => void
 	isDeleted: boolean
 }
 
-export default function DeliveryDateItem({ deliveryDate, orders, isNew, onDeleteClick, isDeleted }: Props) {
+export default function AvailableDateItem({ availableDate, orders, isNew, onDeleteClick, isDeleted }: Props) {
 	const showDeleteButton = (isNew || orders == 0) && !isDeleted
 	return (
-		<div className="deliveryDateItem">
-			<div className="date">{moment(deliveryDate).format("ddd D MMM")}</div>
+		<div className="availableDateItem">
+			<div className="date">{moment(availableDate).format("ddd D MMM")}</div>
 			<div className="orders">{orders} orders</div>
 			<div className="draftState">
 				{isNew && "New"}

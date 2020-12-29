@@ -4,46 +4,46 @@ import { ShopResource } from "../shopResource/shopResource.model"
 import { DatabaseTestService, getConnection } from "../util/database"
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { DeliverySlotBuilder } from "./deliverySlots.builder"
-import { DeliverySlotService } from "./deliverySlots.service"
+import { AvailabilityPeriodBuilder } from "./availabilityPeriods.builder"
+import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
 
-describe("DeliverySlotService", () => {
+describe("AvailabilityPeriodService", () => {
 	let refDate: Moment
 	let shop: Shop | undefined
 	let shopResource: ShopResource | undefined
-	let deliveryDate1: Moment | undefined
-	let deliveryDate2: Moment | undefined
+	let availableDate1: Moment | undefined
+	let availableDate2: Moment | undefined
 
 	beforeEach(async () => {
 		await DatabaseTestService.clearDatabase()
 		refDate = moment().startOf("day").startOf("week").add(1, "week")
 		shop = await new ShopBuilder().buildAndSave()
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
-		deliveryDate1 = refDate
-		deliveryDate2 = refDate.clone().add(1, "day")
+		availableDate1 = refDate
+		availableDate2 = refDate.clone().add(1, "day")
 
-		await new DeliverySlotBuilder()
+		await new AvailabilityPeriodBuilder()
 			.forShopResource(shopResource!)
-			.withDates([deliveryDate1, deliveryDate2])
+			.withDates([availableDate1, availableDate2])
 			.withQuantity(5)
 			.buildAndSave()
 	})
 
 	test("It retrieves future available dates for a given product", async () => {
-		const futureAvailableDates = await DeliverySlotService.findFutureAvailableDates(shopResource!.id!)
+		const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
 		expect(futureAvailableDates).toHaveLength(2)
-		expect(futureAvailableDates[0].date.isSame(deliveryDate1)).toBeTruthy()
-		expect(futureAvailableDates[1].date.isSame(deliveryDate2)).toBeTruthy()
+		expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
+		expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
 	})
 
 	test("It indicates when the date is sold out", async () => {
-		const deliveryDate3 = refDate.clone().add(3, "week")
+		const availableDate3 = refDate.clone().add(3, "week")
 
-		// Add one more delivery slot to make the test scenario more complete
-		await new DeliverySlotBuilder()
+		// Add one more availability period to make the test scenario more complete
+		await new AvailabilityPeriodBuilder()
 			.forShopResource(shopResource!)
-			.withDates([deliveryDate3])
+			.withDates([availableDate3])
 			.withQuantity(10)
 			.buildAndSave()
 
@@ -51,37 +51,37 @@ describe("DeliverySlotService", () => {
 		await new ProductOrderBuilder()
 			.forShopResource(shopResource!)
 			.withQuantity(2)
-			.withDeliveryDate(deliveryDate1!)
+			.withChosenDate(availableDate1!)
 			.buildAndSave()
 
-		// Both delivery slots are not sold out yet
+		// Both availability periods are not sold out yet
 		{
-			const futureAvailableDates = await DeliverySlotService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
 			expect(futureAvailableDates).toHaveLength(3)
-			expect(futureAvailableDates[0].date.isSame(deliveryDate1)).toBeTruthy()
+			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
-			expect(futureAvailableDates[1].date.isSame(deliveryDate2)).toBeTruthy()
+			expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
 			expect(futureAvailableDates[1].isSoldOut).toBeFalsy()
-			expect(futureAvailableDates[2].date.isSame(deliveryDate3)).toBeTruthy()
+			expect(futureAvailableDates[2].date.isSame(availableDate3)).toBeTruthy()
 			expect(futureAvailableDates[2].isSoldOut).toBeFalsy()
 		}
 
-		// Add 3 product orders on day 2, making 5 in total for that delivery slot
+		// Add 3 product orders on day 2, making 5 in total for that availability period
 		await new ProductOrderBuilder()
 			.forShopResource(shopResource!)
 			.withQuantity(3)
-			.withDeliveryDate(deliveryDate2!)
+			.withChosenDate(availableDate2!)
 			.buildAndSave()
 
-		// The first delivery slot is sold out, the second isn't
+		// The first availability period is sold out, the second isn't
 		{
-			const futureAvailableDates = await DeliverySlotService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
 			expect(futureAvailableDates).toHaveLength(3)
-			expect(futureAvailableDates[0].date.isSame(deliveryDate1)).toBeTruthy()
+			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
-			expect(futureAvailableDates[1].date.isSame(deliveryDate2)).toBeTruthy()
+			expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
 			expect(futureAvailableDates[1].isSoldOut).toBeTruthy()
-			expect(futureAvailableDates[2].date.isSame(deliveryDate3)).toBeTruthy()
+			expect(futureAvailableDates[2].date.isSame(availableDate3)).toBeTruthy()
 			expect(futureAvailableDates[2].isSoldOut).toBeFalsy()
 		}
 	})

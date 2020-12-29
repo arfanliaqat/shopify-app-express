@@ -32,7 +32,7 @@ create table shop_resources(
 create unique index ind_unique_shop_resource_gid on shop_resources (resource_type, resource_id);
 create index ind_shop_resource_shop_id on shop_resources (shop_id);
 
-create table delivery_slots(
+create table availability_periods(
 	id uuid default uuid_generate_v4(),
 	shop_resource_id uuid not null references shop_resources(id),
 	quantity integer,
@@ -43,15 +43,15 @@ create table delivery_slots(
 	primary key (id)
 );
 
-create index ind_delivery_slots_shop_resource_id on delivery_slots (shop_resource_id);
-create index ind_delivery_slots_start_date on delivery_slots (start_date);
-create index ind_delivery_slots_end_date on delivery_slots (end_date);
+create index ind_availability_periods_shop_resource_id on availability_periods (shop_resource_id);
+create index ind_availability_periods_start_date on availability_periods (start_date);
+create index ind_availability_periods_end_date on availability_periods (end_date);
 
 create table product_orders(
 	id uuid default uuid_generate_v4(),
 	shop_resource_id uuid not null references shop_resources(id),
 	order_id bigint not null,
-	delivery_date date,
+	chosen_date date,
 	quantity integer not null,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)
@@ -59,5 +59,5 @@ create table product_orders(
 
 create index ind_product_orders_shop_resource_id on product_orders (shop_resource_id);
 create index ind_product_orders_order_id on product_orders (order_id);
-create index ind_product_orders_delivery_date on product_orders (delivery_date);
-create unique index unique_product_order on product_orders (shop_resource_id, order_id, delivery_date)
+create index ind_product_orders_chosen_date on product_orders (chosen_date);
+create unique index unique_product_order on product_orders (shop_resource_id, order_id, chosen_date)

@@ -18,10 +18,10 @@ export class ProductOrderService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ProductOrderSchema>(
 			`
-			SELECT id, shop_resource_id, order_id, delivery_date, quantity, created_date
+			SELECT id, shop_resource_id, order_id, chosen_date, quantity, created_date
 			FROM product_orders
 			WHERE shop_resource_id = $1
-			AND delivery_date between $2 and $3`,
+			AND chosen_date between $2 and $3`,
 			[shopResourceId, fromDate.format(SYSTEM_DATE_FORMAT), toDate.format(SYSTEM_DATE_FORMAT)]
 		)
 		return result.rows.map(ProductOrder.createFromSchema)
@@ -30,7 +30,7 @@ export class ProductOrderService {
 	static sumPerDate(productOrders: ProductOrder[]): OrdersPerDate {
 		const sumPerDate = {} as OrdersPerDate
 		productOrders.forEach((order) => {
-			const strDate = order.deliveryDate.format(SYSTEM_DATE_FORMAT)
+			const strDate = order.chosenDate.format(SYSTEM_DATE_FORMAT)
 			if (!sumPerDate[strDate]) {
 				sumPerDate[strDate] = 0
 			}
@@ -52,7 +52,7 @@ export class ProductOrderService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ProductOrderSchema>(
 			`
-			SELECT id, shop_resource_id, order_id, delivery_date, quantity
+			SELECT id, shop_resource_id, order_id, chosen_date, quantity
 			FROM product_orders
 			WHERE shop_resource_id = $1`,
 			[shopResource.id]
@@ -79,14 +79,14 @@ export class ProductOrderServiceWithTransaction extends WithTransaction {
 	async insert(productOrder: ProductOrder): Promise<ProductOrder | undefined> {
 		const results = await this.getClient().query<{ id: string }>(
 			`
-			INSERT INTO product_orders (shop_resource_id, order_id, delivery_date, quantity)
+			INSERT INTO product_orders (shop_resource_id, order_id, chosen_date, quantity)
 			VALUES ($1, $2, $3, $4)
 			ON CONFLICT DO NOTHING
 			RETURNING id`,
 			[
 				productOrder.shopResourceId,
 				productOrder.orderId,
-				productOrder.deliveryDate.format(SYSTEM_DATE_FORMAT),
+				productOrder.chosenDate.format(SYSTEM_DATE_FORMAT),
 				productOrder.quantity
 			]
 		)

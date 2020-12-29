@@ -64,7 +64,7 @@ export class DatabaseTestService {
 
 		const client: PoolClient = await (await getConnection()).connect()
 		try {
-			await client.query("DELETE FROM delivery_slots")
+			await client.query("DELETE FROM availability_periods")
 			await client.query("DELETE FROM product_orders")
 			await client.query("DELETE FROM shop_resources")
 			await client.query("DELETE FROM access_tokens")

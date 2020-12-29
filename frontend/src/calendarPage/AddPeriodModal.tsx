@@ -3,7 +3,7 @@ import moment, { Moment } from "moment"
 import { TextField, Modal } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import _ from "lodash"
-import DeliveryDatePicker from "../common/DeliveryDatePicker"
+import AvailableDatePicker from "../common/AvailableDatePicker"
 
 interface Props {
 	shopResourceId: string
@@ -12,7 +12,7 @@ interface Props {
 	onClose: () => void
 }
 
-export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose }: Props) {
+export default function AddPeriodModal({ shopResourceId, date, onSuccess, onClose }: Props) {
 	const [active, setActive] = useState(true)
 	const [selectedDates, setSelectedDates] = useState<Moment[]>([date])
 	const [quantity, setQuantity] = useState<number>(10)
@@ -23,10 +23,10 @@ export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose 
 		}, [onSuccess])
 	})
 
-	const handleAddSlotClick = useCallback(() => {
+	const handleAddPeriodClick = useCallback(() => {
 		submitForm({
 			method: "POST",
-			url: `/resources/${shopResourceId}/slots`,
+			url: `/resources/${shopResourceId}/availability_periods`,
 			postData: {
 				dates: selectedDates.map((date) => moment(date).format("YYYY-MM-DD")),
 				quantity
@@ -50,15 +50,15 @@ export default function AddSlotModal({ shopResourceId, date, onSuccess, onClose 
 					setActive(false)
 					onClose()
 				}}
-				title="Add delivery slot"
+				title="Add availability period"
 				primaryAction={{
-					content: "Add slot",
-					onAction: handleAddSlotClick
+					content: "Add period",
+					onAction: handleAddPeriodClick
 				}}
 				loading={isSubmitting}
 			>
-				<div id="AddSlotModal" className="appModal">
-					<DeliveryDatePicker
+				<div id="AddPeriodModal" className="appModal">
+					<AvailableDatePicker
 						selectedDates={selectedDates}
 						onDatesSelected={(selectedDates) => setSelectedDates(selectedDates)}
 					/>

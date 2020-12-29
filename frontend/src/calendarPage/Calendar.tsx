@@ -3,18 +3,18 @@ import { Moment } from "moment"
 import CalendarDay from "./CalendarDay"
 import { Button, Card, Spinner } from "@shopify/polaris"
 import { ChevronLeftMinor, ChevronRightMinor } from "@shopify/polaris-icons"
-import DeliverySlot from "../models/DeliverySlot"
+import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import { CalendarDates, currentStartOfMonth } from "./CalendarPage"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Props {
-	slots: DeliverySlot[]
+	periods: AvailabilityPeriod[]
 	isLoading: boolean
 	calendarDates: CalendarDates
 	ordersPerDate?: OrdersPerDate
 	onDateChange: (year: number, month: number) => void
-	onAddSlotClick: (Moment) => void
+	onAddPeriodClick: (Moment) => void
 }
 
 function getDaysBetween(start: Moment, end: Moment, unit: "day" | "week"): Moment[] {
@@ -26,27 +26,27 @@ function getDaysBetween(start: Moment, end: Moment, unit: "day" | "week"): Momen
 }
 
 export default function Calendar({
-	slots,
+	periods,
 	isLoading,
 	calendarDates,
 	onDateChange,
-	onAddSlotClick,
+	onAddPeriodClick,
 	ordersPerDate
 }: Props) {
-	const slotsByDate: { [date: string]: DeliverySlot } = useMemo(() => {
-		if (!slots) {
+	const availabilityByDate: { [date: string]: AvailabilityPeriod } = useMemo(() => {
+		if (!periods) {
 			return {}
 		}
 		const result = {}
-		slots.forEach((slot) => {
-			if (slot.fromDate && slot.toDate) {
-				for (const cursor = slot.fromDate.clone(); !cursor.isAfter(slot.toDate); cursor.add(1, "day")) {
-					result[cursor.format(SYSTEM_DATE_FORMAT)] = slot
+		periods.forEach((period) => {
+			if (period.fromDate && period.toDate) {
+				for (const cursor = period.fromDate.clone(); !cursor.isAfter(period.toDate); cursor.add(1, "day")) {
+					result[cursor.format(SYSTEM_DATE_FORMAT)] = period
 				}
 			}
 		})
 		return result
-	}, [slots])
+	}, [periods])
 
 	const moveMonth = (delta) => () => {
 		const newMonthStart = calendarDates.monthStart.clone().add(delta, "months")
@@ -106,9 +106,9 @@ export default function Calendar({
 										key={"day" + strDay}
 										monthStart={calendarDates.monthStart}
 										day={day}
-										deliverySlot={slotsByDate[strDay]}
+										availabilityPeriod={availabilityByDate[strDay]}
 										orders={ordersPerDate[strDay] || 0}
-										onAddClick={() => onAddSlotClick(day)}
+										onAddClick={() => onAddPeriodClick(day)}
 									/>
 								)
 							})}

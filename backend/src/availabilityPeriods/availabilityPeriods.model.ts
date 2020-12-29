@@ -1,10 +1,10 @@
 import moment, { Moment } from "moment"
-import DeliverySlotViewModel from "../../../frontend/src/models/DeliverySlot"
+import AvailabilityPeriodViewModel from "../../../frontend/src/models/AvailabilityPeriod"
 import { Shop } from "../shop/shop.model"
 import { AvailableDate as AvailableDateViewModel } from "../../../widget/src/models/AvailableDate"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
-export interface DeliverySlotSchema {
+export interface AvailabilityPeriodSchema {
 	id: string
 	shop_id?: string // joined
 	shop_resource_id: string
@@ -15,7 +15,7 @@ export interface DeliverySlotSchema {
 	created_date: string
 }
 
-export class DeliverySlot {
+export class AvailabilityPeriod {
 	constructor(
 		public id: string | undefined,
 		public shopResourceId: string,
@@ -53,8 +53,8 @@ export class DeliverySlot {
 		return this.dates[0]
 	}
 
-	static createFromSchema(schema: DeliverySlotSchema): DeliverySlot {
-		return new DeliverySlot(
+	static createFromSchema(schema: AvailabilityPeriodSchema): AvailabilityPeriod {
+		return new AvailabilityPeriod(
 			schema.id,
 			schema.shop_resource_id,
 			schema.quantity,
@@ -66,21 +66,21 @@ export class DeliverySlot {
 		)
 	}
 
-	static createFromSchemas(schemas: DeliverySlotSchema[]): DeliverySlot[] {
-		return schemas.map(DeliverySlot.createFromSchema)
+	static createFromSchemas(schemas: AvailabilityPeriodSchema[]): AvailabilityPeriod[] {
+		return schemas.map(AvailabilityPeriod.createFromSchema)
 	}
 
-	toViewModel(): DeliverySlotViewModel {
+	toViewModel(): AvailabilityPeriodViewModel {
 		return {
 			id: this.id!,
 			resourceId: this.shopResourceId,
-			deliveryDates: this.dates.map((date) => date.format("YYYY-MM-DD")),
+			dates: this.dates.map((date) => date.format("YYYY-MM-DD")),
 			quantity: this.quantity
 		}
 	}
 
-	static toViewModels(slots: DeliverySlot[]): DeliverySlotViewModel[] {
-		return slots.map((slot) => slot.toViewModel())
+	static toViewModels(periods: AvailabilityPeriod[]): AvailabilityPeriodViewModel[] {
+		return periods.map((period) => period.toViewModel())
 	}
 
 	belongsTo(shop?: Shop): boolean {
@@ -89,7 +89,7 @@ export class DeliverySlot {
 }
 
 export class AvailableDate {
-	constructor(public deliverySlotId: string, public date: Moment, public isSoldOut: boolean) {}
+	constructor(public availabilityPeriodId: string, public date: Moment, public isSoldOut: boolean) {}
 
 	static toViewModel(availableDate: AvailableDate): AvailableDateViewModel {
 		return {

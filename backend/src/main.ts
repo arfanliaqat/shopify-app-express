@@ -12,7 +12,7 @@ dotenv.config()
 
 import authRouter from "./auth/auth.router"
 import shopResourceRouter from "./shopResource/shopResource.router"
-import deliverySlotsRouter from "./deliverySlots/deliverySlots.router"
+import availabilityPeriodsRouter from "./availabilityPeriods/availabilityPeriods.router"
 import widgetRouter from "./widget/widget.router"
 import hooksRouter from "./hooks/hooks.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
@@ -82,7 +82,7 @@ app.use(
 
 app.use(authRouter)
 app.use(shopResourceRouter)
-app.use(deliverySlotsRouter)
+app.use(availabilityPeriodsRouter)
 app.use(hooksRouter)
 app.use(scriptTagsRouter)
 

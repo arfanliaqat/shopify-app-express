@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import _ from "lodash"
 import { Modal } from "@shopify/polaris"
-import DeliveryDatePicker from "../common/DeliveryDatePicker"
+import AvailableDatePicker from "../common/AvailableDatePicker"
 import moment, { Moment } from "moment"
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 	onClose: () => void
 }
 
-export default function DeliveryDatePickerModal({ date, onDatesSelected, onClose }: Props) {
+export default function AvailableDatePickerModal({ date, onDatesSelected, onClose }: Props) {
 	const [active, setActive] = useState(true)
 	const [selectedDates, setSelectedDates] = useState<Moment[]>([date])
 
@@ -35,14 +35,14 @@ export default function DeliveryDatePickerModal({ date, onDatesSelected, onClose
 					setActive(false)
 					onClose()
 				}}
-				title="Add delivery dates"
+				title="Add available dates"
 				primaryAction={{
 					content: "Add dates",
 					onAction: handleAddDates
 				}}
 			>
-				<div id="deliveryDatePickerModal" className="appModal">
-					<DeliveryDatePicker
+				<div id="availableDatePickerModal" className="appModal">
+					<AvailableDatePicker
 						onDatesSelected={(dates) => {
 							setSelectedDates(dates.map((d) => moment(d)))
 						}}

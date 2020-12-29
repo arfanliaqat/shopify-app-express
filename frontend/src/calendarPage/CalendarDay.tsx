@@ -2,37 +2,41 @@ import React, { useMemo } from "react"
 import { Link } from "react-router-dom"
 import moment, { Moment } from "moment"
 import classNames from "classnames"
-import DeliverySlot from "../models/DeliverySlot"
+import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 
 interface Props {
 	monthStart: Moment
 	day: Moment
-	deliverySlot?: DeliverySlot
+	availabilityPeriod?: AvailabilityPeriod
 	onAddClick: () => void
 	orders: number
 }
 
-export default function CalendarDay({ monthStart, day, deliverySlot, orders, onAddClick }: Props) {
+export default function CalendarDay({ monthStart, day, availabilityPeriod, orders, onAddClick }: Props) {
 	const currentStrDay = useMemo(() => day.format(SYSTEM_DATE_FORMAT), [day])
 	const notSameMonth = useMemo(() => !day.isSame(monthStart, "month"), [day])
 	const isToday = useMemo(() => day.isSame(moment(), "day"), [day])
-	const periodFirstDate = useMemo(() => deliverySlot?.fromDate?.isSame(day, "day"), [day, deliverySlot])
-	const periodLastDate = useMemo(() => deliverySlot?.toDate?.isSame(day, "day"), [day, deliverySlot])
+	const periodFirstDate = useMemo(() => availabilityPeriod?.fromDate?.isSame(day, "day"), [day, availabilityPeriod])
+	const periodLastDate = useMemo(() => availabilityPeriod?.toDate?.isSame(day, "day"), [day, availabilityPeriod])
 	const periodDateNotAvailable = useMemo(
-		() => !deliverySlot?.deliveryDates?.find((strDate) => strDate == currentStrDay),
-		[currentStrDay, deliverySlot]
+		() => !availabilityPeriod?.dates?.find((strDate) => strDate == currentStrDay),
+		[currentStrDay, availabilityPeriod]
 	)
 	const nbOrdersTxt = `${orders} order${orders != 1 ? "s" : ""}`
-	const isSoldOut = deliverySlot && deliverySlot.totalOrders >= deliverySlot.quantity
-	const headerText = deliverySlot ? `${deliverySlot.totalOrders} / ${deliverySlot.quantity} orders` : ""
-	const headerTextTitle = deliverySlot
-		? `${deliverySlot.totalOrders} orders out of ${deliverySlot.quantity} planned ${isSoldOut ? " (Sold out)" : ""}`
+	const isSoldOut = availabilityPeriod && availabilityPeriod.totalOrders >= availabilityPeriod.quantity
+	const headerText = availabilityPeriod
+		? `${availabilityPeriod.totalOrders} / ${availabilityPeriod.quantity} orders`
+		: ""
+	const headerTextTitle = availabilityPeriod
+		? `${availabilityPeriod.totalOrders} orders out of ${availabilityPeriod.quantity} planned ${
+				isSoldOut ? " (Sold out)" : ""
+		  }`
 		: ""
 	return (
 		<div className={classNames("day", { notSameMonth, isToday })}>
 			<div className="number">{day.format("D")}</div>
-			{deliverySlot ? (
+			{availabilityPeriod ? (
 				<Link
 					className={classNames("availabilityPeriodDate", {
 						periodFirstDate,
@@ -40,14 +44,14 @@ export default function CalendarDay({ monthStart, day, deliverySlot, orders, onA
 						periodDateNotAvailable,
 						isSoldOut
 					})}
-					to={`/app/delivery_slots/${deliverySlot.id}`}
+					to={`/app/availability_periods/${availabilityPeriod.id}`}
 				>
 					<span className="itemHeader">
 						{periodFirstDate && (
 							<span title={headerTextTitle}>
 								{isSoldOut ? (
 									<>
-										<strong>Sold out</strong> ({deliverySlot.totalOrders} orders)
+										<strong>Sold out</strong> ({availabilityPeriod.totalOrders} orders)
 									</>
 								) : (
 									headerText

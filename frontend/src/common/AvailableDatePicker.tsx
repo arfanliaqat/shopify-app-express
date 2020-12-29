@@ -22,7 +22,7 @@ function toRangeOrDates(allowRange: boolean, selectedDates: Moment[]): Range | D
 	}
 }
 
-export default function DeliveryDatePicker({ selectedDates, onDatesSelected }: Props) {
+export default function AvailableDatePicker({ selectedDates, onDatesSelected }: Props) {
 	const defaultDate = useMemo<Moment>(() => selectedDates[0], [selectedDates])
 
 	const [calendarMonth, setCalendarMonth] = useState<CalendarMonth>({
@@ -42,7 +42,7 @@ export default function DeliveryDatePicker({ selectedDates, onDatesSelected }: P
 	}
 
 	return (
-		<div className="deliveryDatePicker">
+		<div className="availableDatePicker">
 			<div className="field">
 				<DatePicker
 					month={calendarMonth.month}

@@ -1,12 +1,12 @@
 import { ProductOrder } from "./productOrders.model"
 import moment, { Moment } from "moment"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { ProductOrderService, ProductOrderServiceWithTransaction } from "./productOrders.service"
+import { ProductOrderService } from "./productOrders.service"
 
 export class ProductOrderBuilder {
 	private shopResource?: ShopResource
 	private orderId?: number
-	private deliveryDate?: Moment
+	private chosenDate?: Moment
 	private quantity?: number
 
 	forShopResource(shopResource: ShopResource): this {
@@ -19,8 +19,8 @@ export class ProductOrderBuilder {
 		return this
 	}
 
-	withDeliveryDate(deliveryDate: Moment): this {
-		this.deliveryDate = deliveryDate
+	withChosenDate(availableDate: Moment): this {
+		this.chosenDate = availableDate
 		return this
 	}
 
@@ -36,8 +36,8 @@ export class ProductOrderBuilder {
 			this.orderId = Math.trunc(Math.random() * 10000)
 		}
 
-		if (!this.deliveryDate) {
-			this.deliveryDate = moment()
+		if (!this.chosenDate) {
+			this.chosenDate = moment()
 		}
 
 		if (!this.quantity) {
@@ -45,7 +45,7 @@ export class ProductOrderBuilder {
 		}
 
 		return await ProductOrderService.insert(
-			new ProductOrder(undefined, this.shopResource.id, this.orderId, this.deliveryDate, this.quantity)
+			new ProductOrder(undefined, this.shopResource.id, this.orderId, this.chosenDate, this.quantity)
 		)
 	}
 }

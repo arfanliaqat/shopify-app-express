@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express"
-import { DeliverySlotService } from "../deliverySlots/deliverySlots.service"
+import { AvailabilityPeriodService } from "../availabilityPeriods/availabilityPeriods.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { handleErrors } from "../util/error"
-import { AvailableDate } from "../deliverySlots/deliverySlots.model"
+import { AvailableDate } from "../availabilityPeriods/availabilityPeriods.model"
 
 const router = Router()
 
@@ -14,7 +14,7 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			res.status(404).send({ reason: "Resource not found" })
 			return
 		}
-		const availableDates = await DeliverySlotService.findFutureAvailableDates(shopResourceId)
+		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResourceId)
 		res.send({ availableDates: availableDates.map(AvailableDate.toViewModel) })
 	} catch (error) {
 		handleErrors(res, error)

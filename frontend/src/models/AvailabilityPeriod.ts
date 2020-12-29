@@ -1,9 +1,9 @@
 import { Moment } from "moment"
 
-export default interface DeliverySlot {
+export default interface AvailabilityPeriod {
 	id: string
 	resourceId: string
-	deliveryDates: string[]
+	dates: string[]
 	quantity: number
 
 	fromDate?: Moment

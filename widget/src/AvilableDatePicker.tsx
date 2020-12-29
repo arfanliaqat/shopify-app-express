@@ -3,7 +3,7 @@ import { h } from "preact"
 import { useEffect, useState } from "preact/hooks"
 import { SHOPIFY_APP_URL } from "./constants"
 import { AvailableDate } from "./models/AvailableDate"
-import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT } from "../../backend/src/util/constants"
+import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/src/util/constants"
 
 interface ProductAvailabilityData {
 	config: any
@@ -34,7 +34,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 
 export default function AvailableDatePicker() {
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(undefined)
-	const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string>(undefined)
+	const [selectedAvailableDate, setSelectedAvailableDate] = useState<string>(undefined)
 	const [formError, setFormError] = useState<string>(undefined)
 
 	useEffect(() => {
@@ -43,7 +43,7 @@ export default function AvailableDatePicker() {
 			setProductAvailabilityData(data)
 			const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
 			if (firstAvailableDate) {
-				setSelectedDeliveryDate(firstAvailableDate.date)
+				setSelectedAvailableDate(firstAvailableDate.date)
 			}
 		}
 		fetchData()
@@ -56,7 +56,7 @@ export default function AvailableDatePicker() {
 		const form = datePickerDiv.closest("form")
 		const onSubmit = (e) => {
 			if (e.target.type == "submit") {
-				if (!selectedDeliveryDate) {
+				if (!selectedAvailableDate) {
 					setFormError("Please select a delivery date before adding to cart")
 					e.preventDefault()
 					return false
@@ -69,20 +69,20 @@ export default function AvailableDatePicker() {
 		return () => {
 			form.removeEventListener("click", onSubmit)
 		}
-	}, [selectedDeliveryDate])
+	}, [selectedAvailableDate])
 
-	const handleDeliveryDateSelect = (e) => {
+	const handleAvailableDateSelect = (e) => {
 		if (e.target.value) {
-			setSelectedDeliveryDate(e.target.value)
+			setSelectedAvailableDate(e.target.value)
 		} else {
-			setSelectedDeliveryDate(undefined)
+			setSelectedAvailableDate(undefined)
 		}
 	}
 
 	return (
 		<div>
 			{formError && <div style={{ color: "red", marginBottom: "20px", padding: "0 20%", textAlign: "center" }}>{formError}</div>}
-			<select name="properties[Delivery Date]" id="deliveryDate10a" onChange={handleDeliveryDateSelect} style={{ width: "100%" }}>
+			<select name={`properties[${TAG_LABEL}]`} id="availableDate10a" onChange={handleAvailableDateSelect} style={{ width: "100%" }}>
 				{availableDates.map((availableDate) => {
 					const momentDate = moment(availableDate.date, SYSTEM_DATE_FORMAT)
 					const valueDate = momentDate.format(TAG_DATE_FORMAT)
@@ -90,7 +90,7 @@ export default function AvailableDatePicker() {
 						<option
 							value={valueDate}
 							disabled={availableDate.isSoldOut}
-							selected={valueDate == selectedDeliveryDate}
+							selected={valueDate == selectedAvailableDate}
 						>
 							{momentDate.format("dddd D MMMM")}
 							{availableDate.isSoldOut ? " (sold out)" : ""}

@@ -8,3 +8,4 @@ export const databaseName = process.env.DB_DATABASE || "shopify_app"
 
 export const SYSTEM_DATE_FORMAT = "YYYY-MM-DD"
 export const TAG_DATE_FORMAT = "DD/MM/YYYY"
+export const TAG_LABEL = "Delivery Date"

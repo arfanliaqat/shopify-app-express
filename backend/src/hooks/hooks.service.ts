@@ -4,17 +4,17 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT } from "../util/constants"
+import { TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 
-export function getDeliveryDate(lineItem: LineItem): Moment | undefined {
-	const deliveryDateProperty = lineItem.properties.find((property: Property) => {
-		return property.name?.toLowerCase() == "delivery date"
+export function getChosenDate(lineItem: LineItem): Moment | undefined {
+	const chosenDateProperty = lineItem.properties.find((property: Property) => {
+		return property.name?.toLowerCase() == TAG_LABEL.toLowerCase()
 	})
-	if (!deliveryDateProperty?.value) return undefined
-	return moment(deliveryDateProperty.value, TAG_DATE_FORMAT)
+	if (!chosenDateProperty?.value) return undefined
+	return moment(chosenDateProperty.value, TAG_DATE_FORMAT)
 }
 
 export class HooksService {
@@ -103,18 +103,18 @@ export class HooksService {
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 
 			orderEvent.line_items.forEach((item) => {
-				const deliveryDate = getDeliveryDate(item)
-				if (!deliveryDate) return
+				const chosenDate = getChosenDate(item)
+				if (!chosenDate) return
 				const shopResource = eventShopResources[item.product_id]
 				if (shopResource && shopResource.id) {
-					const key = shopResource.id + ":" + deliveryDate
+					const key = shopResource.id + ":" + chosenDate
 					const newProductOrder = newProductOrdersById[key]
 					if (!newProductOrder) {
 						newProductOrdersById[key] = new ProductOrder(
 							undefined,
 							shopResource.id,
 							orderEvent.id,
-							deliveryDate,
+							chosenDate,
 							item.quantity
 						)
 					} else {

@@ -1,21 +1,21 @@
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { getDeliveryDate, HooksService } from "./hooks.service"
+import { getChosenDate, HooksService } from "./hooks.service"
 import moment, { Moment } from "moment"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import { DatabaseTestService, getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { SYSTEM_DATE_FORMAT } from "../util/constants"
+import { SYSTEM_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 
 describe("HooksService", () => {
-	let deliveryDate: Moment
+	let availableDate: Moment
 	let shop: Shop | undefined
 	let shopResource: ShopResource | undefined
 
 	beforeEach(async () => {
 		await DatabaseTestService.clearDatabase()
-		deliveryDate = moment("01/12/2020", "DD/MM/YYYY")
+		availableDate = moment("01/12/2020", "DD/MM/YYYY")
 		shop = await new ShopBuilder().buildAndSave()
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 
@@ -27,8 +27,8 @@ describe("HooksService", () => {
 					product_id: 4321,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -39,8 +39,8 @@ describe("HooksService", () => {
 	test("Orders get properly ingested", async () => {
 		const productOrders = await ProductOrderService.findByShopResourceAndDate(
 			shopResource!.id!,
-			deliveryDate,
-			deliveryDate
+			availableDate,
+			availableDate
 		)
 		expect(productOrders).toHaveLength(1)
 
@@ -53,8 +53,8 @@ describe("HooksService", () => {
 			// So it creates a product orders record for it
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
-				deliveryDate,
-				deliveryDate
+				availableDate,
+				availableDate
 			)
 			expect(productOrders).toHaveLength(1)
 		}
@@ -67,8 +67,8 @@ describe("HooksService", () => {
 					product_id: 6666,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -86,8 +86,8 @@ describe("HooksService", () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
-				deliveryDate,
-				deliveryDate
+				availableDate,
+				availableDate
 			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
@@ -101,8 +101,8 @@ describe("HooksService", () => {
 					product_id: 4321,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -120,8 +120,8 @@ describe("HooksService", () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
-				deliveryDate,
-				deliveryDate
+				availableDate,
+				availableDate
 			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
@@ -135,8 +135,8 @@ describe("HooksService", () => {
 					product_id: 4321,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -153,8 +153,8 @@ describe("HooksService", () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
-				deliveryDate,
-				deliveryDate
+				availableDate,
+				availableDate
 			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
@@ -168,8 +168,8 @@ describe("HooksService", () => {
 					product_id: 4321,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -186,8 +186,8 @@ describe("HooksService", () => {
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
-				deliveryDate,
-				deliveryDate
+				availableDate,
+				availableDate
 			)
 			expect(productOrders).toHaveLength(1)
 			expect(productOrders[0].quantity).toBe(1)
@@ -202,8 +202,8 @@ describe("HooksService", () => {
 					product_id: 4321,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -216,14 +216,14 @@ describe("HooksService", () => {
 		}
 	})
 
-	test("It handles multiple delivery dates in the same order", async () => {
+	test("It handles multiple chosen dates in the same order", async () => {
 		const shopResource2 = await new ShopResourceBuilder()
 			.forShop(shop!)
 			.withResourceId("Product", 5555)
 			.buildAndSave()
 
-		const deliveryDate1 = deliveryDate.clone().add(1, "day")
-		const deliveryDate2 = deliveryDate.clone().add(2, "day")
+		const availableDate1 = availableDate.clone().add(1, "day")
+		const availableDate2 = availableDate.clone().add(2, "day")
 
 		await HooksService.ingestOrderEvent("updated", shop!, {
 			id: 1234,
@@ -233,8 +233,8 @@ describe("HooksService", () => {
 					product_id: 4321,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate1.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate1.format("DD/MM/YYYY")
 						}
 					]
 				},
@@ -243,8 +243,8 @@ describe("HooksService", () => {
 					product_id: 5555,
 					properties: [
 						{
-							name: "Delivery Date",
-							value: deliveryDate2.format("DD/MM/YYYY")
+							name: TAG_LABEL,
+							value: availableDate2.format("DD/MM/YYYY")
 						}
 					]
 				}
@@ -253,36 +253,36 @@ describe("HooksService", () => {
 
 		const productOrders1 = await ProductOrderService.findByShopResourceAndDate(
 			shopResource!.id!,
-			deliveryDate1,
-			deliveryDate1
+			availableDate1,
+			availableDate1
 		)
 		expect(productOrders1).toHaveLength(1)
-		expect(productOrders1[0].deliveryDate.isSame(deliveryDate1, "day")).toBeTruthy()
+		expect(productOrders1[0].chosenDate.isSame(availableDate1, "day")).toBeTruthy()
 		expect(productOrders1[0].quantity).toBe(1)
 
 		const productOrders2 = await ProductOrderService.findByShopResourceAndDate(
 			shopResource2!.id!,
-			deliveryDate2,
-			deliveryDate2
+			availableDate2,
+			availableDate2
 		)
 		expect(productOrders2).toHaveLength(1)
-		expect(productOrders2[0].deliveryDate.isSame(deliveryDate2, "day")).toBeTruthy()
+		expect(productOrders2[0].chosenDate.isSame(availableDate2, "day")).toBeTruthy()
 		expect(productOrders2[0].quantity).toBe(5)
 	})
 
 	test("Date is parsed correctly", () => {
-		const deliveryDate = getDeliveryDate({
+		const availableDate = getChosenDate({
 			product_id: 123,
 			quantity: 2,
 			properties: [
 				{
-					name: "Delivery Date",
+					name: TAG_LABEL,
 					value: "20/12/2020"
 				}
 			]
 		})
 
-		expect(deliveryDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
+		expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
 	})
 
 	afterAll(async () => {

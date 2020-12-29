@@ -3,11 +3,11 @@ import { loadConnectedShop } from "../shop/shop.middleware"
 import { HandledError, handleErrors, FormError, FormErrors, UnexpectedError, Forbidden } from "../util/error"
 import { getLocals } from "../util/locals"
 import moment, { Moment } from "moment"
-import { DeliverySlotService } from "./deliverySlots.service"
+import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 import _ from "lodash"
 import { loadShopResource } from "../shopResource/shopResource.middleware"
-import { DeliverySlot } from "./deliverySlots.model"
-import { loadDeliverySlot } from "./deliverySlots.middleware"
+import { AvailabilityPeriod } from "./availabilityPeriods.model"
+import { loadAvailabilityPeriod } from "./availabilityPeriods.middleware"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 
@@ -31,9 +31,9 @@ router.get(
 			if (mFrom.diff(mTo, "days") > 45) {
 				throw new HandledError("Incorrect from/to parameters")
 			}
-			const slots = await DeliverySlotService.findDeliverySlots(shopResource.id || "", mFrom, mTo)
+			const periods = await AvailabilityPeriodService.findAvailabilityPeriods(shopResource.id || "", mFrom, mTo)
 			const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(shopResource.id || "", mFrom, mTo)
-			res.send({ shopResource, deliverySlots: DeliverySlot.toViewModels(slots), ordersPerDate })
+			res.send({ shopResource, availabilityPeriods: AvailabilityPeriod.toViewModels(periods), ordersPerDate })
 		} catch (error) {
 			handleErrors(res, error)
 		}
@@ -58,7 +58,7 @@ function validateQuantity(errors: FormError[], quantity?: any): number | undefin
 }
 
 router.post(
-	"/resources/:shopResourceId/slots",
+	"/resources/:shopResourceId/availability_periods",
 	[loadConnectedShop, loadShopResource],
 	async (req: Request, res: Response) => {
 		try {
@@ -67,8 +67,12 @@ router.post(
 			const dates = validateDates(errors, req.body.dates)
 			const quantity = validateQuantity(errors, req.body.quantity)
 			if (!dates || !quantity || errors.length > 0) throw new FormErrors(errors)
-			const deliverySlot = await DeliverySlotService.createDeliverySlot(shopResource?.id || "", dates, quantity)
-			res.send(deliverySlot?.toViewModel())
+			const availabilityPeriod = await AvailabilityPeriodService.createAvailabilityPeriod(
+				shopResource?.id || "",
+				dates,
+				quantity
+			)
+			res.send(availabilityPeriod?.toViewModel())
 		} catch (error) {
 			handleErrors(res, error)
 		}
@@ -76,18 +80,18 @@ router.post(
 )
 
 router.get(
-	"/delivery_slots/:deliverySlotId/page",
-	[loadConnectedShop, loadDeliverySlot],
+	"/availability_periods/:availabilityPeriodId/page",
+	[loadConnectedShop, loadAvailabilityPeriod],
 	async (req: Request, res: Response) => {
 		try {
-			const { connectedShop, deliverySlot } = getLocals(res)
+			const { connectedShop, availabilityPeriod } = getLocals(res)
 			if (!connectedShop) {
 				throw new UnexpectedError("connectedShop should be loaded")
 			}
-			if (!deliverySlot) {
-				throw new UnexpectedError("deliverySlot should be loaded")
+			if (!availabilityPeriod) {
+				throw new UnexpectedError("availabilityPeriod should be loaded")
 			}
-			const shopResource = await ShopResourceService.findShopResourceById(deliverySlot.shopResourceId)
+			const shopResource = await ShopResourceService.findShopResourceById(availabilityPeriod.shopResourceId)
 			if (!shopResource || !shopResource.id) {
 				throw new UnexpectedError("shopResource not found")
 			}
@@ -96,12 +100,12 @@ router.get(
 			}
 			const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(
 				shopResource.id,
-				deliverySlot.startDate,
-				deliverySlot.endDate
+				availabilityPeriod.startDate,
+				availabilityPeriod.endDate
 			)
 			res.send({
 				shopResource: shopResource.toViewModel(),
-				deliverySlot: deliverySlot.toViewModel(),
+				availabilityPeriod: availabilityPeriod.toViewModel(),
 				ordersPerDate
 			})
 		} catch (error) {
@@ -111,21 +115,21 @@ router.get(
 )
 
 router.post(
-	"/delivery_slots/:deliverySlotId",
-	[loadConnectedShop, loadDeliverySlot],
+	"/availability_periods/:availabilityPeriodId",
+	[loadConnectedShop, loadAvailabilityPeriod],
 	async (req: Request, res: Response) => {
 		try {
-			const { deliverySlot } = getLocals(res)
-			if (!deliverySlot) throw new UnexpectedError("deliverySlot cannot be undefined")
+			const { availabilityPeriod } = getLocals(res)
+			if (!availabilityPeriod) throw new UnexpectedError("availabilityPeriod cannot be undefined")
 			const errors = [] as FormError[]
 			const newDates = validateDates(errors, req.body.newDates)
 			const deletedDates = validateDates(errors, req.body.deletedDates)
 			const quantity = validateQuantity(errors, req.body.quantity)
 			if (!quantity || errors.length > 0) throw new FormErrors(errors)
-			deliverySlot.addNewDates(newDates)
-			deliverySlot.deleteDates(deletedDates)
-			deliverySlot.quantity = quantity
-			await DeliverySlotService.updateShopResource(deliverySlot)
+			availabilityPeriod.addNewDates(newDates)
+			availabilityPeriod.deleteDates(deletedDates)
+			availabilityPeriod.quantity = quantity
+			await AvailabilityPeriodService.updateShopResource(availabilityPeriod)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)
@@ -134,14 +138,14 @@ router.post(
 )
 
 router.delete(
-	"/delivery_slots/:deliverySlotId",
-	[loadConnectedShop, loadDeliverySlot],
+	"/availability_periods/:availabilityPeriodId",
+	[loadConnectedShop, loadAvailabilityPeriod],
 	async (req: Request, res: Response) => {
 		try {
-			const { deliverySlot } = getLocals(res)
-			if (!deliverySlot) throw new UnexpectedError("deliverySlot cannot be undefined")
+			const { availabilityPeriod } = getLocals(res)
+			if (!availabilityPeriod) throw new UnexpectedError("availabilityPeriod cannot be undefined")
 			// TODO: prevent deletion of there are orders...
-			await DeliverySlotService.deleteDeliverySlot(deliverySlot)
+			await AvailabilityPeriodService.deleteAvailabilityPeriod(availabilityPeriod)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)

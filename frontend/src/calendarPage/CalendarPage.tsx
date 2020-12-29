@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react"
 import Calendar from "./Calendar"
-import DeliverySlot from "../models/DeliverySlot"
+import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
-import AddSlotModal from "./AddSlotModal"
+import AddPeriodModal from "./AddPeriodModal"
 import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
 import { Page } from "@shopify/polaris"
@@ -33,7 +33,7 @@ export function getCalendarDatesFromParams(params: Params) {
 
 interface CalendarPageData {
 	shopResource: ShopResource
-	deliverySlots: DeliverySlot[]
+	availabilityPeriods: AvailabilityPeriod[]
 	ordersPerDate: OrdersPerDate
 }
 
@@ -44,12 +44,12 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 	const shopResourceId = params.shopResourceId
 	const calendarDates = useMemo(() => getCalendarDatesFromParams(params), [params])
 
-	const [addSlotDate, setAddSlotDate] = useState<Moment>()
+	const [addPeriodDate, setAddPeriodDate] = useState<Moment>()
 	const [requestIncrement, setRequestIncrement] = useState<number>(0)
-	const { setApiRequest: fetchDeliverySlots, data: calendarPageData } = useApi<CalendarPageData>({})
+	const { setApiRequest: fetchCalendarPage, data: calendarPageData } = useApi<CalendarPageData>({})
 
 	useEffect(() => {
-		fetchDeliverySlots({
+		fetchCalendarPage({
 			method: "GET",
 			url: `/resources/${params.shopResourceId}/calendar_page`,
 			queryParams: {
@@ -59,25 +59,25 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 		})
 	}, [params, calendarDates, requestIncrement])
 
-	const refreshDeliverySlots = useCallback(() => {
+	const refreshAvailabilityPeriods = useCallback(() => {
 		setRequestIncrement(requestIncrement + 1)
 	}, [requestIncrement])
 
-	const deliverySlots = useMemo(() => {
-		if (!calendarPageData || !calendarPageData.deliverySlots) return []
-		const deliverySlots = [...calendarPageData.deliverySlots]
-		deliverySlots.forEach((deliverySlot) => {
-			deliverySlot.fromDate = moment(deliverySlot.deliveryDates[0], SYSTEM_DATE_FORMAT)
-			deliverySlot.toDate = moment(
-				deliverySlot.deliveryDates[deliverySlot.deliveryDates.length - 1],
+	const availabilityPeriods = useMemo(() => {
+		if (!calendarPageData || !calendarPageData.availabilityPeriods) return []
+		const availabilityPeriods = [...calendarPageData.availabilityPeriods]
+		availabilityPeriods.forEach((availabilityPeriod) => {
+			availabilityPeriod.fromDate = moment(availabilityPeriod.dates[0], SYSTEM_DATE_FORMAT)
+			availabilityPeriod.toDate = moment(
+				availabilityPeriod.dates[availabilityPeriod.dates.length - 1],
 				SYSTEM_DATE_FORMAT
 			)
-			deliverySlot.totalOrders = deliverySlot.deliveryDates.reduce(
+			availabilityPeriod.totalOrders = availabilityPeriod.dates.reduce(
 				(acc, date) => acc + (calendarPageData.ordersPerDate[date] || 0),
 				0
 			)
 		})
-		return deliverySlots
+		return availabilityPeriods
 	}, [calendarPageData])
 
 	if (calendarPageData == undefined) {
@@ -88,7 +88,7 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 	return (
 		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title={shopResource.title}>
 			<Calendar
-				slots={deliverySlots}
+				periods={availabilityPeriods}
 				isLoading={false}
 				calendarDates={calendarDates}
 				ordersPerDate={ordersPerDate}
@@ -97,18 +97,18 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 					const url = `/app/resources/${params.shopResourceId}/calendar/${year}/${strMonth}`
 					history.push(url)
 				}}
-				onAddSlotClick={setAddSlotDate}
+				onAddPeriodClick={setAddPeriodDate}
 			/>
-			{addSlotDate && (
-				<AddSlotModal
+			{addPeriodDate && (
+				<AddPeriodModal
 					shopResourceId={shopResourceId}
-					date={addSlotDate}
+					date={addPeriodDate}
 					onClose={() => {
-						setAddSlotDate(null)
+						setAddPeriodDate(null)
 					}}
 					onSuccess={() => {
-						setAddSlotDate(null)
-						refreshDeliverySlots()
+						setAddPeriodDate(null)
+						refreshAvailabilityPeriods()
 					}}
 				/>
 			)}

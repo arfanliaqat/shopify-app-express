@@ -5,7 +5,7 @@ import { AppProvider } from "@shopify/polaris"
 import HomePage from "./homePage/HomePage"
 import { Provider } from "@shopify/app-bridge-react"
 import translations from "@shopify/polaris/locales/en.json"
-import DeliverySlotPage from "./deliverySlotPage/DeliverySlotPage"
+import AvailabilityPeriodPage from "./availabilityPeriodPage/AvailabilityPeriodPage"
 import CalendarPage from "./calendarPage/CalendarPage"
 import NotFoundPage from "./NotFoundPage"
 
@@ -41,7 +41,11 @@ ReactDOM.render(
 				<Switch>
 					<Route exact path="/app" component={HomePage} />
 					<Route exact path="/app/resources/:shopResourceId/calendar/:year/:month" component={CalendarPage} />
-					<Route exact path="/app/delivery_slots/:deliverySlotId" component={DeliverySlotPage} />
+					<Route
+						exact
+						path="/app/availability_periods/:availabilityPeriodId"
+						component={AvailabilityPeriodPage}
+					/>
 					<Route path="*" component={NotFoundPage} />
 				</Switch>
 			</BrowserRouter>

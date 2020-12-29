@@ -1,9 +1,9 @@
-import { DeliverySlot } from "./deliverySlots.model"
+import { AvailabilityPeriod } from "./availabilityPeriods.model"
 import moment, { Moment } from "moment"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { DeliverySlotService } from "./deliverySlots.service"
+import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 
-export class DeliverySlotBuilder {
+export class AvailabilityPeriodBuilder {
 	private shopResource?: ShopResource
 	private quantity?: number
 	private dates?: Moment[]
@@ -13,17 +13,17 @@ export class DeliverySlotBuilder {
 		return this
 	}
 
-	withQuantity(quantity: number): DeliverySlotBuilder {
+	withQuantity(quantity: number): AvailabilityPeriodBuilder {
 		this.quantity = quantity
 		return this
 	}
 
-	withDates(dates: Moment[]): DeliverySlotBuilder {
+	withDates(dates: Moment[]): AvailabilityPeriodBuilder {
 		this.dates = dates
 		return this
 	}
 
-	async buildAndSave(): Promise<DeliverySlot | undefined> {
+	async buildAndSave(): Promise<AvailabilityPeriod | undefined> {
 		if (!this.shopResource?.id) throw "this.shop is required"
 
 		if (!this.dates) {
@@ -34,6 +34,6 @@ export class DeliverySlotBuilder {
 			this.quantity = 10
 		}
 
-		return await DeliverySlotService.createDeliverySlot(this.shopResource.id, this.dates, this.quantity)
+		return await AvailabilityPeriodService.createAvailabilityPeriod(this.shopResource.id, this.dates, this.quantity)
 	}
 }

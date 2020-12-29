@@ -5,7 +5,7 @@ export interface ProductOrderSchema {
 	id: string
 	shop_resource_id: string
 	order_id: number
-	delivery_date: Date
+	chosen_date: Date
 	quantity: number
 	created_date: Date
 }
@@ -14,7 +14,7 @@ export interface ProductOrderViewModel {
 	id: string
 	shopResourceId: string
 	orderId: number
-	deliveryDate: string
+	chosenDate: string
 	quantity: number
 }
 
@@ -25,7 +25,7 @@ export class ProductOrder {
 		public id: string | undefined,
 		public shopResourceId: string,
 		public orderId: number,
-		public deliveryDate: Moment,
+		public chosenDate: Moment,
 		public quantity: number,
 		public createdDate?: Moment
 	) {}
@@ -35,7 +35,7 @@ export class ProductOrder {
 			schema.id,
 			schema.shop_resource_id,
 			schema.order_id,
-			moment(schema.delivery_date),
+			moment(schema.chosen_date),
 			schema.quantity,
 			moment(schema.created_date)
 		)
@@ -46,7 +46,7 @@ export class ProductOrder {
 			id: productOrder.id!,
 			shopResourceId: productOrder.shopResourceId,
 			orderId: productOrder.orderId,
-			deliveryDate: productOrder.deliveryDate.format(SYSTEM_DATE_FORMAT),
+			chosenDate: productOrder.chosenDate.format(SYSTEM_DATE_FORMAT),
 			quantity: productOrder.quantity
 		}
 	}
