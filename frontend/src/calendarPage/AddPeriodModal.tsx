@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from "react"
 import moment, { Moment } from "moment"
-import { TextField, Modal } from "@shopify/polaris"
+import { TextField, Modal, Checkbox, FormLayout } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import _ from "lodash"
 import AvailableDatePicker from "../common/AvailableDatePicker"
+import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
 
 interface Props {
 	shopResourceId: string
@@ -16,6 +17,7 @@ export default function AddPeriodModal({ shopResourceId, date, onSuccess, onClos
 	const [active, setActive] = useState(true)
 	const [selectedDates, setSelectedDates] = useState<Moment[]>([date])
 	const [quantity, setQuantity] = useState<number>(10)
+	const [quantityIsShared, setQuantityIsShared] = useState<boolean>(true)
 
 	const { setApiRequest: submitForm, isLoading: isSubmitting } = useApi({
 		onSuccess: useCallback(() => {
@@ -29,10 +31,11 @@ export default function AddPeriodModal({ shopResourceId, date, onSuccess, onClos
 			url: `/resources/${shopResourceId}/availability_periods`,
 			postData: {
 				dates: selectedDates.map((date) => moment(date).format("YYYY-MM-DD")),
-				quantity
+				quantity,
+				quantityIsShared
 			}
 		})
-	}, [submitForm, selectedDates, quantity, shopResourceId])
+	}, [submitForm, selectedDates, quantity, shopResourceId, quantityIsShared])
 
 	return (
 		<div
@@ -58,18 +61,24 @@ export default function AddPeriodModal({ shopResourceId, date, onSuccess, onClos
 				loading={isSubmitting}
 			>
 				<div id="AddPeriodModal" className="appModal">
-					<AvailableDatePicker
-						selectedDates={selectedDates}
-						onDatesSelected={(selectedDates) => setSelectedDates(selectedDates)}
-					/>
-					<TextField
-						label="Quantity"
-						type="number"
-						value={quantity.toString()}
-						onChange={(value) => {
-							setQuantity(parseInt(value))
-						}}
-					/>
+					<FormLayout>
+						<AvailableDatePicker
+							selectedDates={selectedDates}
+							onDatesSelected={(selectedDates) => setSelectedDates(selectedDates)}
+						/>
+						<TextField
+							label="Quantity"
+							type="number"
+							value={quantity.toString()}
+							onChange={(value) => {
+								setQuantity(parseInt(value))
+							}}
+						/>
+						<QuantityIsSharedCheckbox
+							checked={quantityIsShared}
+							onChange={(isShared) => setQuantityIsShared(isShared)}
+						/>
+					</FormLayout>
 				</div>
 			</Modal>
 		</div>

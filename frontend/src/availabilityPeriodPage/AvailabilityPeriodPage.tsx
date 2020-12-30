@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { RouteChildrenProps } from "react-router"
-import { Page, ResourceList, Card, Layout, Button, TextField, PageActions, Badge } from "@shopify/polaris"
+import { Page, ResourceList, Card, Layout, Button, TextField, PageActions, Badge, FormLayout } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
@@ -10,6 +10,7 @@ import { Toast } from "@shopify/app-bridge-react"
 import AvailableDatePickerModal from "./AvailableDatePickerModal"
 import AvailableDateItem from "./AvailableDateItem"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
+import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -47,13 +48,12 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	const [newDates, setNewDates] = useState<Moment[]>([])
 	const [deletedDates, setDeletedDates] = useState<Moment[]>([])
 	const [quantity, setQuantity] = useState<number>()
+	const [quantityIsShared, setQuantityIsShared] = useState<boolean>()
 	const [successMessage, setSuccessMessage] = useState<string>()
 	const [addPeriodModalOpen, setAddPeriodModalOpen] = useState<boolean>()
 
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
-	const { setApiRequest: fetchPeriod, data: availabilityPeriodPageData, isLoading } = useApi<
-		AvailabilityPeriodPageData
-	>({
+	const { setApiRequest: fetchPeriod, data: pageData, isLoading } = useApi<AvailabilityPeriodPageData>({
 		onSuccess: useCallback(() => {
 			setNewDates([])
 		}, [])
@@ -66,8 +66,8 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	})
 	const { setApiRequest: deletePeriod, isLoading: isDeletingPeriod } = useApi({
 		onSuccess: useCallback(() => {
-			history.push(getBackUrl(availabilityPeriodPageData.shopResource))
-		}, [availabilityPeriodPageData, history])
+			history.push(getBackUrl(pageData.shopResource))
+		}, [pageData, history])
 	})
 
 	useEffect(() => {
@@ -77,10 +77,15 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	}, [reloadIncrement])
 
 	useEffect(() => {
-		if (availabilityPeriodPageData && quantity === undefined) {
-			setQuantity(availabilityPeriodPageData.availabilityPeriod.quantity)
+		if (pageData) {
+			if (quantity === undefined) {
+				setQuantity(pageData.availabilityPeriod.quantity)
+			}
+			if (quantityIsShared === undefined) {
+				setQuantityIsShared(pageData.availabilityPeriod.quantityIsShared)
+			}
 		}
-	}, [availabilityPeriodPageData])
+	}, [pageData])
 
 	const handleSavePeriod = useCallback(() => {
 		savePeriod({
@@ -89,10 +94,11 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 			postData: {
 				newDates: newDates.map((date) => moment(date).format(SYSTEM_DATE_FORMAT)),
 				deletedDates: deletedDates.map((date) => moment(date).format(SYSTEM_DATE_FORMAT)),
-				quantity
+				quantity,
+				quantityIsShared
 			}
 		})
-	}, [newDates, deletedDates, quantity])
+	}, [newDates, deletedDates, quantity, quantityIsShared])
 
 	const handleDeletePeriod = useCallback(() => {
 		deletePeriod({
@@ -101,7 +107,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 		})
 	}, [newDates, quantity])
 
-	const currentAvailableDates = (availabilityPeriodPageData?.availabilityPeriod?.dates || []).map((d) => moment(d))
+	const currentAvailableDates = (pageData?.availabilityPeriod?.dates || []).map((d) => moment(d))
 
 	const handleSelectedDates = (selectedDates: Moment[]) => {
 		const filteredDates = selectedDates.filter((d) => !currentAvailableDates.find((cd) => d.isSame(cd, "day")))
@@ -117,7 +123,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 				if (d1.isAfter(d2)) return 1
 				return 0
 			})
-	}, [availabilityPeriodPageData, newDates])
+	}, [pageData, newDates])
 
 	const isNewDate = (availableDate: Moment): boolean => {
 		return newDates.find((nd) => nd.isSame(availableDate, "day")) != undefined
@@ -139,21 +145,22 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	}
 
 	const getOrdersForDate = (availableDate: Moment): number => {
-		if (!availabilityPeriodPageData) return 0
+		if (!pageData) return 0
 		const strDate = availableDate.format(SYSTEM_DATE_FORMAT)
-		return availabilityPeriodPageData.ordersPerDate[strDate] || 0
+		return pageData.ordersPerDate[strDate] || 0
 	}
 
 	const isDirty =
-		(availabilityPeriodPageData && availabilityPeriodPageData.availabilityPeriod.quantity != quantity) ||
+		(pageData && pageData.availabilityPeriod.quantity != quantity) ||
+		(pageData && pageData.availabilityPeriod.quantityIsShared != quantityIsShared) ||
 		newDates.length > 0 ||
 		deletedDates.length > 0
 
-	if (isLoading || !availabilityPeriodPageData) {
+	if (isLoading || !pageData) {
 		return <div />
 	}
 
-	const { shopResource, availabilityPeriod, ordersPerDate } = availabilityPeriodPageData
+	const { shopResource, availabilityPeriod, ordersPerDate } = pageData
 
 	const totalOrders = getTotalOrders(ordersPerDate)
 	const remainingQuantity = Math.max(0, availabilityPeriod.quantity - totalOrders)
@@ -204,14 +211,20 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 						title="Shared period quantity"
 						description="Define your stock for these available dates"
 					>
-						<TextField
-							label="Quantity"
-							type="number"
-							value={quantity.toString()}
-							onChange={(value) => {
-								setQuantity(parseInt(value))
-							}}
-						/>
+						<FormLayout>
+							<TextField
+								label="Quantity"
+								type="number"
+								value={quantity.toString()}
+								onChange={(value) => {
+									setQuantity(parseInt(value))
+								}}
+							/>
+							<QuantityIsSharedCheckbox
+								checked={quantityIsShared}
+								onChange={(isShared) => setQuantityIsShared(isShared)}
+							/>
+						</FormLayout>
 					</Layout.AnnotatedSection>
 
 					<Layout.AnnotatedSection

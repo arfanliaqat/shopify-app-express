@@ -39,6 +39,7 @@ create table availability_periods(
 	start_date timestamp with time zone not null,
 	end_date timestamp with time zone not null,
 	dates jsonb, -- to be refactored into a separate table
+    availability_periods boolean not null,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)
 );

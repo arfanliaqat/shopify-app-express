@@ -66,11 +66,13 @@ router.post(
 			const errors = [] as FormError[]
 			const dates = validateDates(errors, req.body.dates)
 			const quantity = validateQuantity(errors, req.body.quantity)
+			const quantityIsShared = !!req.body.quantityIsShared
 			if (!dates || !quantity || errors.length > 0) throw new FormErrors(errors)
 			const availabilityPeriod = await AvailabilityPeriodService.createAvailabilityPeriod(
 				shopResource?.id || "",
 				dates,
-				quantity
+				quantity,
+				quantityIsShared
 			)
 			res.send(availabilityPeriod?.toViewModel())
 		} catch (error) {
@@ -125,10 +127,12 @@ router.post(
 			const newDates = validateDates(errors, req.body.newDates)
 			const deletedDates = validateDates(errors, req.body.deletedDates)
 			const quantity = validateQuantity(errors, req.body.quantity)
+			const quantityIsShared = !!req.body.quantityIsShared
 			if (!quantity || errors.length > 0) throw new FormErrors(errors)
 			availabilityPeriod.addNewDates(newDates)
 			availabilityPeriod.deleteDates(deletedDates)
 			availabilityPeriod.quantity = quantity
+			availabilityPeriod.quantityIsShared = quantityIsShared
 			await AvailabilityPeriodService.updateShopResource(availabilityPeriod)
 			res.send({})
 		} catch (error) {

@@ -12,6 +12,7 @@ export interface AvailabilityPeriodSchema {
 	start_date: Date
 	end_date: Date
 	dates: string
+	quantity_is_shared: boolean
 	created_date: string
 }
 
@@ -23,6 +24,7 @@ export class AvailabilityPeriod {
 		public startDate: Moment,
 		public endDate: Moment,
 		public dates: Moment[],
+		public quantityIsShared: boolean,
 		public createdDate?: Moment,
 		private shopId?: string
 	) {}
@@ -61,6 +63,7 @@ export class AvailabilityPeriod {
 			moment(schema.start_date),
 			moment(schema.end_date),
 			((schema.dates || []) as string[]).map((date) => moment(date)),
+			schema.quantity_is_shared,
 			moment(schema.created_date),
 			schema.shop_id
 		)
@@ -75,7 +78,8 @@ export class AvailabilityPeriod {
 			id: this.id!,
 			resourceId: this.shopResourceId,
 			dates: this.dates.map((date) => date.format("YYYY-MM-DD")),
-			quantity: this.quantity
+			quantity: this.quantity,
+			quantityIsShared: this.quantityIsShared
 		}
 	}
 

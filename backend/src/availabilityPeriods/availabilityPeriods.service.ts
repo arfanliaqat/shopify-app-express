@@ -16,7 +16,7 @@ export class AvailabilityPeriodService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<AvailabilityPeriodSchema>(
 			`
-			SELECT id, shop_resource_id, quantity, start_date, end_date, dates
+			SELECT id, shop_resource_id, quantity, start_date, end_date, dates, quantity_is_shared
 			FROM availability_periods
 			WHERE shop_resource_id = $1
 			AND (start_date between $2 and $3 OR end_date between $2 and $3)`,
@@ -79,7 +79,8 @@ export class AvailabilityPeriodService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<AvailabilityPeriodSchema>(
 			`
-			SELECT ds.id, sr.shop_id, ds.shop_resource_id, ds.quantity, ds.start_date, ds.end_date, ds.dates
+			SELECT ds.id, sr.shop_id, ds.shop_resource_id, ds.quantity, ds.start_date, ds.end_date, ds.dates,
+			       ds.quantity_is_shared
 			FROM availability_periods ds
 			JOIN shop_resources sr ON sr.id = ds.shop_resource_id
 			WHERE ds.id = $1`,
@@ -92,21 +93,24 @@ export class AvailabilityPeriodService {
 	static async createAvailabilityPeriod(
 		shopResourceId: string,
 		dates: Moment[],
-		quantity: number
+		quantity: number,
+		quantityIsShared: boolean
 	): Promise<AvailabilityPeriod | undefined> {
 		if (dates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
 		const conn: Pool = await getConnection()
 		const result = await conn.query<AvailabilityPeriodSchema>(
 			`
-			INSERT INTO availability_periods (shop_resource_id, quantity, start_date, end_date, dates)
-			VALUES ($1, $2, $3, $4, $5)
-			RETURNING id, shop_resource_id, quantity, start_date, end_date, dates`,
+			INSERT INTO availability_periods (shop_resource_id, quantity, start_date, end_date, dates,
+			                                  quantity_is_shared)
+			VALUES ($1, $2, $3, $4, $5, $6)
+			RETURNING id, shop_resource_id, quantity, start_date, end_date, dates, quantity_is_shared`,
 			[
 				shopResourceId,
 				quantity,
 				dates[0].format(SYSTEM_DATE_FORMAT),
 				dates[dates.length - 1].format(SYSTEM_DATE_FORMAT),
-				JSON.stringify(dates)
+				JSON.stringify(dates),
+				quantityIsShared
 			]
 		)
 		const schema = result.rows[0]
@@ -119,13 +123,14 @@ export class AvailabilityPeriodService {
 		if (availabilityPeriod.dates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
 		await conn.query<AvailabilityPeriodSchema>(
 			`UPDATE availability_periods
-			 SET quantity = $1, start_date = $2, end_date = $3, dates = $4
-			 WHERE id = $5`,
+			 SET quantity = $1, start_date = $2, end_date = $3, dates = $4, quantity_is_shared = $5
+			 WHERE id = $6`,
 			[
 				availabilityPeriod.quantity,
 				availabilityPeriod.getFirstDate()?.format(SYSTEM_DATE_FORMAT),
 				availabilityPeriod.getLastDate()?.format(SYSTEM_DATE_FORMAT),
 				JSON.stringify(availabilityPeriod.dates.map((d) => d.format(SYSTEM_DATE_FORMAT))),
+				availabilityPeriod.quantityIsShared,
 				availabilityPeriod.id
 			]
 		)

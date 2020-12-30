@@ -5,6 +5,7 @@ export default interface AvailabilityPeriod {
 	resourceId: string
 	dates: string[]
 	quantity: number
+	quantityIsShared: boolean
 
 	fromDate?: Moment
 	toDate?: Moment
