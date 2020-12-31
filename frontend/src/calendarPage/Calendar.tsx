@@ -1,5 +1,4 @@
 import React, { useMemo } from "react"
-import { Moment } from "moment"
 import CalendarDay from "./CalendarDay"
 import { Button, Card, Spinner } from "@shopify/polaris"
 import { ChevronLeftMinor, ChevronRightMinor } from "@shopify/polaris-icons"
@@ -7,6 +6,7 @@ import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import { CalendarDates, currentStartOfMonth } from "./CalendarPage"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
+import { getDaysBetween } from "../util/tools"
 
 interface Props {
 	periods: AvailabilityPeriod[]
@@ -15,14 +15,6 @@ interface Props {
 	ordersPerDate?: OrdersPerDate
 	onDateChange: (year: number, month: number) => void
 	onAddPeriodClick: (Moment) => void
-}
-
-function getDaysBetween(start: Moment, end: Moment, unit: "day" | "week"): Moment[] {
-	const days = []
-	for (let cursor = start.clone(); cursor.isBefore(end); cursor.add(1, unit)) {
-		days.push(cursor.clone())
-	}
-	return days
 }
 
 export default function Calendar({

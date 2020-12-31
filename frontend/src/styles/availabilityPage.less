@@ -1,0 +1,35 @@
+#availabilityPeriodPage {
+  .buttonHolder {
+    margin-top: 20px;
+  }
+  .availableDateItem {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    > div {
+      line-height: 36px
+    }
+    .date {
+      flex-basis: 25%;
+    }
+    .orders {
+      flex-basis: 22%;
+    }
+    .status {
+      flex-basis: 23%;
+      font-size: 12px;
+      font-weight: bold;
+      color: #aaa;
+    }
+    .delete {
+      flex-basis: 30%;
+      text-align: right;
+    }
+    &.NOT_AVAILABLE {
+      color: #aaa;
+    }
+    &.AVAILABLE .status {
+      color: #5D8AB4;
+    }
+  }
+}

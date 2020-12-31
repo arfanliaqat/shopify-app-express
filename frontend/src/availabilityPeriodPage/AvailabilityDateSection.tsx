@@ -5,12 +5,14 @@ import moment, { Moment } from "moment"
 import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
+import { getDaysBetween } from "../util/tools"
 
 interface Props {
 	availabilityPeriod: AvailabilityPeriod
 	ordersPerDate: OrdersPerDate
 	newDates: Moment[]
 	deletedDates: Moment[]
+	onNewDateAdded: (Moment) => void
 	onDateDeleted: (Moment) => void
 	onAddAvailabilityDateClick: () => void
 }
@@ -20,6 +22,7 @@ export default function AvailabilityDateSection({
 	newDates,
 	deletedDates,
 	ordersPerDate,
+	onNewDateAdded,
 	onDateDeleted,
 	onAddAvailabilityDateClick
 }: Props) {
@@ -33,6 +36,17 @@ export default function AvailabilityDateSection({
 				return 0
 			})
 	}, [availabilityPeriod, newDates])
+
+	const strAvailableDates = useMemo(() => new Set(availableDates.map((date) => date.format(SYSTEM_DATE_FORMAT))), [
+		availableDates
+	])
+
+	const firstDate = availableDates[0]
+	const lastDate = availableDates[availableDates.length - 1]
+	const allDates = useMemo(() => getDaysBetween(firstDate, lastDate.clone().add(1, "day"), "day"), [
+		firstDate,
+		lastDate
+	])
 
 	const getOrdersForDate = (availableDate: Moment): number => {
 		const strDate = availableDate.format(SYSTEM_DATE_FORMAT)
@@ -54,15 +68,17 @@ export default function AvailabilityDateSection({
 		>
 			<Card>
 				<ResourceList
-					items={availableDates}
-					renderItem={(availableDate) => (
+					items={allDates}
+					renderItem={(date) => (
 						<ResourceList.Item id="product" onClick={() => {}}>
 							<AvailableDateItem
-								availableDate={availableDate}
-								orders={getOrdersForDate(availableDate)}
-								isNew={isNewDate(availableDate)}
-								onDeleteClick={() => onDateDeleted(availableDate)}
-								isDeleted={isDeletedDate(availableDate)}
+								availableDate={date}
+								orders={getOrdersForDate(date)}
+								isNotAvailable={!strAvailableDates.has(date.format(SYSTEM_DATE_FORMAT))}
+								isNew={isNewDate(date)}
+								onNewDateAdded={onNewDateAdded}
+								onDeleteClick={() => onDateDeleted(date)}
+								isDeleted={isDeletedDate(date)}
 							/>
 						</ResourceList.Item>
 					)}

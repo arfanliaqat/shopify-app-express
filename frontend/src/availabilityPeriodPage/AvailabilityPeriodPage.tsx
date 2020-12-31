@@ -164,6 +164,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 						ordersPerDate={pageData.ordersPerDate}
 						newDates={newDates}
 						deletedDates={deletedDates}
+						onNewDateAdded={(newDate) => handleDatesAdded([newDate])}
 						onAddAvailabilityDateClick={() => setAddPeriodModalOpen(true)}
 						onDateDeleted={handleDateDeleted}
 					/>
