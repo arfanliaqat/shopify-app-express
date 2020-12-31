@@ -40,7 +40,7 @@ export class AvailabilityPeriodService {
 		const availableDates: AvailableDate[] = []
 		periods.forEach((period) => {
 			period.dates.forEach((date) => {
-				availableDates.push(new AvailableDate(period.id!, date, false))
+				availableDates.push(new AvailableDate(period.id!, date, false, period.quantityIsShared))
 			})
 		})
 		if (!availableDates.length) {
@@ -53,9 +53,12 @@ export class AvailabilityPeriodService {
 		const lastDate = availableDates[availableDates.length - 1].date
 		const ordersPerDate = await ProductOrderService.findOrdersSummedPerDate(shopResourceId, firstDate, lastDate)
 
-		// Calculate the number of orders per availability period
+		const availableDatesWithSharedQuantity = availableDates.filter((date) => date.quantityIsShared)
+		const availableDatesWithoutSharedQuantity = availableDates.filter((date) => !date.quantityIsShared)
+
+		// Calculate the number of orders per availability period with shared quantity
 		const ordersPerAvailabilityPeriodId = {} as { [periodId: string]: number }
-		availableDates.forEach((availableDate) => {
+		availableDatesWithSharedQuantity.forEach((availableDate) => {
 			const numberOfOrders = ordersPerDate[availableDate.date.format(SYSTEM_DATE_FORMAT)]
 			if (!numberOfOrders) return
 			if (!ordersPerAvailabilityPeriodId[availableDate.availabilityPeriodId]) {
@@ -64,11 +67,20 @@ export class AvailabilityPeriodService {
 			ordersPerAvailabilityPeriodId[availableDate.availabilityPeriodId] += numberOfOrders
 		})
 
-		// Set isSoldOut flag on the available dates
-		availableDates.forEach((availableDate) => {
+		// Set isSoldOut flag on the available dates with shared quantity
+		availableDatesWithSharedQuantity.forEach((availableDate) => {
 			const period = periodsById[availableDate.availabilityPeriodId]
 			if (!period) return
 			const numberOfOrders = ordersPerAvailabilityPeriodId[availableDate.availabilityPeriodId] || 0
+			availableDate.isSoldOut = numberOfOrders >= period.quantity
+		})
+
+		// Set isSoldOut flag on the available dates not sharing quantity
+		availableDatesWithoutSharedQuantity.forEach((availableDate) => {
+			const period = periodsById[availableDate.availabilityPeriodId]
+			if (!period) return
+			const numberOfOrders = ordersPerDate[availableDate.date.format(SYSTEM_DATE_FORMAT)]
+			if (!numberOfOrders) return
 			availableDate.isSoldOut = numberOfOrders >= period.quantity
 		})
 

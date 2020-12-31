@@ -93,7 +93,12 @@ export class AvailabilityPeriod {
 }
 
 export class AvailableDate {
-	constructor(public availabilityPeriodId: string, public date: Moment, public isSoldOut: boolean) {}
+	constructor(
+		public availabilityPeriodId: string,
+		public date: Moment,
+		public isSoldOut: boolean,
+		public quantityIsShared: boolean
+	) {}
 
 	static toViewModel(availableDate: AvailableDate): AvailableDateViewModel {
 		return {

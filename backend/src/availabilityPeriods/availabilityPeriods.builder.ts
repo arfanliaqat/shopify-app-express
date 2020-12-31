@@ -7,6 +7,7 @@ export class AvailabilityPeriodBuilder {
 	private shopResource?: ShopResource
 	private quantity?: number
 	private dates?: Moment[]
+	private quantityIsShared?: boolean
 
 	forShopResource(shopResource: ShopResource): this {
 		this.shopResource = shopResource
@@ -23,6 +24,11 @@ export class AvailabilityPeriodBuilder {
 		return this
 	}
 
+	withQuantityIsShared(isShared: boolean): AvailabilityPeriodBuilder {
+		this.quantityIsShared = isShared
+		return this
+	}
+
 	async buildAndSave(): Promise<AvailabilityPeriod | undefined> {
 		if (!this.shopResource?.id) throw "this.shop is required"
 
@@ -34,6 +40,15 @@ export class AvailabilityPeriodBuilder {
 			this.quantity = 10
 		}
 
-		return await AvailabilityPeriodService.createAvailabilityPeriod(this.shopResource.id, this.dates, this.quantity)
+		if (this.quantityIsShared === undefined) {
+			this.quantityIsShared = true
+		}
+
+		return await AvailabilityPeriodService.createAvailabilityPeriod(
+			this.shopResource.id,
+			this.dates,
+			this.quantity,
+			this.quantityIsShared
+		)
 	}
 }
