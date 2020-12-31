@@ -8,9 +8,9 @@ import ShopResource from "../models/ShopResource"
 import _ from "lodash"
 import { Toast } from "@shopify/app-bridge-react"
 import AvailableDatePickerModal from "./AvailableDatePickerModal"
-import AvailableDateItem from "./AvailableDateItem"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
+import AvailabilityDateSection from "./AvailabilityDateSection"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -107,33 +107,16 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 		})
 	}, [newDates, quantity])
 
-	const currentAvailableDates = (pageData?.availabilityPeriod?.dates || []).map((d) => moment(d))
+	const currentAvailableDates = useMemo(() => (pageData?.availabilityPeriod?.dates || []).map((d) => moment(d)), [
+		pageData
+	])
 
-	const handleSelectedDates = (selectedDates: Moment[]) => {
-		const filteredDates = selectedDates.filter((d) => !currentAvailableDates.find((cd) => d.isSame(cd, "day")))
+	const handleDatesAdded = (addedDates: Moment[]) => {
+		const filteredDates = addedDates.filter((d) => !currentAvailableDates.find((cd) => d.isSame(cd, "day")))
 		setNewDates(filteredDates)
 	}
 
-	const availableDates = useMemo(() => {
-		return []
-			.concat(currentAvailableDates)
-			.concat(newDates)
-			.sort((d1, d2) => {
-				if (d1.isBefore(d2)) return -1
-				if (d1.isAfter(d2)) return 1
-				return 0
-			})
-	}, [pageData, newDates])
-
-	const isNewDate = (availableDate: Moment): boolean => {
-		return newDates.find((nd) => nd.isSame(availableDate, "day")) != undefined
-	}
-
-	const isDeletedDate = (availableDate: Moment): boolean => {
-		return deletedDates.find((deletedDate) => deletedDate.isSame(availableDate, "day")) != undefined
-	}
-
-	const handleDeleteDateClick = (availableDate: Moment) => () => {
+	const handleDateDeleted = (availableDate: Moment) => {
 		const newDateIndex = newDates.findIndex((date) => date.isSame(availableDate, "day"))
 		if (newDateIndex >= 0) {
 			const newDatesCopy = [...newDates]
@@ -142,12 +125,6 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 		} else if (!deletedDates.find((date) => date.isSame(availableDate, "day"))) {
 			setDeletedDates(deletedDates.concat([availableDate]))
 		}
-	}
-
-	const getOrdersForDate = (availableDate: Moment): number => {
-		if (!pageData) return 0
-		const strDate = availableDate.format(SYSTEM_DATE_FORMAT)
-		return pageData.ordersPerDate[strDate] || 0
 	}
 
 	const isDirty =
@@ -182,30 +159,14 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 			>
 				<Layout>
 					<Layout.Section />
-					<Layout.AnnotatedSection
-						title="Available dates"
-						description="You can either add or remove days sharing the same quantity. Orders will be attached to a day, but the stock is common."
-					>
-						<Card>
-							<ResourceList
-								items={availableDates}
-								renderItem={(availableDate) => (
-									<ResourceList.Item id="product" onClick={() => {}}>
-										<AvailableDateItem
-											availableDate={availableDate}
-											orders={getOrdersForDate(availableDate)}
-											isNew={isNewDate(availableDate)}
-											onDeleteClick={handleDeleteDateClick(availableDate)}
-											isDeleted={isDeletedDate(availableDate)}
-										/>
-									</ResourceList.Item>
-								)}
-							/>
-						</Card>
-						<div className="buttonHolder">
-							<Button onClick={() => setAddPeriodModalOpen(true)}>Add available dates</Button>
-						</div>
-					</Layout.AnnotatedSection>
+					<AvailabilityDateSection
+						availabilityPeriod={availabilityPeriod}
+						ordersPerDate={pageData.ordersPerDate}
+						newDates={newDates}
+						deletedDates={deletedDates}
+						onAddAvailabilityDateClick={() => setAddPeriodModalOpen(true)}
+						onDateDeleted={handleDateDeleted}
+					/>
 
 					<Layout.AnnotatedSection
 						title="Shared period quantity"
@@ -262,7 +223,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 			{addPeriodModalOpen && (
 				<AvailableDatePickerModal
 					date={moment(_.last(availabilityPeriod.dates)).add(1, "day")}
-					onDatesSelected={handleSelectedDates}
+					onDatesSelected={handleDatesAdded}
 					onClose={() => setAddPeriodModalOpen(false)}
 				/>
 			)}
