@@ -56,6 +56,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	const { setApiRequest: fetchPeriod, data: pageData, isLoading } = useApi<AvailabilityPeriodPageData>({
 		onSuccess: useCallback(() => {
 			setNewDates([])
+			setDeletedDates([])
 		}, [])
 	})
 
