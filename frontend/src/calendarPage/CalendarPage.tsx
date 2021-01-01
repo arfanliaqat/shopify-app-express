@@ -72,10 +72,6 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 				availabilityPeriod.dates[availabilityPeriod.dates.length - 1],
 				SYSTEM_DATE_FORMAT
 			)
-			availabilityPeriod.totalOrders = availabilityPeriod.dates.reduce(
-				(acc, date) => acc + (calendarPageData.ordersPerDate[date] || 0),
-				0
-			)
 		})
 		return availabilityPeriods
 	}, [calendarPageData])

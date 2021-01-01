@@ -1,21 +1,23 @@
 import React, { useMemo } from "react"
 import moment, { Moment } from "moment"
 import classNames from "classnames"
-import AvailabilityPeriod from "../models/AvailabilityPeriod"
+import AvailabilityPeriod, { getTotalOrders } from "../models/AvailabilityPeriod"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import PeriodElementWithSharedQuantity from "./PeriodElementWithSharedQuantity"
 import PeriodElementWithoutSharedQuantity from "./PeriodElementWithoutSharedQuantity"
+import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Props {
 	monthStart: Moment
 	day: Moment
 	availabilityPeriod?: AvailabilityPeriod
 	onAddClick: () => void
-	orders: number
+	ordersPerDate: OrdersPerDate
 }
 
-export default function CalendarDay({ monthStart, day, availabilityPeriod: period, orders, onAddClick }: Props) {
+export default function CalendarDay({ monthStart, day, availabilityPeriod: period, ordersPerDate, onAddClick }: Props) {
 	const currentStrDay = useMemo(() => day.format(SYSTEM_DATE_FORMAT), [day])
+	const orders = ordersPerDate[currentStrDay] || 0
 	const notSameMonth = useMemo(() => !day.isSame(monthStart, "month"), [day])
 	const isToday = useMemo(() => day.isSame(moment(), "day"), [day])
 	const periodFirstDate = useMemo(() => period?.fromDate?.isSame(day, "day"), [day, period])
@@ -34,8 +36,9 @@ export default function CalendarDay({ monthStart, day, availabilityPeriod: perio
 						periodFirstDate={periodFirstDate}
 						periodLastDate={periodLastDate}
 						periodDateNotAvailable={periodDateNotAvailable}
-						orders={orders}
 						availabilityPeriod={period}
+						orders={orders}
+						totalOrders={getTotalOrders(period, ordersPerDate)}
 					/>
 				) : (
 					<PeriodElementWithoutSharedQuantity

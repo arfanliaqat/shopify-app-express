@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { RouteChildrenProps } from "react-router"
-import { Page, ResourceList, Card, Layout, Button, TextField, PageActions, Badge, FormLayout } from "@shopify/polaris"
+import { Page, Layout, TextField, PageActions, Badge, FormLayout } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import AvailabilityPeriod from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
@@ -141,7 +141,6 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 
 	const totalOrders = getTotalOrders(ordersPerDate)
 	const remainingQuantity = Math.max(0, availabilityPeriod.quantity - totalOrders)
-	const isSoldOut = remainingQuantity == 0
 
 	return (
 		<div id="availabilityPeriodPage">
@@ -155,7 +154,6 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 					}
 				]}
 				title={getTitle(availabilityPeriod)}
-				titleMetadata={isSoldOut && <Badge status="warning">Sold out</Badge>}
 			>
 				<Layout>
 					<Layout.Section />

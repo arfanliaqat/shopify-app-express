@@ -10,21 +10,29 @@ interface Props {
 	onDeleteClick: () => void
 	isDeleted: boolean
 	isNotAvailable: boolean
+	isSoldOut: boolean
 }
 
-type AvailableDateStatus = "NEW" | "DELETED" | "NOT_AVAILABLE" | "AVAILABLE"
+type AvailableDateStatus = "NEW" | "DELETED" | "NOT_AVAILABLE" | "AVAILABLE" | "SOLD_OUT"
 
 const statusMessages: { [key: string]: string } = {
 	NEW: "New",
 	DELETED: "Deleted",
 	NOT_AVAILABLE: "Not available",
-	AVAILABLE: "Available"
+	AVAILABLE: "Available",
+	SOLD_OUT: "Sold out"
 }
 
-function getDateStatus(isNew: boolean, isDeleted: boolean, isNotAvailable: boolean): AvailableDateStatus | undefined {
+function getDateStatus(
+	isNew: boolean,
+	isDeleted: boolean,
+	isNotAvailable: boolean,
+	isSoldOut: boolean
+): AvailableDateStatus | undefined {
 	if (isNew) return "NEW"
 	if (isDeleted) return "DELETED"
 	if (isNotAvailable) return "NOT_AVAILABLE"
+	if (isSoldOut) return "SOLD_OUT"
 	return "AVAILABLE"
 }
 
@@ -35,12 +43,13 @@ export default function AvailableDateItem({
 	onNewDateAdded,
 	onDeleteClick,
 	isDeleted,
-	isNotAvailable
+	isNotAvailable,
+	isSoldOut
 }: Props) {
 	const showDeleteButton = (isNew || orders == 0) && !isDeleted && !isNotAvailable
 	const showSetAvailableButton = isNotAvailable
 
-	const dateStatus = getDateStatus(isNew, isDeleted, isNotAvailable)
+	const dateStatus = getDateStatus(isNew, isDeleted, isNotAvailable, isSoldOut)
 
 	return (
 		<div className={`availableDateItem ${dateStatus}`}>

@@ -1,7 +1,8 @@
 import React from "react"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
-import AvailabilityPeriod from "../models/AvailabilityPeriod"
+import AvailabilityPeriod, { getTotalOrders } from "../models/AvailabilityPeriod"
+import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Props {
 	periodFirstDate: boolean
@@ -9,6 +10,7 @@ interface Props {
 	periodDateNotAvailable: boolean
 	orders: number
 	availabilityPeriod: AvailabilityPeriod
+	totalOrders: number
 }
 
 export default function PeriodElementWithSharedQuantity({
@@ -16,13 +18,14 @@ export default function PeriodElementWithSharedQuantity({
 	periodLastDate,
 	periodDateNotAvailable,
 	orders,
-	availabilityPeriod: period
+	availabilityPeriod: period,
+	totalOrders
 }: Props) {
 	const nbOrdersTxt = `${orders} order${orders != 1 ? "s" : ""}`
-	const isSoldOut = period && period.totalOrders >= period.quantity
-	const headerText = period ? `${period.totalOrders} / ${period.quantity} orders` : ""
+	const isSoldOut = period && totalOrders >= period.quantity
+	const headerText = period ? `${totalOrders} / ${period.quantity} orders` : ""
 	const headerTextTitle = period
-		? `${period.totalOrders} orders out of ${period.quantity} planned ${isSoldOut ? " (Sold out)" : ""}`
+		? `${totalOrders} orders out of ${period.quantity} planned ${isSoldOut ? " (Sold out)" : ""}`
 		: ""
 
 	return (
@@ -41,7 +44,7 @@ export default function PeriodElementWithSharedQuantity({
 					<span title={headerTextTitle}>
 						{isSoldOut ? (
 							<>
-								<strong>Sold out</strong> ({period.totalOrders} orders)
+								<strong>Sold out</strong> ({totalOrders} orders)
 							</>
 						) : (
 							headerText

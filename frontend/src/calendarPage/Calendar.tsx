@@ -99,7 +99,7 @@ export default function Calendar({
 										monthStart={calendarDates.monthStart}
 										day={day}
 										availabilityPeriod={availabilityByDate[strDay]}
-										orders={ordersPerDate[strDay] || 0}
+										ordersPerDate={ordersPerDate}
 										onAddClick={() => onAddPeriodClick(day)}
 									/>
 								)
