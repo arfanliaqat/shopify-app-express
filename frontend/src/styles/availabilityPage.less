@@ -35,4 +35,44 @@
       color: #ae8317;
     }
   }
+  .orderCounts {
+    margin-bottom: 30px;
+    .inner {
+      display: flex;
+      justify-items: stretch;
+      height: 112px;
+      width: 100%;
+      color: #637381;
+
+      .orderCount {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-items: stretch;
+        border-left: 1px solid #DFE3E8;
+
+        &:first-child {
+          border-left-width: 0;
+        }
+
+        .label {
+          flex-grow: 0;
+          flex-basis: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 13px;
+        }
+
+        .count {
+          flex-grow: 1;
+          display: flex;
+          justify-content: center;
+          margin-top: 14px;
+          font-size: 30px;
+          font-weight: bold;
+        }
+      }
+    }
+  }
 }

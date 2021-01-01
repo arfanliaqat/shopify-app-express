@@ -11,6 +11,7 @@ import AvailableDatePickerModal from "./AvailableDatePickerModal"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
 import AvailabilityDateSection from "./AvailabilityDateSection"
+import OrdersWithSharedQuantitySection from "./OrdersWithSharedQuantitySection"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -36,10 +37,6 @@ function getTitle(availabilityPeriod: AvailabilityPeriod) {
 
 function getBackUrl(shopResource: ShopResource) {
 	return `/app/resources/${shopResource.id}/calendar/${moment().format("YYYY/MM")}`
-}
-
-function getTotalOrders(ordersPerDate: OrdersPerDate) {
-	return Object.values(ordersPerDate).reduce((total, orders) => total + orders, 0)
 }
 
 export default function AvailabilityPeriodPage({ match, history }: RouteChildrenProps<UrlParams>) {
@@ -143,9 +140,6 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 
 	const availabilityPeriod = pageData ? AvailabilityPeriod.newInstance(pageData.availabilityPeriod) : null
 
-	const totalOrders = getTotalOrders(ordersPerDate)
-	const remainingQuantity = Math.max(0, availabilityPeriod.quantity - totalOrders)
-
 	return (
 		<div id="availabilityPeriodPage">
 			{successMessage && <Toast content={successMessage} onDismiss={() => setSuccessMessage(undefined)} />}
@@ -191,20 +185,10 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 						</FormLayout>
 					</Layout.AnnotatedSection>
 
-					<Layout.AnnotatedSection
-						title="Remaining quantity"
-						description="Number of items available on these dates"
-					>
-						<div>
-							{totalOrders == 0 ? "No" : totalOrders} order{totalOrders == 1 ? "" : "s"} made out of{" "}
-							{availabilityPeriod.quantity} available.
-						</div>
-						<div>
-							<strong>
-								{remainingQuantity} order{remainingQuantity == 1 ? "" : "s"} remaining
-							</strong>
-						</div>
-					</Layout.AnnotatedSection>
+					<OrdersWithSharedQuantitySection
+						availabilityPeriod={availabilityPeriod}
+						ordersPerDate={ordersPerDate}
+					/>
 				</Layout>
 				<PageActions
 					primaryAction={{
