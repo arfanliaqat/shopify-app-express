@@ -1,5 +1,5 @@
 import moment, { Moment } from "moment"
-import AvailabilityPeriodViewModel from "../../../frontend/src/models/AvailabilityPeriod"
+import { AvailabilityPeriod as AvailabilityPeriodViewModel } from "../../../frontend/src/models/AvailabilityPeriod"
 import { Shop } from "../shop/shop.model"
 import { AvailableDate as AvailableDateViewModel } from "../../../widget/src/models/AvailableDate"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
@@ -74,13 +74,13 @@ export class AvailabilityPeriod {
 	}
 
 	toViewModel(): AvailabilityPeriodViewModel {
-		return {
-			id: this.id!,
-			resourceId: this.shopResourceId,
-			dates: this.dates.map((date) => date.format("YYYY-MM-DD")),
-			quantity: this.quantity,
-			quantityIsShared: this.quantityIsShared
-		}
+		return new AvailabilityPeriodViewModel(
+			this.id!,
+			this.shopResourceId,
+			this.dates.map((date) => date.format("YYYY-MM-DD")),
+			this.quantity,
+			this.quantityIsShared
+		)
 	}
 
 	static toViewModels(periods: AvailabilityPeriod[]): AvailabilityPeriodViewModel[] {

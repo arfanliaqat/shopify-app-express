@@ -1,7 +1,7 @@
 import React from "react"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
-import AvailabilityPeriod from "../models/AvailabilityPeriod"
+import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 
 interface Props {
 	periodFirstDate: boolean

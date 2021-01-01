@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react"
 import moment, { Moment } from "moment"
-import { TextField, Modal, Checkbox, FormLayout } from "@shopify/polaris"
+import { TextField, Modal, FormLayout } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
 import _ from "lodash"
 import AvailableDatePicker from "../common/AvailableDatePicker"

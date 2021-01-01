@@ -2,7 +2,7 @@ import React, { useMemo } from "react"
 import CalendarDay from "./CalendarDay"
 import { Button, Card, Spinner } from "@shopify/polaris"
 import { ChevronLeftMinor, ChevronRightMinor } from "@shopify/polaris-icons"
-import AvailabilityPeriod from "../models/AvailabilityPeriod"
+import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import { CalendarDates, currentStartOfMonth } from "./CalendarPage"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
@@ -31,8 +31,10 @@ export default function Calendar({
 		}
 		const result = {}
 		periods.forEach((period) => {
-			if (period.fromDate && period.toDate) {
-				for (const cursor = period.fromDate.clone(); !cursor.isAfter(period.toDate); cursor.add(1, "day")) {
+			const periodStart = period.getPeriodStart()
+			const periodEnd = period.getPeriodEnd()
+			if (periodStart && periodEnd) {
+				for (const cursor = periodStart.clone(); !cursor.isAfter(periodEnd); cursor.add(1, "day")) {
 					result[cursor.format(SYSTEM_DATE_FORMAT)] = period
 				}
 			}

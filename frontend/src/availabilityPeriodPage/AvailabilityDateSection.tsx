@@ -2,7 +2,7 @@ import React, { useMemo } from "react"
 import { Button, Card, Layout, ResourceList } from "@shopify/polaris"
 import AvailableDateItem from "./AvailableDateItem"
 import moment, { Moment } from "moment"
-import AvailabilityPeriod, { isSoldOut } from "../models/AvailabilityPeriod"
+import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { getDaysBetween } from "../util/tools"
@@ -79,7 +79,7 @@ export default function AvailabilityDateSection({
 								onNewDateAdded={onNewDateAdded}
 								onDeleteClick={() => onDateDeleted(date)}
 								isDeleted={isDeletedDate(date)}
-								isSoldOut={isSoldOut(availabilityPeriod, ordersPerDate, date)}
+								isSoldOut={availabilityPeriod.isSoldOut(ordersPerDate, date)}
 							/>
 						</ResourceList.Item>
 					)}

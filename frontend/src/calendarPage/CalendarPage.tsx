@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react"
 import Calendar from "./Calendar"
-import AvailabilityPeriod from "../models/AvailabilityPeriod"
+import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
 import AddPeriodModal from "./AddPeriodModal"
 import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
 import { Page } from "@shopify/polaris"
 import ShopResource from "../models/ShopResource"
-import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Params {
@@ -63,20 +62,12 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 		setRequestIncrement(requestIncrement + 1)
 	}, [requestIncrement])
 
-	const availabilityPeriods = useMemo(() => {
-		if (!calendarPageData || !calendarPageData.availabilityPeriods) return []
-		const availabilityPeriods = [...calendarPageData.availabilityPeriods]
-		availabilityPeriods.forEach((availabilityPeriod) => {
-			availabilityPeriod.fromDate = moment(availabilityPeriod.dates[0], SYSTEM_DATE_FORMAT)
-			availabilityPeriod.toDate = moment(
-				availabilityPeriod.dates[availabilityPeriod.dates.length - 1],
-				SYSTEM_DATE_FORMAT
-			)
-		})
-		return availabilityPeriods
-	}, [calendarPageData])
+	const availabilityPeriods =
+		!calendarPageData || !calendarPageData.availabilityPeriods
+			? []
+			: AvailabilityPeriod.create(calendarPageData.availabilityPeriods)
 
-	if (calendarPageData == undefined) {
+	if (calendarPageData === undefined) {
 		return <div />
 	}
 	const { shopResource, ordersPerDate } = calendarPageData

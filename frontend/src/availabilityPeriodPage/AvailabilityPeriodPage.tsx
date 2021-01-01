@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { RouteChildrenProps } from "react-router"
-import { Page, Layout, TextField, PageActions, Badge, FormLayout } from "@shopify/polaris"
+import { Page, Layout, TextField, PageActions, FormLayout } from "@shopify/polaris"
 import { useApi } from "../util/useApi"
-import AvailabilityPeriod from "../models/AvailabilityPeriod"
+import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
 import ShopResource from "../models/ShopResource"
 import _ from "lodash"
@@ -58,6 +58,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 			setNewDates([])
 		}, [])
 	})
+
 	const { setApiRequest: savePeriod, isLoading: isSavingPeriod } = useApi({
 		onSuccess: useCallback(() => {
 			setSuccessMessage("Availability period saved!")
@@ -137,7 +138,9 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 		return <div />
 	}
 
-	const { shopResource, availabilityPeriod, ordersPerDate } = pageData
+	const { shopResource, ordersPerDate } = pageData
+
+	const availabilityPeriod = pageData ? AvailabilityPeriod.newInstance(pageData.availabilityPeriod) : null
 
 	const totalOrders = getTotalOrders(ordersPerDate)
 	const remainingQuantity = Math.max(0, availabilityPeriod.quantity - totalOrders)
