@@ -12,6 +12,7 @@ import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
 import AvailabilityDateSection from "./AvailabilityDateSection"
 import OrdersWithSharedQuantitySection from "./OrdersWithSharedQuantitySection"
+import OrdersWithoutSharedQuantitySection from "./OrdersWithoutSharedQuantitySection"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -185,10 +186,17 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 						</FormLayout>
 					</Layout.AnnotatedSection>
 
-					<OrdersWithSharedQuantitySection
-						availabilityPeriod={availabilityPeriod}
-						ordersPerDate={ordersPerDate}
-					/>
+					{quantityIsShared ? (
+						<OrdersWithSharedQuantitySection
+							availabilityPeriod={availabilityPeriod}
+							ordersPerDate={ordersPerDate}
+						/>
+					) : (
+						<OrdersWithoutSharedQuantitySection
+							availabilityPeriod={availabilityPeriod}
+							ordersPerDate={ordersPerDate}
+						/>
+					)}
 				</Layout>
 				<PageActions
 					primaryAction={{

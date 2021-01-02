@@ -35,7 +35,7 @@
       color: #ae8317;
     }
   }
-  .orderCounts {
+  .ordersCountWithSharing {
     margin-bottom: 30px;
     .inner {
       display: flex;
@@ -72,6 +72,33 @@
           font-size: 30px;
           font-weight: bold;
         }
+      }
+    }
+  }
+  .orderCountWithoutSharing {
+    margin-bottom: 30px;
+    .item {
+      display: flex;
+      justify-content: stretch;
+
+      .date {
+        flex: 1;
+        color: #000;
+      }
+
+      .orders {
+        flex: 1;
+        color: #637381;
+      }
+
+      .remaining {
+        flex: 1;
+        color: #637381;
+      }
+
+      strong {
+        color: #000;
+        font-weight: 500;
       }
     }
   }
