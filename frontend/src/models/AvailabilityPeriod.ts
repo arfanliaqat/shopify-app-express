@@ -39,6 +39,10 @@ export class AvailabilityPeriod {
 		return (this.pausedDates || []).map((strDate) => moment(strDate, SYSTEM_DATE_FORMAT))
 	}
 
+	isPaused(strDay: string) {
+		return this.pausedDates.includes(strDay)
+	}
+
 	static create(availabilityPeriods: AvailabilityPeriod[]) {
 		return availabilityPeriods.map(AvailabilityPeriod.newInstance)
 	}

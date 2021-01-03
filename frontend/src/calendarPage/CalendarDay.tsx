@@ -26,6 +26,7 @@ export default function CalendarDay({ monthStart, day, availabilityPeriod: perio
 		currentStrDay,
 		period
 	])
+	const isPaused = useMemo(() => period?.isPaused(currentStrDay), [currentStrDay, period])
 
 	return (
 		<div className={classNames("day", { notSameMonth, isToday })}>
@@ -39,6 +40,7 @@ export default function CalendarDay({ monthStart, day, availabilityPeriod: perio
 						availabilityPeriod={period}
 						orders={orders}
 						totalOrders={period.getTotalOrders(ordersPerDate)}
+						isPaused={isPaused}
 					/>
 				) : (
 					<PeriodElementWithoutSharedQuantity
@@ -47,6 +49,7 @@ export default function CalendarDay({ monthStart, day, availabilityPeriod: perio
 						periodDateNotAvailable={periodDateNotAvailable}
 						orders={orders}
 						availabilityPeriod={period}
+						isPaused={isPaused}
 					/>
 				)
 			) : (

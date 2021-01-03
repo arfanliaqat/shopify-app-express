@@ -8,6 +8,7 @@ interface Props {
 	periodLastDate: boolean
 	periodDateNotAvailable: boolean
 	orders: number
+	isPaused: boolean
 	availabilityPeriod: AvailabilityPeriod
 	totalOrders: number
 }
@@ -16,6 +17,7 @@ export default function PeriodElementWithSharedQuantity({
 	periodFirstDate,
 	periodLastDate,
 	periodDateNotAvailable,
+	isPaused,
 	orders,
 	availabilityPeriod: period,
 	totalOrders
@@ -34,6 +36,7 @@ export default function PeriodElementWithSharedQuantity({
 				periodLastDate,
 				periodDateNotAvailable,
 				isSoldOut,
+				isPaused,
 				quantityIsShared: period.quantityIsShared
 			})}
 			to={`/app/availability_periods/${period.id}`}
@@ -52,7 +55,15 @@ export default function PeriodElementWithSharedQuantity({
 				)}
 			</span>
 			<span className="itemBody">
-				{periodDateNotAvailable ? <em title="Not available">Not available</em> : <span>{nbOrdersTxt}</span>}
+				{periodDateNotAvailable ? (
+					<em title="Not available">Not available</em>
+				) : (
+					<span>
+						{nbOrdersTxt}
+						<br />
+						{isPaused && <span className="paused">Paused</span>}
+					</span>
+				)}
 			</span>
 		</Link>
 	)

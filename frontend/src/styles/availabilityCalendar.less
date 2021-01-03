@@ -135,7 +135,7 @@
         padding-left: 8px;
         display: flex;
         align-items: center;
-        span {
+        > span {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -149,11 +149,18 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        em, span {
+        line-height: 18px;
+        > em, > span {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
           display: block;
+        }
+      }
+      &.isPaused .itemBody {
+        background: #FFF1F1;
+        .paused {
+          color: #D74E4E;
         }
       }
       &.periodDateNotAvailable .itemBody {

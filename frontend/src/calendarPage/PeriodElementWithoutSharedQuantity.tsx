@@ -9,6 +9,7 @@ interface Props {
 	periodDateNotAvailable: boolean
 	orders: number
 	availabilityPeriod: AvailabilityPeriod
+	isPaused: boolean
 }
 
 export default function PeriodElementWithoutSharedQuantity({
@@ -16,7 +17,8 @@ export default function PeriodElementWithoutSharedQuantity({
 	periodLastDate,
 	periodDateNotAvailable,
 	orders,
-	availabilityPeriod: period
+	availabilityPeriod: period,
+	isPaused
 }: Props) {
 	const isSoldOut = period && orders >= period.quantity
 	return (
@@ -26,6 +28,7 @@ export default function PeriodElementWithoutSharedQuantity({
 				periodLastDate,
 				periodDateNotAvailable,
 				isSoldOut,
+				isPaused,
 				quantityIsShared: period.quantityIsShared
 			})}
 			to={`/app/availability_periods/${period.id}`}
@@ -38,6 +41,8 @@ export default function PeriodElementWithoutSharedQuantity({
 						{orders} order{orders != 1 ? "s" : ""}
 						<br />
 						out of {period.quantity}
+						<br />
+						{isPaused && <span className="paused">Paused</span>}
 					</span>
 				)}
 			</div>
