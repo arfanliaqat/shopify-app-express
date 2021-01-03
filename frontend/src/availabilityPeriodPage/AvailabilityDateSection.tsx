@@ -12,19 +12,25 @@ interface Props {
 	ordersPerDate: OrdersPerDate
 	newDates: Moment[]
 	deletedDates: Moment[]
+	pausedDates: Moment[]
 	onNewDateAdded: (Moment) => void
 	onDateDeleted: (Moment) => void
 	onAddAvailabilityDateClick: () => void
+	onPauseDateClick: (Moment) => void
+	onResumeDateClick: (Moment) => void
 }
 
 export default function AvailabilityDateSection({
 	availabilityPeriod,
 	newDates,
 	deletedDates,
+	pausedDates,
 	ordersPerDate,
 	onNewDateAdded,
 	onDateDeleted,
-	onAddAvailabilityDateClick
+	onAddAvailabilityDateClick,
+	onPauseDateClick,
+	onResumeDateClick
 }: Props) {
 	const availableDates = useMemo(() => {
 		return []
@@ -54,11 +60,15 @@ export default function AvailabilityDateSection({
 	}
 
 	const isNewDate = (availableDate: Moment): boolean => {
-		return newDates.find((nd) => nd.isSame(availableDate, "day")) != undefined
+		return newDates.find((date) => date.isSame(availableDate, "day")) != undefined
 	}
 
 	const isDeletedDate = (availableDate: Moment): boolean => {
-		return deletedDates.find((deletedDate) => deletedDate.isSame(availableDate, "day")) != undefined
+		return deletedDates.find((date) => date.isSame(availableDate, "day")) != undefined
+	}
+
+	const isPausedDate = (availableDate: Moment): boolean => {
+		return pausedDates.find((date) => date.isSame(availableDate, "day")) != undefined
 	}
 
 	return (
@@ -80,6 +90,9 @@ export default function AvailabilityDateSection({
 								onDeleteClick={() => onDateDeleted(date)}
 								isDeleted={isDeletedDate(date)}
 								isSoldOut={availabilityPeriod.isSoldOut(ordersPerDate, date)}
+								isPaused={isPausedDate(date)}
+								onPauseDateClick={onPauseDateClick}
+								onResumeDateClick={onResumeDateClick}
 							/>
 						</ResourceList.Item>
 					)}

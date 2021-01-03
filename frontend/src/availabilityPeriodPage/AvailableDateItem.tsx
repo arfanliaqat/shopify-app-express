@@ -11,28 +11,34 @@ interface Props {
 	isDeleted: boolean
 	isNotAvailable: boolean
 	isSoldOut: boolean
+	isPaused: boolean
+	onPauseDateClick: (Moment) => void
+	onResumeDateClick: (Moment) => void
 }
 
-type AvailableDateStatus = "NEW" | "DELETED" | "NOT_AVAILABLE" | "AVAILABLE" | "SOLD_OUT"
+type AvailableDateStatus = "NEW" | "DELETED" | "NOT_AVAILABLE" | "AVAILABLE" | "SOLD_OUT" | "PAUSED"
 
 const statusMessages: { [key: string]: string } = {
 	NEW: "New",
 	DELETED: "Deleted",
 	NOT_AVAILABLE: "Not available",
 	AVAILABLE: "Available",
-	SOLD_OUT: "Sold out"
+	SOLD_OUT: "Sold out",
+	PAUSED: "Paused"
 }
 
 function getDateStatus(
 	isNew: boolean,
 	isDeleted: boolean,
 	isNotAvailable: boolean,
-	isSoldOut: boolean
+	isSoldOut: boolean,
+	isPaused: boolean
 ): AvailableDateStatus | undefined {
 	if (isNew) return "NEW"
 	if (isDeleted) return "DELETED"
 	if (isNotAvailable) return "NOT_AVAILABLE"
 	if (isSoldOut) return "SOLD_OUT"
+	if (isPaused) return "PAUSED"
 	return "AVAILABLE"
 }
 
@@ -44,12 +50,16 @@ export default function AvailableDateItem({
 	onDeleteClick,
 	isDeleted,
 	isNotAvailable,
-	isSoldOut
+	isSoldOut,
+	isPaused,
+	onPauseDateClick,
+	onResumeDateClick
 }: Props) {
 	const showDeleteButton = (isNew || orders == 0) && !isDeleted && !isNotAvailable
 	const showSetAvailableButton = isNotAvailable
-
-	const dateStatus = getDateStatus(isNew, isDeleted, isNotAvailable, isSoldOut)
+	const dateStatus = getDateStatus(isNew, isDeleted, isNotAvailable, isSoldOut, isPaused)
+	const showPauseDateButton = dateStatus == "AVAILABLE" && orders != 0
+	const showResumeDateButton = dateStatus == "PAUSED"
 
 	return (
 		<div className={`availableDateItem ${dateStatus}`}>
@@ -59,6 +69,10 @@ export default function AvailableDateItem({
 			<div className="delete">
 				{showDeleteButton && <Button onClick={() => onDeleteClick()}>Set unavailable</Button>}
 				{showSetAvailableButton && <Button onClick={() => onNewDateAdded(availableDate)}>Set available</Button>}
+				{showPauseDateButton && <Button onClick={() => onPauseDateClick(availableDate)}>Pause selling</Button>}
+				{showResumeDateButton && (
+					<Button onClick={() => onResumeDateClick(availableDate)}>Resume selling</Button>
+				)}
 			</div>
 		</div>
 	)

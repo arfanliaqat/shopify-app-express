@@ -35,6 +35,10 @@ export class AvailabilityPeriod {
 		}
 	}
 
+	getPausedDates(): Moment[] {
+		return (this.pausedDates || []).map((strDate) => moment(strDate, SYSTEM_DATE_FORMAT))
+	}
+
 	static create(availabilityPeriods: AvailabilityPeriod[]) {
 		return availabilityPeriods.map(AvailabilityPeriod.newInstance)
 	}
