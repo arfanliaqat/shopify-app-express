@@ -1,6 +1,7 @@
 import React from "react"
 import { Button } from "@shopify/polaris"
 import moment, { Moment } from "moment"
+import classNames from "classNames"
 
 interface Props {
 	availableDate: Moment
@@ -14,6 +15,7 @@ interface Props {
 	isPaused: boolean
 	onPauseDateClick: (Moment) => void
 	onResumeDateClick: (Moment) => void
+	isDraft: boolean
 }
 
 type AvailableDateStatus = "NEW" | "DELETED" | "NOT_AVAILABLE" | "AVAILABLE" | "SOLD_OUT" | "PAUSED"
@@ -53,7 +55,8 @@ export default function AvailableDateItem({
 	isSoldOut,
 	isPaused,
 	onPauseDateClick,
-	onResumeDateClick
+	onResumeDateClick,
+	isDraft
 }: Props) {
 	const showDeleteButton = (isNew || orders == 0) && !isDeleted && !isNotAvailable
 	const showSetAvailableButton = isNotAvailable
@@ -62,10 +65,12 @@ export default function AvailableDateItem({
 	const showResumeDateButton = dateStatus == "PAUSED"
 
 	return (
-		<div className={`availableDateItem ${dateStatus}`}>
+		<div className={classNames("availableDateItem", dateStatus, { isDraft })}>
 			<div className="date">{moment(availableDate).format("ddd D MMM")}</div>
 			<div className="orders">{orders} orders</div>
-			<div className="status">{statusMessages[dateStatus]}</div>
+			<div className="status">
+				{statusMessages[dateStatus]} {isDraft ? <span className="draft">(unsaved)</span> : ""}
+			</div>
 			<div className="delete">
 				{showDeleteButton && <Button onClick={() => onDeleteClick()}>Set unavailable</Button>}
 				{showSetAvailableButton && <Button onClick={() => onNewDateAdded(availableDate)}>Set available</Button>}

@@ -79,23 +79,31 @@ export default function AvailabilityDateSection({
 			<Card>
 				<ResourceList
 					items={allDates}
-					renderItem={(date) => (
-						<ResourceList.Item id="product" onClick={() => {}}>
-							<AvailableDateItem
-								availableDate={date}
-								orders={getOrdersForDate(date)}
-								isNotAvailable={!strAvailableDates.has(date.format(SYSTEM_DATE_FORMAT))}
-								isNew={isNewDate(date)}
-								onNewDateAdded={onNewDateAdded}
-								onDeleteClick={() => onDateDeleted(date)}
-								isDeleted={isDeletedDate(date)}
-								isSoldOut={availabilityPeriod.isSoldOut(ordersPerDate, date)}
-								isPaused={isPausedDate(date)}
-								onPauseDateClick={onPauseDateClick}
-								onResumeDateClick={onResumeDateClick}
-							/>
-						</ResourceList.Item>
-					)}
+					renderItem={(date) => {
+						const strDay = date.format(SYSTEM_DATE_FORMAT)
+						const isNew = isNewDate(date)
+						const isDeleted = isDeletedDate(date)
+						const isPaused = isPausedDate(date)
+						const isDraft = isNew || isDeleted || isPaused != availabilityPeriod.isPaused(strDay)
+						return (
+							<ResourceList.Item id="product" onClick={() => {}}>
+								<AvailableDateItem
+									availableDate={date}
+									orders={getOrdersForDate(date)}
+									isNotAvailable={!strAvailableDates.has(strDay)}
+									isNew={isNew}
+									onNewDateAdded={onNewDateAdded}
+									onDeleteClick={() => onDateDeleted(date)}
+									isDeleted={isDeleted}
+									isSoldOut={availabilityPeriod.isSoldOut(ordersPerDate, date)}
+									isPaused={isPaused}
+									onPauseDateClick={onPauseDateClick}
+									onResumeDateClick={onResumeDateClick}
+									isDraft={isDraft}
+								/>
+							</ResourceList.Item>
+						)
+					}}
 				/>
 			</Card>
 			<div className="buttonHolder">
