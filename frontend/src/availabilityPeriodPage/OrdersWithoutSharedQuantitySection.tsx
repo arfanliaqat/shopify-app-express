@@ -16,7 +16,7 @@ export default function OrdersWithoutSharedQuantitySection({ availabilityPeriod,
 			<div className="orderCountWithoutSharing">
 				<Card>
 					<ResourceList
-						items={availabilityPeriod.dates}
+						items={availabilityPeriod.availableDates}
 						renderItem={(strDate) => {
 							const date = moment(strDate, SYSTEM_DATE_FORMAT)
 							const orders = ordersPerDate[strDate] || 0

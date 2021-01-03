@@ -22,7 +22,7 @@ export default function CalendarDay({ monthStart, day, availabilityPeriod: perio
 	const isToday = useMemo(() => day.isSame(moment(), "day"), [day])
 	const periodFirstDate = useMemo(() => period?.getPeriodStart()?.isSame(day, "day"), [day, period])
 	const periodLastDate = useMemo(() => period?.getPeriodEnd()?.isSame(day, "day"), [day, period])
-	const periodDateNotAvailable = useMemo(() => !period?.dates?.find((strDate) => strDate == currentStrDay), [
+	const periodDateNotAvailable = useMemo(() => !period?.availableDates?.find((strDate) => strDate == currentStrDay), [
 		currentStrDay,
 		period
 	])

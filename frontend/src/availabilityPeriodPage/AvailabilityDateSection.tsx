@@ -28,7 +28,7 @@ export default function AvailabilityDateSection({
 }: Props) {
 	const availableDates = useMemo(() => {
 		return []
-			.concat((availabilityPeriod?.dates || []).map((d) => moment(d)))
+			.concat((availabilityPeriod?.availableDates || []).map((d) => moment(d)))
 			.concat(newDates)
 			.sort((d1, d2) => {
 				if (d1.isBefore(d2)) return -1

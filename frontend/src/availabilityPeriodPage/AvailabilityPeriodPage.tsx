@@ -27,9 +27,9 @@ interface AvailabilityPeriodPageData {
 }
 
 function getTitle(availabilityPeriod: AvailabilityPeriod) {
-	const startDate = moment(_.first(availabilityPeriod.dates))
-	if (availabilityPeriod.dates.length > 1) {
-		const endDate = moment(_.last(availabilityPeriod.dates))
+	const startDate = moment(_.first(availabilityPeriod.availableDates))
+	if (availabilityPeriod.availableDates.length > 1) {
+		const endDate = moment(_.last(availabilityPeriod.availableDates))
 		return `Availability period: ${startDate.format("D MMM")} - ${endDate.format("D MMM")}`
 	} else {
 		return `Availability period: ${startDate.format("D MMM")}`
@@ -94,6 +94,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 			postData: {
 				newDates: newDates.map((date) => moment(date).format(SYSTEM_DATE_FORMAT)),
 				deletedDates: deletedDates.map((date) => moment(date).format(SYSTEM_DATE_FORMAT)),
+				pausedDates: [], // TODO
 				quantity,
 				quantityIsShared
 			}
@@ -107,9 +108,10 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 		})
 	}, [newDates, quantity])
 
-	const currentAvailableDates = useMemo(() => (pageData?.availabilityPeriod?.dates || []).map((d) => moment(d)), [
-		pageData
-	])
+	const currentAvailableDates = useMemo(
+		() => (pageData?.availabilityPeriod?.availableDates || []).map((d) => moment(d)),
+		[pageData]
+	)
 
 	const handleDatesAdded = (addedDates: Moment[]) => {
 		const filteredDates = addedDates.filter((d) => !currentAvailableDates.find((cd) => d.isSame(cd, "day")))
@@ -217,7 +219,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 			</Page>
 			{addPeriodModalOpen && (
 				<AvailableDatePickerModal
-					date={moment(_.last(availabilityPeriod.dates)).add(1, "day")}
+					date={moment(_.last(availabilityPeriod.availableDates)).add(1, "day")}
 					onDatesSelected={handleDatesAdded}
 					onClose={() => setAddPeriodModalOpen(false)}
 				/>

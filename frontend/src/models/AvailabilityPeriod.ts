@@ -7,21 +7,22 @@ export class AvailabilityPeriod {
 	constructor(
 		public id: string,
 		public resourceId: string,
-		public dates: string[],
+		public availableDates: string[],
+		public pausedDates: string[],
 		public quantity: number,
 		public quantityIsShared: boolean
 	) {}
 
 	getPeriodStart(): Moment {
-		return moment(this.dates[0], SYSTEM_DATE_FORMAT)
+		return moment(this.availableDates[0], SYSTEM_DATE_FORMAT)
 	}
 
 	getPeriodEnd(): Moment {
-		return moment(this.dates[this.dates.length - 1], SYSTEM_DATE_FORMAT)
+		return moment(this.availableDates[this.availableDates.length - 1], SYSTEM_DATE_FORMAT)
 	}
 
 	getTotalOrders(ordersPerDate: OrdersPerDate) {
-		return this.dates.reduce((acc, date) => acc + (ordersPerDate[date] || 0), 0)
+		return this.availableDates.reduce((acc, date) => acc + (ordersPerDate[date] || 0), 0)
 	}
 
 	isSoldOut(ordersPerDate: OrdersPerDate, date: Moment) {
@@ -42,7 +43,8 @@ export class AvailabilityPeriod {
 		return new AvailabilityPeriod(
 			period.id,
 			period.resourceId,
-			period.dates,
+			period.availableDates,
+			period.pausedDates,
 			period.quantity,
 			period.quantityIsShared
 		)

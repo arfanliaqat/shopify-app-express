@@ -38,7 +38,8 @@ create table availability_periods(
 	quantity integer,
 	start_date timestamp with time zone not null,
 	end_date timestamp with time zone not null,
-	dates jsonb, -- to be refactored into a separate table
+	available_dates jsonb not null default '[]'::jsonb,
+	paused_dates jsonb not null default '[]'::jsonb,
     availability_periods boolean not null,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)

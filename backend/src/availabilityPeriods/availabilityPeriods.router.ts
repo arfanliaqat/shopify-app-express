@@ -64,13 +64,13 @@ router.post(
 		try {
 			const { shopResource } = getLocals(res)
 			const errors = [] as FormError[]
-			const dates = validateDates(errors, req.body.dates)
+			const availableDates = validateDates(errors, req.body.dates)
 			const quantity = validateQuantity(errors, req.body.quantity)
 			const quantityIsShared = !!req.body.quantityIsShared
-			if (!dates || !quantity || errors.length > 0) throw new FormErrors(errors)
+			if (!availableDates || !quantity || errors.length > 0) throw new FormErrors(errors)
 			const availabilityPeriod = await AvailabilityPeriodService.createAvailabilityPeriod(
 				shopResource?.id || "",
-				dates,
+				availableDates,
 				quantity,
 				quantityIsShared
 			)
@@ -126,11 +126,13 @@ router.post(
 			const errors = [] as FormError[]
 			const newDates = validateDates(errors, req.body.newDates)
 			const deletedDates = validateDates(errors, req.body.deletedDates)
+			const pausedDates = validateDates(errors, req.body.pausedDates)
 			const quantity = validateQuantity(errors, req.body.quantity)
 			const quantityIsShared = !!req.body.quantityIsShared
 			if (!quantity || errors.length > 0) throw new FormErrors(errors)
 			availabilityPeriod.addNewDates(newDates)
 			availabilityPeriod.deleteDates(deletedDates)
+			availabilityPeriod.setPausedDates(pausedDates)
 			availabilityPeriod.quantity = quantity
 			availabilityPeriod.quantityIsShared = quantityIsShared
 			await AvailabilityPeriodService.updateShopResource(availabilityPeriod)
