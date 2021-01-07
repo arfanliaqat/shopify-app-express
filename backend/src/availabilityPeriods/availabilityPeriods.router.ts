@@ -135,7 +135,7 @@ router.post(
 			availabilityPeriod.setPausedDates(pausedDates)
 			availabilityPeriod.quantity = quantity
 			availabilityPeriod.quantityIsShared = quantityIsShared
-			await AvailabilityPeriodService.updateShopResource(availabilityPeriod)
+			await AvailabilityPeriodService.update(availabilityPeriod)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)

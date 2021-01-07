@@ -93,7 +93,7 @@ describe("AvailabilityPeriodService", () => {
 		}
 	})
 
-	test("The sold out indicated takes into account whether the quantity is shared or not", async () => {
+	test("The sold out indicator takes into account whether the quantity is shared or not", async () => {
 		await new AvailabilityPeriodBuilder()
 			.forShopResource(shopResource!)
 			.withDates([availableDate1!, availableDate2!])
@@ -115,7 +115,38 @@ describe("AvailabilityPeriodService", () => {
 			.withChosenDate(availableDate1!)
 			.buildAndSave()
 
+		// availableDate1 is sold out
+		{
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			expect(futureAvailableDates).toHaveLength(2)
+			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
+			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
+			expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
+			expect(futureAvailableDates[1].isSoldOut).toBeFalsy()
+		}
+	})
+
+	test("When a date is paused, the date is marked as sold out", async () => {
+		const period = await new AvailabilityPeriodBuilder()
+			.forShopResource(shopResource!)
+			.withDates([availableDate1!, availableDate2!])
+			.withQuantity(5)
+			.buildAndSave()
+
 		// Both availability periods are not sold out yet
+		{
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			expect(futureAvailableDates).toHaveLength(2)
+			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
+			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
+			expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
+			expect(futureAvailableDates[1].isSoldOut).toBeFalsy()
+		}
+
+		period!.setPausedDates([availableDate1!])
+		await AvailabilityPeriodService.update(period!)
+
+		// availableDate1 is sold out
 		{
 			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
 			expect(futureAvailableDates).toHaveLength(2)

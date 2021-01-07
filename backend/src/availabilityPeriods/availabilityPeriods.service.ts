@@ -73,7 +73,7 @@ export class AvailabilityPeriodService {
 			const period = periodsById[availableDate.availabilityPeriodId]
 			if (!period) return
 			const numberOfOrders = ordersPerAvailabilityPeriodId[availableDate.availabilityPeriodId] || 0
-			availableDate.isSoldOut = numberOfOrders >= period.quantity
+			availableDate.isSoldOut = numberOfOrders >= period.quantity || period.isPaused(availableDate.date)
 		})
 
 		// Set isSoldOut flag on the available dates not sharing quantity
@@ -82,7 +82,7 @@ export class AvailabilityPeriodService {
 			if (!period) return
 			const numberOfOrders = ordersPerDate[availableDate.date.format(SYSTEM_DATE_FORMAT)]
 			if (!numberOfOrders) return
-			availableDate.isSoldOut = numberOfOrders >= period.quantity
+			availableDate.isSoldOut = numberOfOrders >= period.quantity || period.isPaused(availableDate.date)
 		})
 
 		return availableDates
@@ -105,11 +105,11 @@ export class AvailabilityPeriodService {
 
 	static async createAvailabilityPeriod(
 		shopResourceId: string,
-		dates: Moment[],
+		availableDates: Moment[],
 		quantity: number,
 		quantityIsShared: boolean
 	): Promise<AvailabilityPeriod | undefined> {
-		if (dates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
+		if (availableDates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
 		const conn: Pool = await getConnection()
 		const result = await conn.query<AvailabilityPeriodSchema>(
 			`
@@ -123,9 +123,9 @@ export class AvailabilityPeriodService {
 			[
 				shopResourceId,
 				quantity,
-				dates[0].format(SYSTEM_DATE_FORMAT),
-				dates[dates.length - 1].format(SYSTEM_DATE_FORMAT),
-				JSON.stringify(dates),
+				availableDates[0].format(SYSTEM_DATE_FORMAT),
+				availableDates[availableDates.length - 1].format(SYSTEM_DATE_FORMAT),
+				JSON.stringify(availableDates),
 				quantityIsShared
 			]
 		)
@@ -133,7 +133,7 @@ export class AvailabilityPeriodService {
 		return schema ? AvailabilityPeriod.createFromSchema(schema) : undefined
 	}
 
-	static async updateShopResource(availabilityPeriod: AvailabilityPeriod): Promise<void> {
+	static async update(availabilityPeriod: AvailabilityPeriod): Promise<void> {
 		const conn: Pool = await getConnection()
 		if (!availabilityPeriod.id) throw new UnexpectedError("`id` is required to update the availability period")
 		if (availabilityPeriod.availableDates.length == 0) throw new UnexpectedError("`dates` cannot be empty")

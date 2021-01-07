@@ -6,7 +6,7 @@ import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 export class AvailabilityPeriodBuilder {
 	private shopResource?: ShopResource
 	private quantity?: number
-	private dates?: Moment[]
+	private availableDates?: Moment[]
 	private quantityIsShared?: boolean
 
 	forShopResource(shopResource: ShopResource): this {
@@ -20,7 +20,7 @@ export class AvailabilityPeriodBuilder {
 	}
 
 	withDates(dates: Moment[]): AvailabilityPeriodBuilder {
-		this.dates = dates
+		this.availableDates = dates
 		return this
 	}
 
@@ -32,8 +32,8 @@ export class AvailabilityPeriodBuilder {
 	async buildAndSave(): Promise<AvailabilityPeriod | undefined> {
 		if (!this.shopResource?.id) throw "this.shop is required"
 
-		if (!this.dates) {
-			this.dates = [moment().startOf("day")]
+		if (!this.availableDates) {
+			this.availableDates = [moment().startOf("day")]
 		}
 
 		if (!this.quantity) {
@@ -46,7 +46,7 @@ export class AvailabilityPeriodBuilder {
 
 		return await AvailabilityPeriodService.createAvailabilityPeriod(
 			this.shopResource.id,
-			this.dates,
+			this.availableDates,
 			this.quantity,
 			this.quantityIsShared
 		)

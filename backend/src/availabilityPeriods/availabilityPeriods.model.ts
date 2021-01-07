@@ -52,8 +52,12 @@ export class AvailabilityPeriod {
 		)
 	}
 
-	setPausedDates(pausedDates: moment.Moment[] | undefined) {
+	setPausedDates(pausedDates: Moment[] | undefined) {
 		this.pausedDates = pausedDates || []
+	}
+
+	isPaused(date: Moment): boolean {
+		return !!(this.pausedDates || []).find((pausedDate) => pausedDate.isSame(date, "day"))
 	}
 
 	getLastDate(): Moment | undefined {
