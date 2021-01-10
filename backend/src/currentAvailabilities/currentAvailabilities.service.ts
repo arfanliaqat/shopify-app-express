@@ -7,7 +7,7 @@ import { ShopResourceService } from "../shopResource/shopResource.service"
 import { Shop } from "../shop/shop.model"
 
 export class CurrentAvailabilityService {
-	static async refreshAllShopResources(shop: Shop): Promise<void> {
+	static async refreshAllByShop(shop: Shop): Promise<void> {
 		const shopResources = await ShopResourceService.findShopResources(shop)
 		for (const shopResource of shopResources) {
 			if (shopResource.id) {

@@ -1,6 +1,8 @@
 import ShopResourceViewModel from "../../../frontend/src/models/ShopResource"
 import { Shop } from "../shop/shop.model"
 import { ResourceId } from "./shopResource.util"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
+import moment, { Moment } from "moment"
 
 export type ResourceType = "Product" | "ProductVariant" | "Collection"
 
@@ -11,6 +13,10 @@ export interface ShopResourceSchema {
 	resource_id: number
 	title: string
 	created_date?: Date
+	next_availability_date?: Date
+	last_availability_date?: Date
+	available_dates?: number
+	sold_out_dates?: number
 }
 
 export class ShopResource {
@@ -20,7 +26,11 @@ export class ShopResource {
 		public resourceType: ResourceType,
 		public resourceId: number,
 		public title: string,
-		public createdDate?: Date
+		public createdDate?: Date,
+		public nextAvailabilityDate?: Moment,
+		public lastAvailabilityDate?: Moment,
+		public availableDates?: number,
+		public soldOutDates?: number
 	) {}
 
 	belongsTo(connectedShop: Shop): boolean {
@@ -38,7 +48,11 @@ export class ShopResource {
 			schema.resource_type as ResourceType,
 			schema.resource_id,
 			schema.title,
-			schema.created_date
+			schema.created_date,
+			moment(schema.next_availability_date),
+			moment(schema.last_availability_date),
+			schema.available_dates,
+			schema.sold_out_dates
 		)
 	}
 
@@ -47,7 +61,11 @@ export class ShopResource {
 			id: this.id || "",
 			resourceId: this.resourceId,
 			resourceType: this.resourceType,
-			title: this.title
+			title: this.title,
+			nextAvailabilityDate: this.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
+			lastAvailabilityDate: this.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
+			availableDates: this.availableDates,
+			soldOutDates: this.soldOutDates
 		}
 	}
 }

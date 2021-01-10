@@ -65,9 +65,20 @@ export class ShopResourceService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
 			`
-			SELECT id, shop_id, resource_type, resource_id, title
-			FROM shop_resources
-			WHERE shop_id = $1`,
+			SELECT
+				sr.id,
+			   	sr.shop_id,
+				sr.resource_type,
+				sr.resource_id,
+				sr.title,
+			    ca.next_availability_date,
+			    ca.last_availability_date,
+			    ca.available_dates,
+			    ca.sold_out_dates
+			FROM shop_resources sr
+			LEFT JOIN current_availabilities ca on sr.id = ca.shop_resource_id
+			WHERE sr.shop_id = $1
+			ORDER BY ca.id IS NULL DESC, lower(sr.title)`,
 			[shop.id]
 		)
 		return result.rows.map(ShopResource.createFromSchema)

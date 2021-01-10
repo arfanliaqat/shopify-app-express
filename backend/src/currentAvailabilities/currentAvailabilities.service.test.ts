@@ -8,6 +8,7 @@ import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPe
 import { CurrentAvailabilityService } from "./currentAvailabilities.service"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
 import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
+import { ShopResourceService } from "../shopResource/shopResource.service"
 
 describe("CurrentAvailabilityService", () => {
 	let refDate: Moment
@@ -25,7 +26,7 @@ describe("CurrentAvailabilityService", () => {
 		availableDate2 = refDate.clone().add(1, "day")
 	})
 
-	test("Scenario 1", async () => {
+	test("refreshCurrentAvailability => Scenario 1", async () => {
 		await new AvailabilityPeriodBuilder()
 			.forShopResource(shopResource!)
 			.withDates([availableDate1!, availableDate2!])
@@ -44,7 +45,7 @@ describe("CurrentAvailabilityService", () => {
 		expect(currentAvailability.soldOutDates).toBe(0)
 	})
 
-	test("Scenario 2", async () => {
+	test("refreshCurrentAvailability => Scenario 2", async () => {
 		await new AvailabilityPeriodBuilder()
 			.forShopResource(shopResource!)
 			.withDates([availableDate1!, availableDate2!])
@@ -67,6 +68,33 @@ describe("CurrentAvailabilityService", () => {
 		)
 		expect(currentAvailability.availableDates).toBe(1)
 		expect(currentAvailability.soldOutDates).toBe(1)
+	})
+
+	test("refreshAllByShop", async () => {
+		await new AvailabilityPeriodBuilder()
+			.forShopResource(shopResource!)
+			.withDates([availableDate1!, availableDate2!])
+			.withQuantityIsShared(false)
+			.withQuantity(2)
+			.buildAndSave()
+
+		await new ProductOrderBuilder()
+			.forShopResource(shopResource!)
+			.withQuantity(2)
+			.withChosenDate(availableDate1!)
+			.buildAndSave()
+
+		await CurrentAvailabilityService.refreshAllByShop(shop!)
+
+		const [product] = await ShopResourceService.findShopResources(shop!)
+		expect(product.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT)).toBe(
+			availableDate2?.format(SYSTEM_DATE_FORMAT)
+		)
+		expect(product.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT)).toBe(
+			availableDate2?.format(SYSTEM_DATE_FORMAT)
+		)
+		expect(product.availableDates).toBe(1)
+		expect(product.soldOutDates).toBe(1)
 	})
 
 	afterAll(async () => {
