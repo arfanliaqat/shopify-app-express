@@ -63,3 +63,15 @@ create index ind_product_orders_shop_resource_id on product_orders (shop_resourc
 create index ind_product_orders_order_id on product_orders (order_id);
 create index ind_product_orders_chosen_date on product_orders (chosen_date);
 create unique index unique_product_order on product_orders (shop_resource_id, order_id, chosen_date)
+
+create table current_availabilities(
+	id uuid not null primary key default uuid_generate_v4(),
+	shop_resource_id uuid not null constraint current_availabilities_shop_resources_id_fk references shop_resources,
+	next_availability_date date,
+	last_availability_date date,
+	sold_out_dates integer not null,
+	available_dates integer not null,
+	updated_date timestamp with time zone default now() not null
+);
+
+create unique index current_availabilities_shop_resource_id_index on current_availabilities (shop_resource_id);
