@@ -5,6 +5,7 @@ import { AvailableDate, AvailabilityPeriod, AvailabilityPeriodSchema } from "./a
 import { UnexpectedError } from "../util/error"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
 import { ProductOrderService } from "../productOrders/productOrders.service"
+import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
 
 export class AvailabilityPeriodService {
 	static async findAvailabilityPeriods(
@@ -129,6 +130,7 @@ export class AvailabilityPeriodService {
 				quantityIsShared
 			]
 		)
+		await CurrentAvailabilityService.refreshCurrentAvailability(shopResourceId)
 		const schema = result.rows[0]
 		return schema ? AvailabilityPeriod.createFromSchema(schema) : undefined
 	}
@@ -152,6 +154,7 @@ export class AvailabilityPeriodService {
 				availabilityPeriod.id
 			]
 		)
+		await CurrentAvailabilityService.refreshCurrentAvailability(availabilityPeriod.shopResourceId)
 	}
 
 	static async deleteAvailabilityPeriod(availabilityPeriod: AvailabilityPeriod): Promise<void> {
@@ -160,5 +163,6 @@ export class AvailabilityPeriodService {
 		await conn.query<AvailabilityPeriodSchema>(`DELETE FROM availability_periods WHERE id = $1`, [
 			availabilityPeriod.id
 		])
+		await CurrentAvailabilityService.refreshCurrentAvailability(availabilityPeriod.shopResourceId)
 	}
 }

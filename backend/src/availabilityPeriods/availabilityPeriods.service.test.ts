@@ -7,6 +7,9 @@ import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
 import { AvailabilityPeriodBuilder } from "./availabilityPeriods.builder"
 import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
+import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
+import { ShopResourceService } from "../shopResource/shopResource.service"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 describe("AvailabilityPeriodService", () => {
 	let refDate: Moment
@@ -154,6 +157,83 @@ describe("AvailabilityPeriodService", () => {
 			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
 			expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
 			expect(futureAvailableDates[1].isSoldOut).toBeFalsy()
+		}
+	})
+
+	test("It refreshes the current availabilities cache when creating an availability period", async () => {
+		{
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			const [product] = await ShopResourceService.findShopResources(shop!)
+			expect(product.availableDates).toBe(0)
+			expect(product.soldOutDates).toBe(0)
+		}
+
+		await AvailabilityPeriodService.createAvailabilityPeriod(
+			shopResource!.id!,
+			[moment().startOf("week").add(1, "week")],
+			5,
+			true
+		)
+
+		{
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			const [product] = await ShopResourceService.findShopResources(shop!)
+			expect(product.availableDates).toBe(1)
+			expect(product.soldOutDates).toBe(0)
+		}
+	})
+
+	test("It refreshes the current availabilities cache when updating an availability period", async () => {
+		const availableDate1 = moment().startOf("week").add(1, "week")
+		const availableDate2 = availableDate1.clone().add(1, "day")
+
+		const period = await AvailabilityPeriodService.createAvailabilityPeriod(
+			shopResource!.id!,
+			[availableDate1],
+			5,
+			true
+		)
+
+		{
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			const [product] = await ShopResourceService.findShopResources(shop!)
+			expect(product.availableDates).toBe(1)
+			expect(product.soldOutDates).toBe(0)
+		}
+
+		period!.addNewDates([availableDate2])
+		await AvailabilityPeriodService.update(period!)
+
+		{
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			const [product] = await ShopResourceService.findShopResources(shop!)
+			expect(product.availableDates).toBe(2)
+			expect(product.soldOutDates).toBe(0)
+		}
+	})
+
+	test("It refreshes the current availabilities cache when deleting an availability period", async () => {
+		const period = await AvailabilityPeriodService.createAvailabilityPeriod(
+			shopResource!.id!,
+			[moment().startOf("week").add(1, "week")],
+			5,
+			true
+		)
+
+		{
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			const [product] = await ShopResourceService.findShopResources(shop!)
+			expect(product.availableDates).toBe(1)
+			expect(product.soldOutDates).toBe(0)
+		}
+
+		await AvailabilityPeriodService.deleteAvailabilityPeriod(period!)
+
+		{
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			const [product] = await ShopResourceService.findShopResources(shop!)
+			expect(product.availableDates).toBe(0)
+			expect(product.soldOutDates).toBe(0)
 		}
 	})
 

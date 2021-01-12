@@ -8,6 +8,7 @@ import { TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
+import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
 
 export function getChosenDate(lineItem: LineItem): Moment | undefined {
 	const chosenDateProperty = lineItem.properties.find((property: Property) => {
@@ -85,6 +86,7 @@ export class HooksService {
 		connectedShop: Shop,
 		orderEvent: OrderEventData
 	): Promise<void> {
+		let eventShopResourcesArray
 		const service = new ProductOrderServiceWithTransaction()
 		await service.initClient()
 		await service.beginTransaction()
@@ -97,7 +99,7 @@ export class HooksService {
 			}
 
 			const productIds = Array.from(new Set<number>(orderEvent.line_items.map((item) => item.product_id)))
-			const eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
+			eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
 			const eventShopResources = ShopResourceService.groupByResourceId(eventShopResourcesArray)
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
@@ -134,5 +136,7 @@ export class HooksService {
 		} finally {
 			service.releaseClient()
 		}
+
+		await CurrentAvailabilityService.refreshCurrentAvailabilities(eventShopResourcesArray)
 	}
 }

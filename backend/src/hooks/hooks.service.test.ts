@@ -7,18 +7,15 @@ import { DatabaseTestService, getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
 import { SYSTEM_DATE_FORMAT, TAG_LABEL } from "../util/constants"
+import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPeriods.builder"
+import { ShopResourceService } from "../shopResource/shopResource.service"
 
 describe("HooksService", () => {
 	let availableDate: Moment
 	let shop: Shop | undefined
 	let shopResource: ShopResource | undefined
 
-	beforeEach(async () => {
-		await DatabaseTestService.clearDatabase()
-		availableDate = moment("01/12/2020", "DD/MM/YYYY")
-		shop = await new ShopBuilder().buildAndSave()
-		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
-
+	async function ingestOrderEvent() {
 		await HooksService.ingestOrderEvent("create", shop!, {
 			id: 1234,
 			line_items: [
@@ -34,9 +31,17 @@ describe("HooksService", () => {
 				}
 			]
 		})
+	}
+
+	beforeEach(async () => {
+		await DatabaseTestService.clearDatabase()
+		availableDate = moment("01/12/2020", "DD/MM/YYYY")
+		shop = await new ShopBuilder().buildAndSave()
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 	})
 
 	test("Orders get properly ingested", async () => {
+		await ingestOrderEvent()
 		const productOrders = await ProductOrderService.findByShopResourceAndDate(
 			shopResource!.id!,
 			availableDate,
@@ -49,6 +54,7 @@ describe("HooksService", () => {
 	})
 
 	test("If the order changes with another product, it doesn't retain the previously ingested product order", async () => {
+		await ingestOrderEvent()
 		{
 			// So it creates a product orders record for it
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
@@ -83,6 +89,7 @@ describe("HooksService", () => {
 	})
 
 	test("If the quantity of a product changes in an order, the product order quantity for that date gets updated", async () => {
+		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
@@ -117,6 +124,7 @@ describe("HooksService", () => {
 	})
 
 	test("When the event is of type cancellation it removes the product orders", async () => {
+		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
@@ -150,6 +158,7 @@ describe("HooksService", () => {
 	})
 
 	test("When the event is of type deletion it removes the product orders", async () => {
+		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
@@ -183,6 +192,7 @@ describe("HooksService", () => {
 	})
 
 	test("When the event cancelled_at property is not null it removes the product orders", async () => {
+		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
 				shopResource!.id!,
@@ -217,6 +227,7 @@ describe("HooksService", () => {
 	})
 
 	test("It handles multiple chosen dates in the same order", async () => {
+		await ingestOrderEvent()
 		const shopResource2 = await new ShopResourceBuilder()
 			.forShop(shop!)
 			.withResourceId("Product", 5555)
@@ -270,7 +281,7 @@ describe("HooksService", () => {
 		expect(productOrders2[0].quantity).toBe(5)
 	})
 
-	test("Date is parsed correctly", () => {
+	test("Date is parsed correctly", async () => {
 		const availableDate = getChosenDate({
 			product_id: 123,
 			quantity: 2,
@@ -283,6 +294,44 @@ describe("HooksService", () => {
 		})
 
 		expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
+	})
+
+	test("When an order gets ingested it refreshes the current availabilities cache", async () => {
+		const availableDate1 = moment().startOf("week").add(1, "week")
+		const availableDate2 = availableDate1.clone().add(1, "day")
+		const availableDate3 = availableDate1.clone().add(3, "day")
+		await new AvailabilityPeriodBuilder()
+			.forShopResource(shopResource!)
+			.withDates([availableDate1, availableDate2, availableDate3])
+			.withQuantityIsShared(false)
+			.withQuantity(2)
+			.buildAndSave()
+
+		await HooksService.ingestOrderEvent("create", shop!, {
+			id: 1234,
+			line_items: [
+				{
+					quantity: 2,
+					product_id: 4321,
+					properties: [
+						{
+							name: TAG_LABEL,
+							value: availableDate1.format("DD/MM/YYYY")
+						}
+					]
+				}
+			]
+		})
+
+		const [product] = await ShopResourceService.findShopResources(shop!)
+		expect(product.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT)).toBe(
+			availableDate2?.format(SYSTEM_DATE_FORMAT)
+		)
+		expect(product.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT)).toBe(
+			availableDate3?.format(SYSTEM_DATE_FORMAT)
+		)
+		expect(product.availableDates).toBe(2)
+		expect(product.soldOutDates).toBe(1)
 	})
 
 	afterAll(async () => {

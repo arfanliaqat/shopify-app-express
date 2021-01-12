@@ -1,6 +1,6 @@
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
-import { ShopResourceSchema } from "../shopResource/shopResource.model"
+import { ShopResource, ShopResourceSchema } from "../shopResource/shopResource.model"
 import { CurrentAvailability } from "./currentAvailabilities.model"
 import { AvailabilityPeriodService } from "../availabilityPeriods/availabilityPeriods.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
@@ -19,6 +19,14 @@ export class CurrentAvailabilityService {
 	static async refreshCurrentAvailability(shopResourceId: string): Promise<CurrentAvailability> {
 		const currentAvailability = await this.findNewState(shopResourceId)
 		return await this.save(currentAvailability)
+	}
+
+	static async refreshCurrentAvailabilities(shopResources: ShopResource[]): Promise<void> {
+		for (const shopResource of shopResources) {
+			if (shopResource.id) {
+				await this.refreshCurrentAvailability(shopResource.id)
+			}
+		}
 	}
 
 	static async findNewState(shopResourceId: string): Promise<CurrentAvailability> {
