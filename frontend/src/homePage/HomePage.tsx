@@ -5,6 +5,7 @@ import { useApi } from "../util/useApi"
 import ShopResource from "../models/ShopResource"
 import AddResourceModal from "./AddResourceModal"
 import { RouteChildrenProps } from "react-router"
+import ProductItem from "./ProductItem"
 
 export default function HomePage({ history }: RouteChildrenProps) {
 	const [open, setOpen] = useState<boolean>(false)
@@ -44,9 +45,7 @@ export default function HomePage({ history }: RouteChildrenProps) {
 						<ResourceList
 							items={shopResources}
 							renderItem={(shopResource) => (
-								<ResourceList.Item id="product" onClick={onShopResourceClick(shopResource)}>
-									<div className="shopResourceTitle">{shopResource.title}</div>
-								</ResourceList.Item>
+								<ProductItem shopResource={shopResource} onClick={onShopResourceClick(shopResource)} />
 							)}
 						/>
 					</Card>
