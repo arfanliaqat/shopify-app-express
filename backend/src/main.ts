@@ -1,4 +1,4 @@
-import express, { Application, json } from "express"
+import express, { Application, json, NextFunction, Request, Response } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
@@ -16,8 +16,10 @@ import availabilityPeriodsRouter from "./availabilityPeriods/availabilityPeriods
 import widgetRouter from "./widget/widget.router"
 import hooksRouter from "./hooks/hooks.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
+import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabilities.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
 import { appUrl, isDev } from "./util/constants"
+import { noApiCallCache } from "./util/middlewares"
 
 const app: Application = express()
 
@@ -80,11 +82,14 @@ app.use(
 	})
 )
 
+app.use(noApiCallCache)
+
 app.use(authRouter)
 app.use(shopResourceRouter)
 app.use(availabilityPeriodsRouter)
 app.use(hooksRouter)
 app.use(scriptTagsRouter)
+app.use(currentAvailabilitiesRouter)
 
 app.use(cors())
 app.use(
