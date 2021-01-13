@@ -6,7 +6,7 @@ import AddPeriodModal from "./AddPeriodModal"
 import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
 import { Page } from "@shopify/polaris"
-import ShopResource from "../models/ShopResource"
+import { ShopResource } from "../models/ShopResource"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 
 interface Params {

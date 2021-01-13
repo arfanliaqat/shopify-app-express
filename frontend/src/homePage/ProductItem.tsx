@@ -1,6 +1,6 @@
 import React from "react"
 import { ResourceList } from "@shopify/polaris"
-import ShopResource from "../models/ShopResource"
+import { getAvailabilityStatusMessage, ShopResource } from "../models/ShopResource"
 import moment from "moment"
 import { SHORT_DISPLAY_FORMAT, SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export default function ProductItem({ shopResource, onClick }: Props) {
+	const availabilityStatus = shopResource.getAvailabilityStatus()
 	return (
 		<ResourceList.Item id={`product${shopResource.title}`} onClick={onClick}>
 			<div className="productItem">
@@ -42,6 +43,9 @@ export default function ProductItem({ shopResource, onClick }: Props) {
 						<div className="value">
 							{shopResource.nextAvailabilityDate ? shopResource.availableDates || 0 : "n/a"}
 						</div>
+					</div>
+					<div className={`status ${availabilityStatus}`}>
+						{getAvailabilityStatusMessage(availabilityStatus)}
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-import ShopResourceViewModel from "../../../frontend/src/models/ShopResource"
+import { ShopResource as ShopResourceViewModel } from "../../../frontend/src/models/ShopResource"
 import { Shop } from "../shop/shop.model"
 import { ResourceId } from "./shopResource.util"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
@@ -57,15 +57,15 @@ export class ShopResource {
 	}
 
 	toViewModel(): ShopResourceViewModel {
-		return {
-			id: this.id || "",
-			resourceId: this.resourceId,
-			resourceType: this.resourceType,
-			title: this.title,
-			nextAvailabilityDate: this.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
-			lastAvailabilityDate: this.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
-			availableDates: this.availableDates,
-			soldOutDates: this.soldOutDates
-		}
+		return new ShopResourceViewModel(
+			this.id || "",
+			this.resourceType,
+			this.resourceId,
+			this.title,
+			this.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
+			this.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
+			this.availableDates,
+			this.soldOutDates
+		)
 	}
 }

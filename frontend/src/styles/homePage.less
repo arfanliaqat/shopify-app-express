@@ -12,8 +12,21 @@
       justify-items: stretch;
       > div {
         flex-grow: 1;
+        flex-basis: 0;
         > .title {
           color: #637381;
+        }
+        &.status {
+          font-weight: 500;
+          &.AVAILABLE {
+            color: #5D8AB4;
+          }
+          &.SOLD_OUT {
+            color: #595130;
+          }
+          &.NOT_AVAILABLE {
+            color: #637381;
+          }
         }
       }
     }

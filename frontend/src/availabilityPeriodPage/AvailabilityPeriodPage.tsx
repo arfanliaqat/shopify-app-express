@@ -4,7 +4,7 @@ import { Page, Layout, TextField, PageActions, FormLayout } from "@shopify/polar
 import { useApi } from "../util/useApi"
 import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
-import ShopResource from "../models/ShopResource"
+import { ShopResource } from "../models/ShopResource"
 import _ from "lodash"
 import { Toast } from "@shopify/app-bridge-react"
 import AvailableDatePickerModal from "./AvailableDatePickerModal"
