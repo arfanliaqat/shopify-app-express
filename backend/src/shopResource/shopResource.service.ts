@@ -6,15 +6,28 @@ import { parseResourceGid } from "./shopResource.util"
 import { BadParameter, handleAxiosErrors, UnexpectedError } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import Axios from "axios"
+import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
+import { CurrentAvailability } from "../currentAvailabilities/currentAvailabilities.model"
 
 export interface ShopifyResource {
 	id: string
 	title: string
+	featuredImage: {
+		originalSrc: string
+	} | null
 }
 
 type ShopResourceById = { [id: string]: ShopResource }
 
 export class ShopResourceService {
+	static getThumbnailUrlFromOriginalUrl(originalUrl: string | undefined): string | undefined {
+		if (!originalUrl) return undefined
+		const pos = originalUrl.lastIndexOf(".")
+		const head = originalUrl.substring(0, pos)
+		const tail = originalUrl.substring(pos)
+		return `${head}_medium${tail}`
+	}
+
 	static async findShopResourceById(shopResourceId: string): Promise<ShopResource | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
@@ -71,6 +84,7 @@ export class ShopResourceService {
 				sr.resource_type,
 				sr.resource_id,
 				sr.title,
+			    sr.image_url,
 			    ca.next_availability_date,
 			    ca.last_availability_date,
 			    ca.available_dates,
@@ -78,7 +92,7 @@ export class ShopResourceService {
 			FROM shop_resources sr
 			LEFT JOIN current_availabilities ca on sr.id = ca.shop_resource_id
 			WHERE sr.shop_id = $1
-			ORDER BY ca.id IS NULL DESC, lower(sr.title)`,
+			ORDER BY ca.next_availability_date IS NOT NULL DESC, lower(sr.title)`,
 			[shop.id]
 		)
 		return result.rows.map(ShopResource.createFromSchema)
@@ -88,15 +102,25 @@ export class ShopResourceService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
 			`
-			INSERT INTO shop_resources (shop_id, resource_type, resource_id, title)
-			VALUES ($1, $2, $3, $4)
+			INSERT INTO shop_resources (shop_id, resource_type, resource_id, title, image_url)
+			VALUES ($1, $2, $3, $4, $5)
 			ON CONFLICT DO NOTHING
-			RETURNING id, shop_id, resource_type, resource_id, title`,
-			[shopResource.shopId, shopResource.resourceType, shopResource.resourceId, shopResource.title]
+			RETURNING id, shop_id, resource_type, resource_id, title, image_url`,
+			[
+				shopResource.shopId,
+				shopResource.resourceType,
+				shopResource.resourceId,
+				shopResource.title,
+				shopResource.imageUrl
+			]
 		)
 		const row = result.rows[0]
 		if (!row) return undefined
-		return ShopResource.createFromSchema(row)
+		const newShopResource = ShopResource.createFromSchema(row)
+		if (newShopResource.id) {
+			await CurrentAvailabilityService.createInitial(newShopResource.id)
+		}
+		return newShopResource
 	}
 
 	static async fetchShopifyProduct(
@@ -113,7 +137,16 @@ export class ShopResourceService {
 					"X-Shopify-Access-Token": accessToken.token
 				},
 				data: {
-					query: `{ product(id: "${productGid}") { id, title } }`
+					query: `
+						{
+							product(id: "${productGid}") {
+								id,
+								title,
+								featuredImage {
+									originalSrc
+								}
+							}
+						}`
 				}
 			})
 			return response.data.data.product as ShopifyResource
@@ -128,19 +161,20 @@ export class ShopResourceService {
 			if (!resourceId) {
 				throw new BadParameter(`'gid' could not be parsed: ${resourceGid}`)
 			}
-			let title
+			let title, imageUrl
 			if (resourceId.type == "Product") {
 				const shopifyProduct = await this.fetchShopifyProduct(shop, accessToken, resourceGid)
 				if (!shopifyProduct) {
 					throw new BadParameter(`Shopify product not found: ${resourceGid}`)
 				}
 				title = shopifyProduct.title
+				imageUrl = this.getThumbnailUrlFromOriginalUrl(shopifyProduct.featuredImage?.originalSrc)
 			}
 			if (!title) {
 				throw new BadParameter("`title` should be defined")
 			} else {
 				if (!shop.id) throw new UnexpectedError("shop.id cannot be undefined")
-				const shopResource = ShopResource.create(shop.id, resourceId, title)
+				const shopResource = ShopResource.create(shop.id, resourceId, title, imageUrl)
 				await this.insert(shopResource)
 			}
 		}

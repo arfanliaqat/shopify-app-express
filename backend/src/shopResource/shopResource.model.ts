@@ -12,6 +12,7 @@ export interface ShopResourceSchema {
 	resource_type: string
 	resource_id: number
 	title: string
+	image_url: string
 	created_date?: Date
 	next_availability_date?: Date
 	last_availability_date?: Date
@@ -26,6 +27,7 @@ export class ShopResource {
 		public resourceType: ResourceType,
 		public resourceId: number,
 		public title: string,
+		public imageUrl: string | undefined,
 		public createdDate?: Date,
 		public nextAvailabilityDate?: Moment,
 		public lastAvailabilityDate?: Moment,
@@ -37,8 +39,8 @@ export class ShopResource {
 		return !!connectedShop?.id && !!this.shopId && connectedShop?.id == this.shopId
 	}
 
-	static create(shopId: string, resourceId: ResourceId, title: string): ShopResource {
-		return new ShopResource(undefined, shopId, resourceId.type, resourceId.id, title)
+	static create(shopId: string, resourceId: ResourceId, title: string, imageUrl?: string): ShopResource {
+		return new ShopResource(undefined, shopId, resourceId.type, resourceId.id, title, imageUrl)
 	}
 
 	static createFromSchema(schema: ShopResourceSchema): ShopResource {
@@ -48,6 +50,7 @@ export class ShopResource {
 			schema.resource_type as ResourceType,
 			schema.resource_id,
 			schema.title,
+			schema.image_url,
 			schema.created_date,
 			moment(schema.next_availability_date),
 			moment(schema.last_availability_date),
@@ -62,6 +65,7 @@ export class ShopResource {
 			this.resourceType,
 			this.resourceId,
 			this.title,
+			this.imageUrl,
 			this.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
 			this.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
 			this.availableDates,

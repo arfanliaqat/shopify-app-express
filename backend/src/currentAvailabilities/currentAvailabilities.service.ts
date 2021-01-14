@@ -71,4 +71,16 @@ export class CurrentAvailabilityService {
 		}
 		return currentAvailability
 	}
+
+	static async createInitial(shopResourceId: string): Promise<void> {
+		const initialCurrentAvailability = new CurrentAvailability(
+			undefined,
+			shopResourceId,
+			undefined,
+			undefined,
+			0,
+			0
+		)
+		await this.save(initialCurrentAvailability)
+	}
 }

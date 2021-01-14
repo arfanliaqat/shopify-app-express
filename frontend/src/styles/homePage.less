@@ -1,12 +1,36 @@
 #homePage {
   .productItem {
-    > .title {
+    display: flex;
+    justify-items: stretch;
+    .left {
+      flex-grow: 0;
+      flex-basis: 100px;
+    }
+    .right {
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+    .productTitle {
       font-size: 16px;
       font-weight: 500;
       text-transform: capitalize;
       margin-bottom: 5px;
     }
-    .props {
+    .productImage {
+      .image {
+        width: 80px;
+        height: 80px;
+        background-size: cover;
+        border-radius: 3px;
+        &.placeholder {
+          border: 1px solid #eee;
+          display: flex;
+          justify-content: center;
+          align-content: center;
+        }
+      }
+    }
+    .productProperties {
       display: flex;
       width: 100%;
       justify-items: stretch;

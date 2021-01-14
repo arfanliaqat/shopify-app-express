@@ -17,6 +17,7 @@ export class ShopResource {
 		public resourceType: string,
 		public resourceId: number,
 		public title: string,
+		public imageUrl: string | undefined,
 		public nextAvailabilityDate?: string,
 		public lastAvailabilityDate?: string,
 		public availableDates?: number,
@@ -29,6 +30,7 @@ export class ShopResource {
 			rawShopResource.resourceType,
 			rawShopResource.resourceId,
 			rawShopResource.title,
+			rawShopResource.imageUrl,
 			rawShopResource.nextAvailabilityDate,
 			rawShopResource.lastAvailabilityDate,
 			rawShopResource.availableDates,
@@ -37,8 +39,8 @@ export class ShopResource {
 	}
 
 	getAvailabilityStatus(): AvailabilityStatus {
-		if (this.soldOutDates > 0 && this.availableDates == 0) return "SOLD_OUT"
-		if (this.availableDates > 0) return "AVAILABLE"
+		if (this.soldOutDates !== undefined && this.soldOutDates > 0 && this.availableDates == 0) return "SOLD_OUT"
+		if (this.availableDates !== undefined && this.availableDates > 0) return "AVAILABLE"
 		return "NOT_AVAILABLE"
 	}
 }

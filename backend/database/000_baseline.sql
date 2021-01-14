@@ -25,6 +25,7 @@ create table shop_resources(
 	resource_type text not null,
 	resource_id bigint not null,
 	title text not null,
+	image_url text,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)
 );
