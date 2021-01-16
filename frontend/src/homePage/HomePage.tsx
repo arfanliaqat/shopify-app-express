@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"
-import { Page, Card, Spinner, ResourceList } from "@shopify/polaris"
+import { Page, Card, ResourceList, SkeletonPage, SkeletonBodyText } from "@shopify/polaris"
 import moment from "moment"
 import { useApi } from "../util/useApi"
 import { ShopResource } from "../models/ShopResource"
@@ -15,6 +15,7 @@ export default function HomePage({ history }: RouteChildrenProps) {
 
 	const fetchShopResources = useCallback(() => {
 		setApiRequest({ url: `/resources` })
+		setOpen(false)
 	}, [setApiRequest])
 
 	useEffect(() => {
@@ -28,6 +29,22 @@ export default function HomePage({ history }: RouteChildrenProps) {
 		[history]
 	)
 
+	if (isLoading || shopResources === undefined) {
+		return (
+			<div id="homePage">
+				<SkeletonPage title="Products" primaryAction>
+					<Card>
+						{Array.from({ length: 5 }).map((val, index) => (
+							<Card.Section key={index}>
+								<SkeletonBodyText lines={3} />
+							</Card.Section>
+						))}
+					</Card>
+				</SkeletonPage>
+			</div>
+		)
+	}
+
 	return (
 		<div id="homePage">
 			<AddResourceModal open={open} onSuccess={() => fetchShopResources()} onClose={() => setOpen(false)} />
@@ -38,20 +55,14 @@ export default function HomePage({ history }: RouteChildrenProps) {
 					onAction: () => setOpen(true)
 				}}
 			>
-				{isLoading || shopResources === undefined ? (
-					<Card>
-						<Spinner />
-					</Card>
-				) : (
-					<Card>
-						<ResourceList
-							items={shopResources}
-							renderItem={(shopResource) => (
-								<ProductItem shopResource={shopResource} onClick={onShopResourceClick(shopResource)} />
-							)}
-						/>
-					</Card>
-				)}
+				<Card>
+					<ResourceList
+						items={shopResources}
+						renderItem={(shopResource) => (
+							<ProductItem shopResource={shopResource} onClick={onShopResourceClick(shopResource)} />
+						)}
+					/>
+				</Card>
 			</Page>
 		</div>
 	)

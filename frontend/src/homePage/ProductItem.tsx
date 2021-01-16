@@ -1,9 +1,8 @@
 import React from "react"
-import { ResourceList, Icon } from "@shopify/polaris"
+import { ResourceList } from "@shopify/polaris"
 import { getAvailabilityStatusMessage, ShopResource } from "../models/ShopResource"
 import moment from "moment"
 import { SHORT_DISPLAY_FORMAT, SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
-import { ImageMajorTwotone } from "@shopify/polaris-icons"
 import ProductThumbnail from "../util/ProductThumbnail"
 import { capitalize } from "../util/tools"
 
