@@ -5,7 +5,7 @@ import moment, { Moment } from "moment"
 import AddPeriodModal from "./AddPeriodModal"
 import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
-import { Page, Thumbnail } from "@shopify/polaris"
+import { Card, Page, SkeletonDisplayText } from "@shopify/polaris"
 import { ShopResource } from "../models/ShopResource"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 import ProductThumbnail from "../util/ProductThumbnail"
@@ -70,8 +70,34 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 			: AvailabilityPeriod.create(calendarPageData.availabilityPeriods)
 
 	if (calendarPageData === undefined) {
-		return <div />
+		return (
+			<div className="skeletonCalendar">
+				<Page>
+					<div className="skeletonBreadcrumb">
+						<SkeletonDisplayText size="small" />
+					</div>
+					<div className="skeletonPageHeader">
+						<div className="skeletonThumbnail" />
+						<div className="skeletonTitle">
+							<SkeletonDisplayText size="large" />
+						</div>
+					</div>
+					<Card>
+						<div className="skeletonCalendar">
+							{Array.from({ length: 5 }).map((val, weekIndex) => (
+								<div key={weekIndex} className="skeletonWeek">
+									{Array.from({ length: 7 }).map((val, dayIndex) => (
+										<div key={dayIndex} className="skeletonDay" />
+									))}
+								</div>
+							))}
+						</div>
+					</Card>
+				</Page>
+			</div>
+		)
 	}
+
 	const { shopResource, ordersPerDate } = calendarPageData
 
 	return (

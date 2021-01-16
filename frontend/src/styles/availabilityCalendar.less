@@ -1,3 +1,68 @@
+.skeletonCalendar {
+  .skeletonBreadcrumb {
+    padding-top: 20px;
+    .Polaris-SkeletonDisplayText--sizeSmall {
+      height: 1.8rem;
+    }
+  }
+  .skeletonPageHeader {
+    display: flex;
+    align-items: center;
+    justify-items: stretch;
+    width: 100%;
+    .skeletonThumbnail {
+      height: 80px;
+      width: 80px;
+      margin: 20px 20px 20px 0;
+      background: #EBEDF0;
+      border-radius: 3px;
+      animation: var(--polaris-animation-skeleton-shimmer) 800ms linear infinite alternate;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      will-change: opacity;
+    }
+    .skeletonTitle {
+      min-width: 200px;
+      flex: 1;
+      .Polaris-SkeletonDisplayText__DisplayText {
+        max-width: 40%;
+      }
+    }
+  }
+  .skeletonCalendar {
+    display: flex;
+    flex-direction: column;
+    justify-items: stretch;
+    height: 600px;
+
+    .skeletonWeek {
+      margin-top: 20px;
+      flex: 1;
+      display: flex;
+      justify-items: stretch;
+
+      &:last-child {
+        margin-bottom: 20px;
+      }
+
+      .skeletonDay {
+        flex: 1;
+        background: #EBEDF0;
+        border-radius: 3px;
+        margin-left: 20px;
+        animation: var(--polaris-animation-skeleton-shimmer) 800ms linear infinite alternate;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        will-change: opacity;
+
+        &:last-child {
+          margin-right: 20px;
+        }
+      }
+    }
+  }
+}
+
 .availabilityCalendar {
   padding: 20px;
 
