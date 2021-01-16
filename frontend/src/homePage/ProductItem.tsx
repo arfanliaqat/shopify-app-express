@@ -4,6 +4,7 @@ import { getAvailabilityStatusMessage, ShopResource } from "../models/ShopResour
 import moment from "moment"
 import { SHORT_DISPLAY_FORMAT, SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { ImageMajorTwotone } from "@shopify/polaris-icons"
+import ProductThumbnail from "../util/ProductThumbnail"
 
 function formatDate(strDate: string): string {
 	return moment(strDate, SYSTEM_DATE_FORMAT).format(SHORT_DISPLAY_FORMAT)
@@ -20,15 +21,7 @@ export default function ProductItem({ shopResource, onClick }: Props) {
 		<ResourceList.Item id={`product${shopResource.title}`} onClick={onClick}>
 			<div className="productItem">
 				<div className="left">
-					<div className="productImage">
-						{shopResource.imageUrl ? (
-							<div className="image" style={{ backgroundImage: `url(${shopResource.imageUrl}` }} />
-						) : (
-							<div className="image placeholder">
-								<Icon source={ImageMajorTwotone} color="inkLightest" />
-							</div>
-						)}
-					</div>
+					<ProductThumbnail src={shopResource.imageUrl} />
 				</div>
 				<div className="right">
 					<div className="productTitle">{shopResource.title}</div>

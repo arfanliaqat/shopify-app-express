@@ -32,7 +32,7 @@ export class ShopResourceService {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
 			`
-			SELECT id, shop_id, resource_type, resource_id, title
+			SELECT id, shop_id, resource_type, resource_id, title, image_url
 			FROM shop_resources
 			WHERE id = $1`,
 			[shopResourceId]

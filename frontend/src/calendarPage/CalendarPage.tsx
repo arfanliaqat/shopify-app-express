@@ -5,9 +5,10 @@ import moment, { Moment } from "moment"
 import AddPeriodModal from "./AddPeriodModal"
 import { useApi } from "../util/useApi"
 import { RouteChildrenProps } from "react-router"
-import { Page } from "@shopify/polaris"
+import { Page, Thumbnail } from "@shopify/polaris"
 import { ShopResource } from "../models/ShopResource"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
+import ProductThumbnail from "../util/ProductThumbnail"
 
 interface Params {
 	shopResourceId: string
@@ -73,7 +74,11 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 	const { shopResource, ordersPerDate } = calendarPageData
 
 	return (
-		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title={shopResource.title}>
+		<Page
+			breadcrumbs={[{ content: "Products", url: "/app" }]}
+			title={shopResource.title}
+			thumbnail={<ProductThumbnail src={shopResource.imageUrl} />}
+		>
 			<Calendar
 				periods={availabilityPeriods}
 				isLoading={false}

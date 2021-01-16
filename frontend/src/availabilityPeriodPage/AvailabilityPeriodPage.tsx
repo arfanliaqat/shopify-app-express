@@ -13,6 +13,7 @@ import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
 import AvailabilityDateSection from "./AvailabilityDateSection"
 import OrdersWithSharedQuantitySection from "./OrdersWithSharedQuantitySection"
 import OrdersWithoutSharedQuantitySection from "./OrdersWithoutSharedQuantitySection"
+import ProductThumbnail from "../util/ProductThumbnail"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -183,6 +184,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 					}
 				]}
 				title={getTitle(availabilityPeriod)}
+				thumbnail={<ProductThumbnail src={shopResource.imageUrl} />}
 			>
 				<Layout>
 					<Layout.Section />
