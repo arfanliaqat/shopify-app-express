@@ -9,6 +9,7 @@ import { Page, Thumbnail } from "@shopify/polaris"
 import { ShopResource } from "../models/ShopResource"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 import ProductThumbnail from "../util/ProductThumbnail"
+import { capitalize } from "../util/tools"
 
 interface Params {
 	shopResourceId: string
@@ -76,7 +77,7 @@ export default function CalendarPage({ match, history }: RouteChildrenProps<Para
 	return (
 		<Page
 			breadcrumbs={[{ content: "Products", url: "/app" }]}
-			title={shopResource.title}
+			title={capitalize(shopResource.title)}
 			thumbnail={<ProductThumbnail src={shopResource.imageUrl} />}
 		>
 			<Calendar

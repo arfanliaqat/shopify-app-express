@@ -14,6 +14,7 @@ import AvailabilityDateSection from "./AvailabilityDateSection"
 import OrdersWithSharedQuantitySection from "./OrdersWithSharedQuantitySection"
 import OrdersWithoutSharedQuantitySection from "./OrdersWithoutSharedQuantitySection"
 import ProductThumbnail from "../util/ProductThumbnail"
+import { capitalize } from "../util/tools"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -179,7 +180,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 				breadcrumbs={[
 					{ content: "Products", url: "/" },
 					{
-						content: shopResource.title,
+						content: capitalize(shopResource.title),
 						url: getBackUrl(shopResource)
 					}
 				]}

@@ -5,6 +5,7 @@ import moment from "moment"
 import { SHORT_DISPLAY_FORMAT, SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import { ImageMajorTwotone } from "@shopify/polaris-icons"
 import ProductThumbnail from "../util/ProductThumbnail"
+import { capitalize } from "../util/tools"
 
 function formatDate(strDate: string): string {
 	return moment(strDate, SYSTEM_DATE_FORMAT).format(SHORT_DISPLAY_FORMAT)
@@ -24,7 +25,7 @@ export default function ProductItem({ shopResource, onClick }: Props) {
 					<ProductThumbnail src={shopResource.imageUrl} />
 				</div>
 				<div className="right">
-					<div className="productTitle">{shopResource.title}</div>
+					<div className="productTitle">{capitalize(shopResource.title)}</div>
 					<div className="productProperties">
 						<div className="nextAvailableDate">
 							<div className="title">Next available date</div>
