@@ -15,6 +15,7 @@ import OrdersWithSharedQuantitySection from "./OrdersWithSharedQuantitySection"
 import OrdersWithoutSharedQuantitySection from "./OrdersWithoutSharedQuantitySection"
 import ProductThumbnail from "../util/ProductThumbnail"
 import { capitalize } from "../util/tools"
+import AvailabilityPeriodPageSkeleton from "./AvailabilityPeriodPageSkeleton"
 
 interface UrlParams {
 	availabilityPeriodId: string
@@ -46,6 +47,36 @@ function getTitle(availabilityPeriod: AvailabilityPeriod) {
 
 function getBackUrl(shopResource: ShopResource) {
 	return `/app/resources/${shopResource.id}/calendar/${moment().format("YYYY/MM")}`
+}
+
+export interface SectionMessage {
+	title: string
+	description: string
+}
+
+export interface SectionMessages {
+	availabilityDates: SectionMessage
+	sharedPeriodQuantity: SectionMessage
+	orders: SectionMessage
+}
+
+const sectionMessages: SectionMessages = {
+	availabilityDates: {
+		title: "Available dates",
+		description: `
+			You can either add or remove days sharing the same quantity.
+			Orders will be attached to a day, but the stock is common.`
+	},
+	sharedPeriodQuantity: {
+		title: "Shared period quantity",
+		description: `
+			You can either add or remove days sharing the same quantity.
+			Define your stock for these available dates.`
+	},
+	orders: {
+		title: "Orders",
+		description: "Current state for this availability period."
+	}
 }
 
 export default function AvailabilityPeriodPage({ match, history }: RouteChildrenProps<UrlParams>) {
@@ -161,7 +192,7 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	}
 
 	if (isLoading || !pageData) {
-		return <div />
+		return <AvailabilityPeriodPageSkeleton sectionMessages={sectionMessages} />
 	}
 
 	const { shopResource, ordersPerDate } = pageData
@@ -188,7 +219,6 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 				thumbnail={<ProductThumbnail src={shopResource.imageUrl} />}
 			>
 				<Layout>
-					<Layout.Section />
 					<AvailabilityDateSection
 						availabilityPeriod={availabilityPeriod}
 						ordersPerDate={pageData.ordersPerDate}
@@ -203,8 +233,8 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 					/>
 
 					<Layout.AnnotatedSection
-						title="Shared period quantity"
-						description="Define your stock for these available dates"
+						title={sectionMessages.sharedPeriodQuantity.title}
+						description={sectionMessages.sharedPeriodQuantity.description}
 					>
 						<FormLayout>
 							<TextField
@@ -226,11 +256,13 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 						<OrdersWithSharedQuantitySection
 							availabilityPeriod={availabilityPeriod}
 							ordersPerDate={ordersPerDate}
+							sectionMessages={sectionMessages}
 						/>
 					) : (
 						<OrdersWithoutSharedQuantitySection
 							availabilityPeriod={availabilityPeriod}
 							ordersPerDate={ordersPerDate}
+							sectionMessages={sectionMessages}
 						/>
 					)}
 				</Layout>

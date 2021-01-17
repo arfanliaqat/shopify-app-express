@@ -4,15 +4,21 @@ import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.model"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import moment from "moment"
+import { SectionMessages } from "./AvailabilityPeriodPage"
 
 interface Props {
 	availabilityPeriod: AvailabilityPeriod
 	ordersPerDate: OrdersPerDate
+	sectionMessages: SectionMessages
 }
 
-export default function OrdersWithoutSharedQuantitySection({ availabilityPeriod, ordersPerDate }: Props) {
+export default function OrdersWithoutSharedQuantitySection({
+	availabilityPeriod,
+	ordersPerDate,
+	sectionMessages
+}: Props) {
 	return (
-		<Layout.AnnotatedSection title="Orders" description="Current state for this availability period.">
+		<Layout.AnnotatedSection title={sectionMessages.orders.title} description={sectionMessages.orders.description}>
 			<div className="orderCountWithoutSharing">
 				<Card>
 					<ResourceList

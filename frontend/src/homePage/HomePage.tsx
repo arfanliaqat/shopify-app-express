@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"
-import { Page, Card, ResourceList, SkeletonPage, SkeletonBodyText } from "@shopify/polaris"
+import { Page, Card, ResourceList } from "@shopify/polaris"
 import moment from "moment"
 import { useApi } from "../util/useApi"
 import { ShopResource } from "../models/ShopResource"
 import AddResourceModal from "./AddResourceModal"
 import { RouteChildrenProps } from "react-router"
 import ProductItem from "./ProductItem"
+import HomePageSkeleton from "./HomePageSkeleton"
 
 export default function HomePage({ history }: RouteChildrenProps) {
 	const [open, setOpen] = useState<boolean>(false)
@@ -30,19 +31,7 @@ export default function HomePage({ history }: RouteChildrenProps) {
 	)
 
 	if (isLoading || shopResources === undefined) {
-		return (
-			<div id="homePage">
-				<SkeletonPage title="Products" primaryAction>
-					<Card>
-						{Array.from({ length: 5 }).map((val, index) => (
-							<Card.Section key={index}>
-								<SkeletonBodyText lines={3} />
-							</Card.Section>
-						))}
-					</Card>
-				</SkeletonPage>
-			</div>
-		)
+		return <HomePageSkeleton />
 	}
 
 	return (
