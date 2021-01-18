@@ -86,7 +86,8 @@ describe("CurrentAvailabilityService", () => {
 
 		await CurrentAvailabilityService.refreshAllByShop(shop!)
 
-		const [product] = await ShopResourceService.findShopResources(shop!)
+		const results = await ShopResourceService.searchShopResources(shop!, {})
+		const product = results.results[0]
 		expect(product.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT)).toBe(
 			availableDate2?.format(SYSTEM_DATE_FORMAT)
 		)

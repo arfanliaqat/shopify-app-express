@@ -11,8 +11,9 @@ const router = Router()
 router.get("/resources", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
 	try {
 		const connectedShop = res.locals.connectedShop as Shop
-		const resources = await ShopResourceService.findShopResources(connectedShop)
-		res.send(resources)
+		const page = parseInt(req.query.page?.toString() || "0")
+		const results = await ShopResourceService.searchShopResources(connectedShop, { page })
+		res.send(results)
 	} catch (error) {
 		handleErrors(res, error)
 	}

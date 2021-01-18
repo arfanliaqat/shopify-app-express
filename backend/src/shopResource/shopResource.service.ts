@@ -19,6 +19,19 @@ export interface ShopifyResource {
 
 type ShopResourceById = { [id: string]: ShopResource }
 
+interface PageResult<A> {
+	results: A[]
+	hasMore: boolean
+}
+
+type AvailabilityStatus = "AVAILABLE" | "SOLD_OUT" | "NOT_AVAILABLE"
+
+interface PageParam {
+	search?: string
+	status?: AvailabilityStatus
+	page?: number
+}
+
 export class ShopResourceService {
 	static getThumbnailUrlFromOriginalUrl(originalUrl: string | undefined): string | undefined {
 		if (!originalUrl) return undefined
@@ -74,7 +87,26 @@ export class ShopResourceService {
 		}, {} as ShopResourceById)
 	}
 
-	static async findShopResources(shop: Shop): Promise<ShopResource[]> {
+	static async findAllShopResource(shop: Shop): Promise<ShopResource[]> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<ShopResourceSchema>(
+			`
+			SELECT
+				sr.id,
+			   	sr.shop_id,
+				sr.resource_type,
+				sr.resource_id,
+				sr.title,
+			    sr.image_url
+			FROM shop_resources sr
+			WHERE sr.shop_id = $1`,
+			[shop.id]
+		)
+		return result.rows.map(ShopResource.createFromSchema)
+	}
+
+	static PAGE_SIZE = 50
+	static async searchShopResources(shop: Shop, param: PageParam): Promise<PageResult<ShopResource>> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopResourceSchema>(
 			`
@@ -92,10 +124,16 @@ export class ShopResourceService {
 			FROM shop_resources sr
 			LEFT JOIN current_availabilities ca on sr.id = ca.shop_resource_id
 			WHERE sr.shop_id = $1
-			ORDER BY ca.next_availability_date IS NOT NULL DESC, lower(sr.title)`,
-			[shop.id]
+			ORDER BY ca.next_availability_date IS NOT NULL DESC, lower(sr.title)
+			OFFSET $2 LIMIT $3`,
+			[shop.id, (param.page || 0) * this.PAGE_SIZE, this.PAGE_SIZE + 1]
 		)
-		return result.rows.map(ShopResource.createFromSchema)
+		const results = result.rows.map(ShopResource.createFromSchema)
+		const hasMore = results.length == this.PAGE_SIZE + 1
+		if (hasMore) {
+			results.pop()
+		}
+		return { results, hasMore }
 	}
 
 	static async insert(shopResource: ShopResource): Promise<ShopResource | undefined> {

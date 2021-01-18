@@ -8,7 +8,7 @@ import { Shop } from "../shop/shop.model"
 
 export class CurrentAvailabilityService {
 	static async refreshAllByShop(shop: Shop): Promise<void> {
-		const shopResources = await ShopResourceService.findShopResources(shop)
+		const shopResources = await ShopResourceService.findAllShopResource(shop)
 		for (const shopResource of shopResources) {
 			if (shopResource.id) {
 				await this.refreshCurrentAvailability(shopResource.id)

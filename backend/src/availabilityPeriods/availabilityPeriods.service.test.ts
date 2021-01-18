@@ -163,7 +163,8 @@ describe("AvailabilityPeriodService", () => {
 	test("It refreshes the current availabilities cache when creating an availability period", async () => {
 		{
 			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
-			const [product] = await ShopResourceService.findShopResources(shop!)
+			const { results } = await ShopResourceService.searchShopResources(shop!, {})
+			const product = results[0]
 			expect(product.availableDates).toBe(0)
 			expect(product.soldOutDates).toBe(0)
 		}
@@ -177,7 +178,8 @@ describe("AvailabilityPeriodService", () => {
 
 		{
 			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
-			const [product] = await ShopResourceService.findShopResources(shop!)
+			const { results } = await ShopResourceService.searchShopResources(shop!, {})
+			const product = results[0]
 			expect(product.availableDates).toBe(1)
 			expect(product.soldOutDates).toBe(0)
 		}
@@ -196,7 +198,8 @@ describe("AvailabilityPeriodService", () => {
 
 		{
 			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
-			const [product] = await ShopResourceService.findShopResources(shop!)
+			const { results } = await ShopResourceService.searchShopResources(shop!, {})
+			const product = results[0]
 			expect(product.availableDates).toBe(1)
 			expect(product.soldOutDates).toBe(0)
 		}
@@ -206,7 +209,8 @@ describe("AvailabilityPeriodService", () => {
 
 		{
 			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
-			const [product] = await ShopResourceService.findShopResources(shop!)
+			const { results } = await ShopResourceService.searchShopResources(shop!, {})
+			const product = results[0]
 			expect(product.availableDates).toBe(2)
 			expect(product.soldOutDates).toBe(0)
 		}
@@ -222,7 +226,8 @@ describe("AvailabilityPeriodService", () => {
 
 		{
 			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
-			const [product] = await ShopResourceService.findShopResources(shop!)
+			const { results } = await ShopResourceService.searchShopResources(shop!, {})
+			const product = results[0]
 			expect(product.availableDates).toBe(1)
 			expect(product.soldOutDates).toBe(0)
 		}
@@ -231,7 +236,8 @@ describe("AvailabilityPeriodService", () => {
 
 		{
 			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
-			const [product] = await ShopResourceService.findShopResources(shop!)
+			const { results } = await ShopResourceService.searchShopResources(shop!, {})
+			const product = results[0]
 			expect(product.availableDates).toBe(0)
 			expect(product.soldOutDates).toBe(0)
 		}

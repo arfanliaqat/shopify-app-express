@@ -323,7 +323,8 @@ describe("HooksService", () => {
 			]
 		})
 
-		const [product] = await ShopResourceService.findShopResources(shop!)
+		const { results } = await ShopResourceService.searchShopResources(shop!, {})
+		const product = results[0]
 		expect(product.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT)).toBe(
 			availableDate2?.format(SYSTEM_DATE_FORMAT)
 		)
