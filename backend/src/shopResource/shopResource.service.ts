@@ -24,11 +24,11 @@ interface PageResult<A> {
 	hasMore: boolean
 }
 
-type AvailabilityStatus = "AVAILABLE" | "SOLD_OUT" | "NOT_AVAILABLE"
+export type StatusFilter = "all" | "available" | "soldOut" | "notAvailable"
 
 interface PageParam {
 	search?: string
-	status?: AvailabilityStatus
+	status?: StatusFilter
 	page?: number
 }
 
@@ -108,6 +108,19 @@ export class ShopResourceService {
 	static PAGE_SIZE = 50
 	static async searchShopResources(shop: Shop, param: PageParam): Promise<PageResult<ShopResource>> {
 		const conn: Pool = await getConnection()
+
+		const getFilterSub = () => {
+			switch (param.status) {
+				case "soldOut":
+					return "AND ca.sold_out_dates IS NOT NULL AND ca.sold_out_dates > 0 AND ca.available_dates > 0"
+				case "available":
+					return "AND ca.available_dates IS NOT NULL AND ca.available_dates > 0"
+				case "notAvailable":
+					return "AND coalesce(ca.available_dates, 0) = 0 AND coalesce(ca.sold_out_dates, 0) = 0"
+			}
+			return ""
+		}
+
 		const result = await conn.query<ShopResourceSchema>(
 			`
 			SELECT
@@ -124,6 +137,7 @@ export class ShopResourceService {
 			FROM shop_resources sr
 			LEFT JOIN current_availabilities ca on sr.id = ca.shop_resource_id
 			WHERE sr.shop_id = $1
+			${getFilterSub()}
 			ORDER BY ca.next_availability_date IS NOT NULL DESC, lower(sr.title)
 			OFFSET $2 LIMIT $3`,
 			[shop.id, (param.page || 0) * this.PAGE_SIZE, this.PAGE_SIZE + 1]
