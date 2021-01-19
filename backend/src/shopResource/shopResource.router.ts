@@ -13,7 +13,8 @@ router.get("/resources", [loadConnectedShop, loadAccessToken], async (req: Reque
 		const connectedShop = res.locals.connectedShop as Shop
 		const page = parseInt(req.query.page?.toString() || "0")
 		const status = (req.query.status?.toString() || "all") as StatusFilter
-		const results = await ShopResourceService.searchShopResources(connectedShop, { page, status })
+		const search = req.query.search?.toString()
+		const results = await ShopResourceService.searchShopResources(connectedShop, { page, status, search })
 		res.send(results)
 	} catch (error) {
 		handleErrors(res, error)

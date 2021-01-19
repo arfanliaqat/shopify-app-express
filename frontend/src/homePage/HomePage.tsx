@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react"
-import { Page, Card, ResourceList, Button, Tabs } from "@shopify/polaris"
+import { Page, Card, ResourceList, Button, Tabs, Filters } from "@shopify/polaris"
 import moment from "moment"
 import { useApi } from "../util/useApi"
 import { ShopResource } from "../models/ShopResource"
@@ -37,6 +37,8 @@ export default function HomePage({ history }: RouteChildrenProps) {
 	const [open, setOpen] = useState(false)
 	const [page, setPage] = useState(0)
 	const [filterTabIndex, setFilterTabIndex] = useState(0)
+	const [queryValue, setQueryValue] = useState<string>()
+	const [search, setSearch] = useState<string>()
 	const [shopResources, setShopResources] = useState<ShopResource[]>([])
 	const { setApiRequest, data: pageResult, isLoading } = useApi<ShopResourcesPageResult>({
 		onSuccess: (pageResult) => {
@@ -49,13 +51,20 @@ export default function HomePage({ history }: RouteChildrenProps) {
 		}
 	})
 
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearch(queryValue)
+		}, 300)
+		return () => clearTimeout(timer)
+	}, [queryValue])
+
 	const fetchShopResources = useCallback(() => {
 		setApiRequest({
 			url: `/resources`,
-			queryParams: { page, status: tabs[filterTabIndex].id }
+			queryParams: { page, status: tabs[filterTabIndex].id, search }
 		})
 		setOpen(false)
-	}, [setApiRequest, page, filterTabIndex])
+	}, [setApiRequest, page, filterTabIndex, search])
 
 	useEffect(() => {
 		fetchShopResources()
@@ -77,6 +86,16 @@ export default function HomePage({ history }: RouteChildrenProps) {
 		setPage(0)
 	}
 
+	const filterControl = (
+		<Filters
+			queryValue={queryValue}
+			filters={[]}
+			onQueryChange={setQueryValue}
+			onQueryClear={() => setQueryValue(undefined)}
+			onClearAll={() => setQueryValue(undefined)}
+		/>
+	)
+
 	return (
 		<div id="homePage">
 			<AddResourceModal open={open} onSuccess={() => fetchShopResources()} onClose={() => setOpen(false)} />
@@ -90,10 +109,16 @@ export default function HomePage({ history }: RouteChildrenProps) {
 				<Card>
 					<Tabs tabs={tabs} selected={filterTabIndex} onSelect={handleTabSelected} />
 					<ResourceList
+						filterControl={filterControl}
 						items={shopResources}
 						loading={isLoading}
 						renderItem={(shopResource) => (
-							<ProductItem shopResource={shopResource} onClick={onShopResourceClick(shopResource)} />
+							<ResourceList.Item
+								id={`product${shopResource.title}`}
+								onClick={onShopResourceClick(shopResource)}
+							>
+								<ProductItem shopResource={shopResource} />
+							</ResourceList.Item>
 						)}
 						emptyState={<div className="noResults">No results found</div>}
 					/>

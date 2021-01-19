@@ -109,7 +109,7 @@ export class ShopResourceService {
 	static async searchShopResources(shop: Shop, param: PageParam): Promise<PageResult<ShopResource>> {
 		const conn: Pool = await getConnection()
 
-		const getFilterSub = () => {
+		const statusFilterSub = () => {
 			switch (param.status) {
 				case "soldOut":
 					return "AND ca.sold_out_dates IS NOT NULL AND ca.sold_out_dates > 0 AND ca.available_dates > 0"
@@ -119,6 +119,19 @@ export class ShopResourceService {
 					return "AND coalesce(ca.available_dates, 0) = 0 AND coalesce(ca.sold_out_dates, 0) = 0"
 			}
 			return ""
+		}
+
+		const searchFilterSub = () => {
+			if (param.search) {
+				return "AND lower(sr.title) like $4"
+			}
+			return ""
+		}
+
+		const queryValues = [shop.id, (param.page || 0) * this.PAGE_SIZE, this.PAGE_SIZE + 1]
+
+		if (param.search) {
+			queryValues.push("%" + (param.search || "").toLowerCase() + "%")
 		}
 
 		const result = await conn.query<ShopResourceSchema>(
@@ -137,10 +150,11 @@ export class ShopResourceService {
 			FROM shop_resources sr
 			LEFT JOIN current_availabilities ca on sr.id = ca.shop_resource_id
 			WHERE sr.shop_id = $1
-			${getFilterSub()}
+			${statusFilterSub()}
+			${searchFilterSub()}
 			ORDER BY ca.next_availability_date IS NOT NULL DESC, lower(sr.title)
 			OFFSET $2 LIMIT $3`,
-			[shop.id, (param.page || 0) * this.PAGE_SIZE, this.PAGE_SIZE + 1]
+			queryValues
 		)
 		const results = result.rows.map(ShopResource.createFromSchema)
 		const hasMore = results.length == this.PAGE_SIZE + 1

@@ -1,5 +1,4 @@
 import React from "react"
-import { ResourceList } from "@shopify/polaris"
 import { getAvailabilityStatusMessage, ShopResource } from "../models/ShopResource"
 import moment from "moment"
 import { SHORT_DISPLAY_FORMAT, SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
@@ -12,54 +11,47 @@ function formatDate(strDate: string): string {
 
 interface Props {
 	shopResource: ShopResource
-	onClick: () => void
 }
 
-export default function ProductItem({ shopResource, onClick }: Props) {
+export default function ProductItem({ shopResource }: Props) {
 	const availabilityStatus = shopResource.getAvailabilityStatus()
 	return (
-		<ResourceList.Item id={`product${shopResource.title}`} onClick={onClick}>
-			<div className="productItem">
-				<div className="left">
-					<ProductThumbnail src={shopResource.imageUrl} />
-				</div>
-				<div className="right">
-					<div className="productTitle">{capitalize(shopResource.title)}</div>
-					<div className="productProperties">
-						<div className="nextAvailableDate">
-							<div className="title">Next available date</div>
-							<div className="value">
-								{shopResource.nextAvailabilityDate
-									? formatDate(shopResource.nextAvailabilityDate)
-									: "n/a"}
-							</div>
+		<div className="productItem">
+			<div className="left">
+				<ProductThumbnail src={shopResource.imageUrl} />
+			</div>
+			<div className="right">
+				<div className="productTitle">{capitalize(shopResource.title)}</div>
+				<div className="productProperties">
+					<div className="nextAvailableDate">
+						<div className="title">Next available date</div>
+						<div className="value">
+							{shopResource.nextAvailabilityDate ? formatDate(shopResource.nextAvailabilityDate) : "n/a"}
 						</div>
-						<div className="lastAvailableDate">
-							<div className="title">Last available date</div>
-							<div className="value">
-								{shopResource.lastAvailabilityDate
-									? formatDate(shopResource.lastAvailabilityDate)
-									: "n/a"}
-							</div>
+					</div>
+					<div className="lastAvailableDate">
+						<div className="title">Last available date</div>
+						<div className="value">
+							{shopResource.lastAvailabilityDate ? formatDate(shopResource.lastAvailabilityDate) : "n/a"}
 						</div>
-						<div className="soldOutDates">
-							<div className="title">Sold out dates</div>
-							<div className="value">
-								{shopResource.nextAvailabilityDate ? shopResource.soldOutDates || 0 : "n/a"}
-							</div>
+					</div>
+					<div className="soldOutDates">
+						<div className="title">Sold out dates</div>
+						<div className="value">
+							{shopResource.nextAvailabilityDate ? shopResource.soldOutDates || 0 : "n/a"}
 						</div>
-						<div className="availableDates">
-							<div className="title">Available dates</div>
-							<div className="value">
-								{shopResource.nextAvailabilityDate ? shopResource.availableDates || 0 : "n/a"}
-							</div>
+					</div>
+					<div className="availableDates">
+						<div className="title">Available dates</div>
+						<div className="value">
+							{shopResource.nextAvailabilityDate ? shopResource.availableDates || 0 : "n/a"}
 						</div>
-						<div className={`status ${availabilityStatus}`}>
-							{getAvailabilityStatusMessage(availabilityStatus)}
-						</div>
+					</div>
+					<div className={`status ${availabilityStatus}`}>
+						{getAvailabilityStatusMessage(availabilityStatus)}
 					</div>
 				</div>
 			</div>
-		</ResourceList.Item>
+		</div>
 	)
 }
