@@ -1,4 +1,4 @@
-import express, { Application, json, NextFunction, Request, Response } from "express"
+import express, { Application, json } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
@@ -20,6 +20,8 @@ import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabi
 import { loadConnectedShop } from "./shop/shop.middleware"
 import { appUrl, isDev } from "./util/constants"
 import { noApiCallCache } from "./util/middlewares"
+
+import "./currentAvailabilities/currentAvailabilities.job"
 
 const app: Application = express()
 

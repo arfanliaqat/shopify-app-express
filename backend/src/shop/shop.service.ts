@@ -16,6 +16,12 @@ export class ShopService {
 		return result.rows.map(toShop)[0]
 	}
 
+	static async findAllActiveShops(): Promise<Shop[]> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<ShopSchema>(`SELECT id, domain, email FROM shops`)
+		return result.rows.map(toShop)
+	}
+
 	static async createFromApi(shopData: ShopApiData): Promise<Shop | undefined> {
 		if (!shopData.domain) throw new UnexpectedError("shopData.domain cannot be undefined")
 		if (!shopData.email) throw new UnexpectedError("shopData.email cannot be undefined")

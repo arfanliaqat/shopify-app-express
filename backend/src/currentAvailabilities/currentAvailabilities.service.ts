@@ -1,7 +1,7 @@
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { ShopResource, ShopResourceSchema } from "../shopResource/shopResource.model"
-import { CurrentAvailability } from "./currentAvailabilities.model"
+import { CurrentAvailability, CurrentAvailabilitySchema } from "./currentAvailabilities.model"
 import { AvailabilityPeriodService } from "../availabilityPeriods/availabilityPeriods.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { Shop } from "../shop/shop.model"
@@ -45,6 +45,25 @@ export class CurrentAvailabilityService {
 			nbSoldOutDates,
 			nbAvailableDates
 		)
+	}
+
+	static async findByShopResourceId(shopResourceId: string): Promise<CurrentAvailability | undefined> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<CurrentAvailabilitySchema>(
+			`
+			SELECT
+				ca.id,
+				ca.shop_resource_id,
+				ca.next_availability_date,
+				ca.last_availability_date,
+				ca.sold_out_dates,
+				ca.available_dates
+			FROM current_availabilities ca
+			WHERE ca.shop_resource_id = $1`,
+			[shopResourceId]
+		)
+		const results = result.rows.map(CurrentAvailability.createFromSchema)
+		return results.length > 0 ? results[0] : undefined
 	}
 
 	static async save(currentAvailability: CurrentAvailability): Promise<CurrentAvailability> {
