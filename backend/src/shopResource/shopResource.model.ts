@@ -27,7 +27,7 @@ export class ShopResource {
 		public resourceType: ResourceType,
 		public resourceId: number,
 		public title: string,
-		public imageUrl: string | undefined,
+		public imageUrl?: string,
 		public createdDate?: Date,
 		public nextAvailabilityDate?: Moment,
 		public lastAvailabilityDate?: Moment,

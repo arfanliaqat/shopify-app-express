@@ -42,7 +42,9 @@ export class AvailabilityPeriodService {
 		const availableDates: AvailableDate[] = []
 		periods.forEach((period) => {
 			period.availableDates.forEach((date) => {
-				availableDates.push(new AvailableDate(period.id!, date, false, period.quantityIsShared))
+				if (!date.isBefore(from, "day")) {
+					availableDates.push(new AvailableDate(period.id!, date, false, period.quantityIsShared))
+				}
 			})
 		})
 		if (!availableDates.length) {

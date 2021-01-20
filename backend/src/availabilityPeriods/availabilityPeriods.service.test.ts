@@ -9,7 +9,6 @@ import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
-import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 describe("AvailabilityPeriodService", () => {
 	let refDate: Moment
@@ -157,6 +156,25 @@ describe("AvailabilityPeriodService", () => {
 			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
 			expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
 			expect(futureAvailableDates[1].isSoldOut).toBeFalsy()
+		}
+	})
+
+	test("Dates aren't available if they are in the past", async () => {
+		const date1 = moment().startOf("day").subtract(1, "day")
+		const date2 = moment().startOf("day").add(1, "day")
+
+		await new AvailabilityPeriodBuilder()
+			.forShopResource(shopResource!)
+			.withDates([date1!, date2!])
+			.withQuantity(5)
+			.buildAndSave()
+
+		// The date in the past isn't showing in the list of available dates
+		{
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			expect(futureAvailableDates).toHaveLength(1)
+			expect(futureAvailableDates[0].date.isSame(date2)).toBeTruthy()
+			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
 		}
 	})
 
