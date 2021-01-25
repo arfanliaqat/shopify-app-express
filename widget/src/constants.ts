@@ -1,1 +1,2 @@
-export const SHOPIFY_APP_URL = "https://f4b48787504e.ngrok.io"
+export const SHOPIFY_APP_URL = "https://shopify-app.dev"
+export const ANCHOR_ID = "available-date-picker-10a"

@@ -1,9 +1,10 @@
-import moment  from "moment"
 import { h } from "preact"
 import { useEffect, useState } from "preact/hooks"
-import { SHOPIFY_APP_URL } from "./constants"
+import { ANCHOR_ID, SHOPIFY_APP_URL } from "./constants"
 import { AvailableDate } from "./models/AvailableDate"
-import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/src/util/constants"
+import DropdownDatePicker from "./DropdownDatePicker"
+import { JSXInternal } from "preact/src/jsx"
+import CSSProperties = JSXInternal.CSSProperties
 
 interface ProductAvailabilityData {
 	config: any
@@ -19,7 +20,7 @@ function getProductId() {
 async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	const productId = getProductId()
 	if (!productId) {
-		throw "[10a - AvailableDatePicker] productId not found"
+		throw "[H10 - AvailableDatePicker] productId not found"
 	}
 	const response = await fetch(SHOPIFY_APP_URL + "/product_availability/" + productId, {
 		headers: {
@@ -27,7 +28,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 		}
 	})
 	if (response.status != 200) {
-		throw "[10a - AvailableDatePicker] failed to fetch product availability"
+		throw "[H10 - AvailableDatePicker] failed to fetch product availability"
 	}
 	return (await response.json()) as ProductAvailabilityData
 }
@@ -46,21 +47,30 @@ export default function AvailableDatePicker() {
 				setSelectedAvailableDate(firstAvailableDate.date)
 			}
 		}
+
 		fetchData()
 	}, [])
 
 	const availableDates = productAvailabilityData?.availableDates || []
 
 	useEffect(() => {
-		const datePickerDiv = document.getElementById("available-date-picker-10a")
+		const datePickerDiv = document.getElementById(ANCHOR_ID)
 		const form = datePickerDiv.closest("form")
 		const onSubmit = (e) => {
-			if (e.target.type == "submit") {
-				if (!selectedAvailableDate) {
-					setFormError("Please select a delivery date before adding to cart")
-					e.preventDefault()
-					return false
+			if (selectedAvailableDate) return
+			let halt = false
+			if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
+				halt = true
+			} else {
+				const button = e.target.closest("button")
+				if (button && button.type == "submit") {
+					halt = true
 				}
+			}
+			if (halt) {
+				setFormError("Please select a delivery date before adding to cart.")
+				e.preventDefault()
+				return false
 			}
 		}
 		if (form) {
@@ -71,33 +81,30 @@ export default function AvailableDatePicker() {
 		}
 	}, [selectedAvailableDate])
 
-	const handleAvailableDateSelect = (e) => {
-		if (e.target.value) {
-			setSelectedAvailableDate(e.target.value)
-		} else {
-			setSelectedAvailableDate(undefined)
+	useEffect(() => {
+		if (productAvailabilityData && availableDates.length == 0) {
+			setFormError("There are currently no dates available for this product.")
 		}
+	}, [productAvailabilityData, availableDates])
+
+	const handleAvailableDateSelect = (value: string | undefined) => {
+		setSelectedAvailableDate(value)
+	}
+
+	const formErrorStyles: CSSProperties = {
+		color: "darkred",
+		marginBottom: "20px"
 	}
 
 	return (
-		<div>
-			{formError && <div style={{ color: "red", marginBottom: "20px", padding: "0 20%", textAlign: "center" }}>{formError}</div>}
-			<select name={`properties[${TAG_LABEL}]`} id="availableDate10a" onChange={handleAvailableDateSelect} style={{ width: "100%" }}>
-				{availableDates.map((availableDate) => {
-					const momentDate = moment(availableDate.date, SYSTEM_DATE_FORMAT)
-					const valueDate = momentDate.format(TAG_DATE_FORMAT)
-						return (
-						<option
-							value={valueDate}
-							disabled={availableDate.isSoldOut}
-							selected={valueDate == selectedAvailableDate}
-						>
-							{momentDate.format("dddd D MMMM")}
-							{availableDate.isSoldOut ? " (sold out)" : ""}
-						</option>
-					)
-				})}
-			</select>
+		<div className="h10-date-picker">
+			<div className="h10-date-picker-label">Pick a delivery date:</div>
+			{formError && <div className="h10-date-picker-error" style={formErrorStyles}>{formError}</div>}
+			{availableDates.length > 0 && <DropdownDatePicker
+                availableDates={availableDates}
+                onSelect={handleAvailableDateSelect}
+                selectedAvailableDate={selectedAvailableDate}
+            />}
 		</div>
 	)
 }
