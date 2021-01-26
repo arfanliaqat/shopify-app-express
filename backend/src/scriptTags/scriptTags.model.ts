@@ -13,7 +13,7 @@ export function getScriptTagsToCreate(): ScriptTag[] {
 	return [
 		{
 			event: "onload",
-			src: `${SHOPIFY_APP_URL}/widget/available-date-picker-10a.js`
+			src: `${SHOPIFY_APP_URL}/widget/build/h10-stock-by-date.js`
 		}
 	]
 }

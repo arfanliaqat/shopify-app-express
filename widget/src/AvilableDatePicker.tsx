@@ -12,7 +12,7 @@ interface ProductAvailabilityData {
 }
 
 function getProductId() {
-	const datePickerDiv = document.getElementById("available-date-picker-10a")
+	const datePickerDiv = document.getElementById(ANCHOR_ID)
 	if (!datePickerDiv) return undefined
 	return datePickerDiv?.getAttribute("data-productid")
 }

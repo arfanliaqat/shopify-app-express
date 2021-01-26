@@ -96,7 +96,7 @@ app.use(currentAvailabilitiesRouter)
 app.use(cors())
 app.use(
 	"/widget",
-	express.static(path.join(process.cwd(), "../widget/build"), {
+	express.static(path.join(process.cwd(), "../widget/public"), {
 		setHeaders: (res) => {
 			if (isDev) {
 				res.setHeader("Cache-Control", "no-cache")

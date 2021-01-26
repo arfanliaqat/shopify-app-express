@@ -10,4 +10,4 @@
 /frontend/public/build
 
 /widget/node_modules
-/widget/build
+/widget/public/build

@@ -19,7 +19,7 @@ module.exports = {
 		extensions: [".tsx", ".ts", ".js"]
 	},
 	output: {
-		filename: "available-date-picker-10a.js",
-		path: path.resolve(__dirname, "build")
+		filename: "h10-stock-by-date.js",
+		path: path.resolve(__dirname, "public/build")
 	}
 }
