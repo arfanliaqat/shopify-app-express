@@ -91,15 +91,10 @@ export default function AvailableDatePicker() {
 		setSelectedAvailableDate(value)
 	}
 
-	const formErrorStyles: CSSProperties = {
-		color: "darkred",
-		marginBottom: "20px"
-	}
-
 	return (
 		<div className="h10-date-picker">
 			<div className="h10-date-picker-label">Pick a delivery date:</div>
-			{formError && <div className="h10-date-picker-error" style={formErrorStyles}>{formError}</div>}
+			{formError && <div className="h10-date-picker-error">{formError}</div>}
 			{availableDates.length > 0 && <DropdownDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
