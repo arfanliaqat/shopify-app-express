@@ -3,11 +3,11 @@ import { useEffect, useState } from "preact/hooks"
 import { ANCHOR_ID, SHOPIFY_APP_URL } from "./constants"
 import { AvailableDate } from "./models/AvailableDate"
 import DropdownDatePicker from "./DropdownDatePicker"
-import { JSXInternal } from "preact/src/jsx"
-import CSSProperties = JSXInternal.CSSProperties
+import CalendarDatePicker from "./CalendarDatePicker"
+import { WidgetSettings } from "./models/WidgetSettings"
 
 interface ProductAvailabilityData {
-	config: any
+	settings: WidgetSettings
 	availableDates: AvailableDate[]
 }
 
@@ -52,6 +52,7 @@ export default function AvailableDatePicker() {
 	}, [])
 
 	const availableDates = productAvailabilityData?.availableDates || []
+	const settings = productAvailabilityData?.settings || ({} as WidgetSettings)
 
 	useEffect(() => {
 		const datePickerDiv = document.getElementById(ANCHOR_ID)
@@ -92,10 +93,15 @@ export default function AvailableDatePicker() {
 	}
 
 	return (
-		<div className="h10-date-picker">
-			<div className="h10-date-picker-label">Pick a delivery date:</div>
-			{formError && <div className="h10-date-picker-error">{formError}</div>}
-			{availableDates.length > 0 && <DropdownDatePicker
+		<div className="h10-dropdown-picker">
+			<div className="h10-dropdown-picker-label">Pick a delivery date:</div>
+			{formError && <div className="h10-dropdown-picker-error">{formError}</div>}
+			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
+                availableDates={availableDates}
+                onSelect={handleAvailableDateSelect}
+                selectedAvailableDate={selectedAvailableDate}
+            />}
+			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}

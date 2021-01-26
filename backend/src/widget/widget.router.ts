@@ -3,6 +3,7 @@ import { AvailabilityPeriodService } from "../availabilityPeriods/availabilityPe
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { handleErrors } from "../util/error"
 import { AvailableDate } from "../availabilityPeriods/availabilityPeriods.model"
+import { WidgetService } from "./widget.service"
 
 const router = Router()
 
@@ -15,7 +16,11 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			return
 		}
 		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResourceId)
-		res.send({ availableDates: availableDates.map(AvailableDate.toViewModel) })
+		const settings = WidgetService.findWidgetSettings()
+		res.send({
+			settings,
+			availableDates: availableDates.map(AvailableDate.toViewModel)
+		})
 	} catch (error) {
 		handleErrors(res, error)
 	}
