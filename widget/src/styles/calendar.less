@@ -1,0 +1,72 @@
+
+.h10cal {
+  margin-top: 20px;
+  background: #fff;
+  color: #333;
+  padding: 5px 10px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.15);
+  border-radius: 10px;
+  min-width: 276px;
+  max-width: 400px;
+  .h10cal-header-wrapper {
+    position: relative;
+    padding-bottom: 14.28%;
+  }
+  .h10cal-header {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-items: stretch;
+    > div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .h10cal-previous, .h10cal-next {
+      width: 14.28%;
+      > svg {
+        width: 50%;
+        height: 50%;
+      }
+    }
+    .h10cal-month {
+      font-weight: bold;
+      flex: 1;
+    }
+  }
+  .h10cal-day-names {
+    display: flex;
+    width: 100%;
+    justify-content: stretch;
+    .h10cal-day-name {
+      flex: 1;
+      text-align: center;
+    }
+  }
+  .h10cal-body {
+    width: 100%;
+    flex: 1;
+    .h10cal-week-wrapper {
+      padding-bottom: 14.28%;
+      position: relative;
+    }
+    .h10cal-week {
+      position: absolute;
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+      width: 100%;
+      .h10cal-day {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #aaa;
+        &.h10cal-available {
+          color: #333;
+        }
+      }
+    }
+  }
+}

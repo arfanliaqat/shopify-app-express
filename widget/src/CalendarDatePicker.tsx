@@ -1,13 +1,52 @@
 import { h } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
+import { ArrowLeftCircle, ArrowRightCircle } from "./Icons"
+import { getDaysBetween } from "../../frontend/src/util/tools"
+import moment from "moment"
+import { useMemo } from "preact/hooks"
+import { SYSTEM_DATE_FORMAT } from "../../backend/src/util/constants"
 
 interface Props {
 	onSelect: (value: string) => void,
 	availableDates: AvailableDate[],
 	selectedAvailableDate: string
 }
-export default function CalendarDatePicker({}: Props) {
-	return <div className="h10-calendar">
-		CALENDAR
+
+export default function CalendarDatePicker({ availableDates }: Props) {
+	const monthStart = moment().startOf("month")
+	const currentMonth = monthStart.month()
+	const calendarStart = monthStart.clone().startOf("week")
+	const calendarEnd = moment().endOf("month").endOf("week")
+	const availableDatesSet = useMemo(() => new Set(availableDates.map(ad => ad.date)), [availableDates])
+	console.log(availableDatesSet)
+	return <div className="h10cal">
+		<div className="h10cal-header-wrapper">
+			<div className="h10cal-header">
+				<div className="h10cal-previous"><ArrowLeftCircle/></div>
+				<div className="h10cal-month">{monthStart.format("MMMM YYYY")}</div>
+				<div className="h10cal-next"><ArrowRightCircle/></div>
+			</div>
+		</div>
+		<div className="h10cal-day-names">
+			{getDaysBetween(calendarStart, calendarStart.clone().endOf("week"), "day").map((day) => (
+				<div className="h10cal-day-name" key={"day" + day.format("YYYY-MM-DD")}>{day.format("dd")}</div>
+			))}
+		</div>
+		<div className="h10cal-body">
+			{getDaysBetween(calendarStart, calendarEnd, "week").map((weekStart) => (
+				<div className="h10cal-week-wrapper" key={"week" + weekStart.format(SYSTEM_DATE_FORMAT)}>
+					<div className="h10cal-week">
+						{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
+							const strDay = day.format(SYSTEM_DATE_FORMAT)
+							return <div
+								className={`h10cal-day ${availableDatesSet.has(strDay) ? "h10cal-available" : ""}`}
+								key={"day" + strDay}>
+								{day.month() == currentMonth ? day.format("D") : ""}
+							</div>
+						})}
+					</div>
+				</div>
+			))}
+		</div>
 	</div>
 }

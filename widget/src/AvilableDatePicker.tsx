@@ -93,8 +93,8 @@ export default function AvailableDatePicker() {
 	}
 
 	return (
-		<div className="h10-dropdown-picker">
-			<div className="h10-dropdown-picker-label">Pick a delivery date:</div>
+		<div className="h10-date-dropdown-picker">
+			<div className="h10-date-picker-label">Pick a delivery date:</div>
 			{formError && <div className="h10-dropdown-picker-error">{formError}</div>}
 			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
                 availableDates={availableDates}
