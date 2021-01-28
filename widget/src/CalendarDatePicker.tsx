@@ -2,9 +2,9 @@ import { h } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
 import { ArrowLeftCircle, ArrowRightCircle } from "./Icons"
 import { getDaysBetween } from "../../frontend/src/util/tools"
-import moment from "moment"
+import moment, { Moment } from "moment"
 import { useMemo, useState } from "preact/hooks"
-import { SYSTEM_DATE_FORMAT } from "../../backend/src/util/constants"
+import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/src/util/constants"
 import classNames from "classnames"
 
 interface Props {
@@ -14,18 +14,29 @@ interface Props {
 }
 
 export default function CalendarDatePicker({ availableDates }: Props) {
-	const monthStart = moment().startOf("month")
+
+	const [selectedDate, setSelectedDate] = useState<string>(availableDates[0]?.date)
+	const [monthStart, setMonthStart] = useState<Moment>(moment().startOf("month"))
+
 	const currentMonth = monthStart.month()
 	const calendarStart = monthStart.clone().startOf("week")
-	const calendarEnd = moment().endOf("month").endOf("week")
+	const calendarEnd = monthStart.clone().endOf("month").endOf("week")
+
 	const availableDatesSet = useMemo(() => new Set(availableDates.map(ad => ad.date)), [availableDates])
-	const [selectedDate, setSelectedDate] = useState<string>(availableDates[0]?.date)
+	const formattedSelectedDate = useMemo(() => moment(selectedDate)?.format(TAG_DATE_FORMAT), [])
+
+	const moveMonth = (delta) => () => {
+		const newMonthStart = monthStart.clone().add(delta, "months")
+		setMonthStart(newMonthStart)
+	}
+
 	return <div className="h10cal">
+		<input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate} />
 		<div className="h10cal-header-wrapper">
 			<div className="h10cal-header">
-				<div className="h10cal-previous"><ArrowLeftCircle/></div>
+				<div className="h10cal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
 				<div className="h10cal-month">{monthStart.format("MMMM YYYY")}</div>
-				<div className="h10cal-next"><ArrowRightCircle/></div>
+				<div className="h10cal-next" onClick={moveMonth(1)}><ArrowRightCircle/></div>
 			</div>
 		</div>
 		<div className="h10cal-day-names">
