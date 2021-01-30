@@ -69,7 +69,7 @@ export default function AvailableDatePicker() {
 				}
 			}
 			if (halt) {
-				setFormError("Please select a delivery date before adding to cart.")
+				setFormError("Please select a delivery date before adding to the cart.")
 				e.preventDefault()
 				return false
 			}

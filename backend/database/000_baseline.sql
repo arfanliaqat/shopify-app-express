@@ -76,3 +76,14 @@ create table current_availabilities(
 );
 
 create unique index current_availabilities_shop_resource_id_index on current_availabilities (shop_resource_id);
+
+create table widget_settings(
+    shop_id uuid not null references shops,
+    settings jsonb not null,
+    updated_date timestamp with time zone default now() not null,
+    created_date timestamp with time zone default now() not null
+);
+
+create unique index ind_widget_settings_shop_id on widget_settings (shop_id);
+
+

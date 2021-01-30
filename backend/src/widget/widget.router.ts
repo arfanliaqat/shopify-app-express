@@ -10,13 +10,13 @@ const router = Router()
 router.get("/product_availability/:productId", async (req: Request, res: Response) => {
 	try {
 		const productId = parseInt(req.params.productId)
-		const shopResourceId = await ShopResourceService.findShopResourceIdByProductId(productId)
-		if (!shopResourceId) {
+		const shopResource = await ShopResourceService.findShopResourceByProductId(productId)
+		if (!shopResource || !shopResource.id) {
 			res.status(404).send({ reason: "Resource not found" })
 			return
 		}
-		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResourceId)
-		const settings = WidgetService.findWidgetSettings()
+		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource.id)
+		const settings = await WidgetService.findOrCreateWidgetService(shopResource.shopId)
 		res.send({
 			settings,
 			availableDates: availableDates.map(AvailableDate.toViewModel)

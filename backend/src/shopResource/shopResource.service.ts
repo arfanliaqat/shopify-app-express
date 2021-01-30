@@ -55,17 +55,17 @@ export class ShopResourceService {
 		return ShopResource.createFromSchema(row)
 	}
 
-	static async findShopResourceIdByProductId(productId: number): Promise<string | undefined> {
+	static async findShopResourceByProductId(productId: number): Promise<ShopResource | undefined> {
 		const conn: Pool = await getConnection()
-		const result = await conn.query<{ id: string }>(
+		const result = await conn.query<ShopResourceSchema>(
 			`
-			SELECT id
+			SELECT id, shop_id, resource_type, resource_id, title
 			FROM shop_resources
 			WHERE resource_type = 'Product'
 			AND resource_id = $1`,
 			[productId]
 		)
-		return result.rows[0]?.id
+		return result.rows.map(ShopResource.createFromSchema)[0]
 	}
 
 	static async findByProductIds(productIds: number[], client: PoolClient): Promise<ShopResource[]> {
