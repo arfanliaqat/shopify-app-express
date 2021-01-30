@@ -31,7 +31,10 @@ export class WidgetService {
 	private static async insert(newSettings: WidgetSettings): Promise<void> {
 		const conn: Pool = await getConnection()
 		await conn.query(
-			`INSERT INTO widget_settings (shop_id, settings) VALUES ($1, $2) ON CONFLICT (shop_id) DO NOTHING`,
+			`
+			INSERT INTO widget_settings (shop_id, settings) VALUES ($1, $2)
+			ON CONFLICT (shop_id)
+			DO UPDATE SET settings = $2, updated_date = now()`,
 			[newSettings.shop_id, newSettings.settings]
 		)
 	}

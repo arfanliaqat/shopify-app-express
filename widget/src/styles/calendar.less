@@ -1,10 +1,7 @@
 .h10cal {
   margin-top: 20px;
-  background: #fff;
   color: #333;
   padding: 5px 10px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.15);
-  border-radius: 10px;
   min-width: 276px;
   max-width: 400px;
   .h10cal-header-wrapper {
@@ -63,7 +60,6 @@
       .h10cal-day {
         flex: 1;
         position: relative;
-        color: #aaa;
         > span {
           position: absolute;
           top: 10%;
@@ -76,16 +72,8 @@
           border-radius: 50%;
         }
         &.h10cal-available {
-          color: #333;
           font-weight: bold;
           cursor: pointer;
-          &:hover > span {
-            background: #ddd;
-          }
-          &.h10cal-selected > span {
-            background: #333;
-            color: #fff;
-          }
         }
       }
     }

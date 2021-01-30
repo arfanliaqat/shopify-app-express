@@ -25,7 +25,7 @@ export class WidgetSettings {
 				headerDaysFontColor: "#333333",
 				dayUnavailableFontColor: "#aaaaaa",
 				dayAvailableFontColor: "#333333",
-				dayHoveringBackgroundColor: "#333333",
+				dayHoveringBackgroundColor: "#eeeeee",
 				dayHoveringFontColor: "#333333",
 				daySelectedBackgroundColor: "#333333",
 				daySelectedFontColor: "#ffffff"

@@ -16,7 +16,10 @@ interface Props {
 export default function CalendarDatePicker({ availableDates }: Props) {
 
 	const [selectedDate, setSelectedDate] = useState<string>(availableDates[0]?.date)
-	const [monthStart, setMonthStart] = useState<Moment>(moment().startOf("month"))
+	const momentSelectedDate = selectedDate ? moment(selectedDate, SYSTEM_DATE_FORMAT) : undefined
+	const [monthStart, setMonthStart] = useState<Moment>(
+		momentSelectedDate ? momentSelectedDate.clone().startOf("month") : moment().startOf("month")
+	)
 
 	const currentMonth = monthStart.month()
 	const calendarStart = monthStart.clone().startOf("week")
@@ -51,14 +54,16 @@ export default function CalendarDatePicker({ availableDates }: Props) {
 						{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
 							const strDay = day.format(SYSTEM_DATE_FORMAT)
 							const dateIsAvailable = availableDatesSet.has(strDay)
+							const isCurrentMonth = day.month() == currentMonth
 							return <div
 								className={classNames("h10cal-day", {
-									"h10cal-available": dateIsAvailable,
-									"h10cal-selected": strDay == selectedDate
+									"h10cal-unavailable": isCurrentMonth && !dateIsAvailable,
+									"h10cal-available": isCurrentMonth && dateIsAvailable,
+									"h10cal-selected": isCurrentMonth && strDay == selectedDate
 								})}
 								key={"day" + strDay}
 								onClick={dateIsAvailable ? () => setSelectedDate(strDay) : () => {}}>
-								<span>{day.month() == currentMonth ? day.format("D") : ""}</span>
+								<span>{isCurrentMonth ? day.format("D") : ""}</span>
 							</div>
 						})}
 					</div>
