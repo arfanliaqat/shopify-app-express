@@ -2,14 +2,16 @@ import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/sr
 import moment from "moment"
 import { h } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
+import { WidgetSettings } from "./models/WidgetSettings"
 
 interface Props {
 	onSelect: (value: string) => void,
 	availableDates: AvailableDate[],
-	selectedAvailableDate: string
+	selectedAvailableDate: string,
+	settings: WidgetSettings
 }
 
-export default function DropdownDatePicker({ onSelect, availableDates, selectedAvailableDate }: Props) {
+export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate }: Props) {
 	const handleSelect = (e) => {
 		if (e.target.value) {
 			onSelect(e.target.value)
@@ -18,14 +20,14 @@ export default function DropdownDatePicker({ onSelect, availableDates, selectedA
 		}
 	}
 
-	return <select name={`properties[${TAG_LABEL}]`} onChange={handleSelect} style={{ width: "100%" }}>
+	return <select className="h10-dropdown" name={`properties[${TAG_LABEL}]`} onChange={handleSelect}>
 		{availableDates.map((availableDate) => {
 			const momentDate = moment(availableDate.date, SYSTEM_DATE_FORMAT)
 			const valueDate = momentDate.format(TAG_DATE_FORMAT)
 			return <option value={valueDate} disabled={availableDate.isSoldOut}
 						   selected={valueDate == selectedAvailableDate}>
-				{momentDate.format("dddd D MMMM")}
-				{availableDate.isSoldOut ? " (sold out)" : ""}
+				{momentDate.format(settings.dropdownDateFormat)}
+				{availableDate.isSoldOut ? ` (${settings.messages.soldOut})` : ""}
 			</option>
 		})}
 	</select>

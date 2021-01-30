@@ -20,7 +20,7 @@ export class WidgetService {
 		return result.rows[0]?.settings
 	}
 
-	static async findOrCreateWidgetService(shopId: string): Promise<WidgetSettingsViewModel> {
+	static async findOrCreateWidgetSettings(shopId: string): Promise<WidgetSettingsViewModel> {
 		const settings = await this.findWidgetSettingsByShopId(shopId)
 		if (settings) return settings
 		const newSettings = WidgetSettings.getDefault(shopId)
@@ -30,9 +30,9 @@ export class WidgetService {
 
 	private static async insert(newSettings: WidgetSettings): Promise<void> {
 		const conn: Pool = await getConnection()
-		await conn.query(`INSERT INTO widget_settings (shop_id, settings) VALUES ($1, $2)`, [
-			newSettings.shop_id,
-			newSettings.settings
-		])
+		await conn.query(
+			`INSERT INTO widget_settings (shop_id, settings) VALUES ($1, $2) ON CONFLICT (shop_id) DO NOTHING`,
+			[newSettings.shop_id, newSettings.settings]
+		)
 	}
 }

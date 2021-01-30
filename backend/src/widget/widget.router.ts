@@ -16,7 +16,7 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			return
 		}
 		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource.id)
-		const settings = await WidgetService.findOrCreateWidgetService(shopResource.shopId)
+		const settings = await WidgetService.findOrCreateWidgetSettings(shopResource.shopId)
 		res.send({
 			settings,
 			availableDates: availableDates.map(AvailableDate.toViewModel)

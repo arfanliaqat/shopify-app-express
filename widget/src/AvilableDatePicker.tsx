@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { useEffect, useState } from "preact/hooks"
+import { useCallback, useEffect, useState } from "preact/hooks"
 import { ANCHOR_ID, SHOPIFY_APP_URL } from "./constants"
 import { AvailableDate } from "./models/AvailableDate"
 import DropdownDatePicker from "./DropdownDatePicker"
@@ -38,6 +38,10 @@ export default function AvailableDatePicker() {
 	const [selectedAvailableDate, setSelectedAvailableDate] = useState<string>(undefined)
 	const [formError, setFormError] = useState<string>(undefined)
 
+	const getSettings = useCallback(() => ((productAvailabilityData?.settings || {}) as WidgetSettings),
+		[productAvailabilityData]
+	)
+
 	useEffect(() => {
 		async function fetchData() {
 			const data = await fetchAvailabilityForProduct()
@@ -52,7 +56,6 @@ export default function AvailableDatePicker() {
 	}, [])
 
 	const availableDates = productAvailabilityData?.availableDates || []
-	const settings = productAvailabilityData?.settings || ({} as WidgetSettings)
 
 	useEffect(() => {
 		const datePickerDiv = document.getElementById(ANCHOR_ID)
@@ -69,7 +72,7 @@ export default function AvailableDatePicker() {
 				}
 			}
 			if (halt) {
-				setFormError("Please select a delivery date before adding to the cart.")
+				setFormError(getSettings().messages.noDateSelectedError)
 				e.preventDefault()
 				return false
 			}
@@ -80,28 +83,29 @@ export default function AvailableDatePicker() {
 		return () => {
 			form.removeEventListener("click", onSubmit)
 		}
-	}, [selectedAvailableDate])
+	}, [selectedAvailableDate, getSettings])
 
 	useEffect(() => {
 		if (productAvailabilityData && availableDates.length == 0) {
-			setFormError("There are currently no dates available for this product.")
+			setFormError(getSettings().messages.noAvailableDatesError)
 		}
-	}, [productAvailabilityData, availableDates])
+	}, [productAvailabilityData, availableDates, getSettings])
 
 	const handleAvailableDateSelect = (value: string | undefined) => {
 		setSelectedAvailableDate(value)
 	}
 
+	if (!productAvailabilityData) return undefined
 	return (
 		<div className="h10-date-dropdown-picker">
-			<div className="h10-date-picker-label">Pick a delivery date:</div>
-			{formError && <div className="h10-dropdown-picker-error">{formError}</div>}
-			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
+			<div className="h10-date-picker-label">{getSettings().messages.datePickerLabel}</div>
+			{formError && <div className="h10-date-picker-error">{formError}</div>}
+			{getSettings().pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}
             />}
-			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
+			{getSettings().pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}

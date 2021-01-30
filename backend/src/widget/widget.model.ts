@@ -13,7 +13,10 @@ export class WidgetSettings {
 	static getDefault(shopId: string): WidgetSettings {
 		return new WidgetSettings(shopId, {
 			pickerType: "CALENDAR",
+			calendarWeekStart: "MONDAY",
+			dropdownDateFormat: "dddd D MMMM",
 			styles: {
+				errorFontColor: "#8b0000",
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",
 				calendarBorderRadius: "10px",
 				calendarBackgroundColor: "#ffffff",
@@ -31,10 +34,7 @@ export class WidgetSettings {
 				datePickerLabel: "Pick a delivery date:",
 				noDateSelectedError: "Please select a delivery date before adding to the cart.",
 				noAvailableDatesError: "There are currently no dates available for this product.",
-				soldOut: "sold out"
-			},
-			dateFormats: {
-				weekStart: "MONDAY",
+				soldOut: "sold out",
 				headerDays: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
 				headerMonths: [
 					"January",
@@ -49,8 +49,7 @@ export class WidgetSettings {
 					"October",
 					"November",
 					"December"
-				],
-				dropdownDateFormat: "dddd D MMMM"
+				]
 			}
 		})
 	}
