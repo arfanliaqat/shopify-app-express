@@ -10,6 +10,7 @@ import CalendarPage from "./calendarPage/CalendarPage"
 import NotFoundPage from "./NotFoundPage"
 
 import "./styles/main.less"
+import SettingsPage from "./settingsPage/SettingsPage"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -46,6 +47,7 @@ ReactDOM.render(
 						path="/app/availability_periods/:availabilityPeriodId"
 						component={AvailabilityPeriodPage}
 					/>
+					<Route exact path="/app/settings" component={SettingsPage} />
 					<Route path="*" component={NotFoundPage} />
 				</Switch>
 			</BrowserRouter>

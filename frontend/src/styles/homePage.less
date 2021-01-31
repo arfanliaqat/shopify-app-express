@@ -1,4 +1,23 @@
 #homePage {
+  .pageHeader {
+    padding: 20px 0;
+    display: flex;
+    justify-content: stretch;
+    align-items: center;
+    .pageTitle {
+      font-size: 28px;
+      font-weight: 600;
+      flex: 1;
+      line-height: 28px;
+    }
+    .pageActions {
+      width: 300px;
+      text-align: right;
+      > * {
+        margin-left: 10px;
+      }
+    }
+  }
   .productItem {
     display: flex;
     justify-items: stretch;
