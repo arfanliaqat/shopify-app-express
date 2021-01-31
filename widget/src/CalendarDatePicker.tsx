@@ -2,23 +2,26 @@ import { h } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
 import { ArrowLeftCircle, ArrowRightCircle } from "./Icons"
 import { getDaysBetween } from "../../frontend/src/util/tools"
-import moment, { Moment } from "moment"
-import { useMemo, useState } from "preact/hooks"
+import { Moment } from "moment"
+import {  useMemo, useState } from "preact/hooks"
 import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/src/util/constants"
 import classNames from "classnames"
+import { WidgetSettings } from "./models/WidgetSettings"
+import { getMoment, parseMoment } from "./util/dates"
 
 interface Props {
 	onSelect: (value: string) => void,
 	availableDates: AvailableDate[],
-	selectedAvailableDate: string
+	selectedAvailableDate: string,
+	settings: WidgetSettings
 }
 
-export default function CalendarDatePicker({ availableDates }: Props) {
+export default function CalendarDatePicker({ availableDates, settings }: Props) {
 
 	const [selectedDate, setSelectedDate] = useState<string>(availableDates[0]?.date)
-	const momentSelectedDate = selectedDate ? moment(selectedDate, SYSTEM_DATE_FORMAT) : undefined
+	const momentSelectedDate = selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT) : undefined
 	const [monthStart, setMonthStart] = useState<Moment>(
-		momentSelectedDate ? momentSelectedDate.clone().startOf("month") : moment().startOf("month")
+		momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
 	)
 
 	const currentMonth = monthStart.month()
@@ -26,7 +29,7 @@ export default function CalendarDatePicker({ availableDates }: Props) {
 	const calendarEnd = monthStart.clone().endOf("month").endOf("week")
 
 	const availableDatesSet = useMemo(() => new Set(availableDates.map(ad => ad.date)), [availableDates])
-	const formattedSelectedDate = useMemo(() => moment(selectedDate)?.format(TAG_DATE_FORMAT), [])
+	const formattedSelectedDate = useMemo(() => parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT), [])
 
 	const moveMonth = (delta) => () => {
 		const newMonthStart = monthStart.clone().add(delta, "months")

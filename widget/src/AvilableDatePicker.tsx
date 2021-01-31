@@ -115,6 +115,7 @@ export default function AvailableDatePicker() {
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}
+				settings={settings}
             />}
 		</div>
 	)

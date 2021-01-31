@@ -7,7 +7,7 @@ export const hooksSecret = process.env.HOOKS_SECRET || ""
 export const databaseName = process.env.DB_DATABASE || "shopify_app"
 
 export const SYSTEM_DATE_FORMAT = "YYYY-MM-DD"
-export const TAG_DATE_FORMAT = "DD/MM/YYYY"
 export const SHORT_DISPLAY_FORMAT = "ddd D MMM"
 export const SHORT_DISPLAY_FORMAT_WITH_YEAR = "ddd D MMM YYYY"
+export const TAG_DATE_FORMAT = "L"
 export const TAG_LABEL = "Delivery Date"

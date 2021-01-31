@@ -10,8 +10,8 @@ const queries: WidgetStyles = {
 	headerDaysFontColor: ".h10cal .h10cal-header .h10cal-day-names { color: $$ }",
 	dayUnavailableFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-unavailable > span { color: $$ }",
 	dayAvailableFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available > span { color: $$ }",
-	dayHoveringBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover > span { background-color: $$ }",
-	dayHoveringFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover > span { color: $$ }",
+	dayHoveringBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover:not(.h10cal-selected) > span { background-color: $$ }",
+	dayHoveringFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover:not(.h10cal-selected) > span { color: $$ }",
 	daySelectedBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-selected > span { background-color: $$ }",
 	daySelectedFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-selected > span { color: $$ }"
 }

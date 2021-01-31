@@ -2,8 +2,7 @@ export type PickerType = "CALENDAR" | "DROPDOWN"
 
 export interface WidgetSettings {
 	pickerType: PickerType
-	calendarWeekStart: "MONDAY" | "SUNDAY"
-	dropdownDateFormat: string
+	locale: string,
 	styles: WidgetStyles
 	messages: WidgetMessages
 }
@@ -29,7 +28,5 @@ export interface WidgetMessages {
 	noDateSelectedError: string
 	noAvailableDatesError: string
 	soldOut: string
-	headerDays: string[]
-	headerMonths: string[]
 }
 
