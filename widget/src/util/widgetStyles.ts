@@ -8,6 +8,7 @@ const queries: WidgetStyles = {
 	headerFontColor: ".h10cal .h10cal-month { color: $$ }",
 	arrowIconColor: ".h10cal .h10cal-header .h10cal-previous, .h10cal .h10cal-header .h10cal-next { color: $$ }",
 	headerDaysFontColor: ".h10cal .h10cal-header .h10cal-day-names { color: $$ }",
+	headerDaysFontWeight: ".h10cal .h10cal-header .h10cal-day-names { font-style: $$ }",
 	dayUnavailableFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-unavailable > span { color: $$ }",
 	dayAvailableFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available > span { color: $$ }",
 	dayHoveringBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover:not(.h10cal-selected) > span { background-color: $$ }",
@@ -19,7 +20,7 @@ const queries: WidgetStyles = {
 export function getCssFromWidgetStyles(widgetStyles: WidgetStyles): string {
 	const css = []
 	for (const [key, query] of Object.entries(queries)) {
-		if (query) {
+		if (query && widgetStyles[key]) {
 			css.push(query.replace("$$", widgetStyles[key]))
 		}
 	}

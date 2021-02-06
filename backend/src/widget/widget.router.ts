@@ -1,9 +1,11 @@
 import { Request, Response, Router } from "express"
 import { AvailabilityPeriodService } from "../availabilityPeriods/availabilityPeriods.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
-import { handleErrors } from "../util/error"
+import { handleErrors, UnexpectedError } from "../util/error"
 import { AvailableDate } from "../availabilityPeriods/availabilityPeriods.model"
 import { WidgetService } from "./widget.service"
+import { loadConnectedShop } from "../shop/shop.middleware"
+import { getLocals } from "../util/locals"
 
 const router = Router()
 
@@ -21,6 +23,19 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			settings,
 			availableDates: availableDates.map(AvailableDate.toViewModel)
 		})
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
+
+router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Response) => {
+	try {
+		const { connectedShop } = getLocals(res)
+		if (!connectedShop || !connectedShop.id) {
+			throw new UnexpectedError("`connectedShop` should have been provided")
+		}
+		const settings = await WidgetService.findOrCreateWidgetSettings(connectedShop.id)
+		res.send(settings)
 	} catch (error) {
 		handleErrors(res, error)
 	}
