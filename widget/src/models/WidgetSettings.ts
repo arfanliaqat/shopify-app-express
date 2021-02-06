@@ -21,6 +21,7 @@ export interface WidgetStyles {
 	dayHoveringFontColor: string
 	daySelectedBackgroundColor: string
 	daySelectedFontColor: string
+	previewBackgroundColor: string
 }
 
 export interface WidgetMessages {

@@ -15,19 +15,20 @@ export class WidgetSettings {
 			pickerType: "CALENDAR",
 			locale: "en",
 			styles: {
-				errorFontColor: "#8b0000",
+				errorFontColor: "#8B0000",
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",
 				calendarBorderRadius: "10px",
-				calendarBackgroundColor: "#ffffff",
+				calendarBackgroundColor: "#FFFFFF",
 				headerFontColor: "#333333",
 				arrowIconColor: "#000000",
 				headerDaysFontColor: "#333333",
-				dayUnavailableFontColor: "#aaaaaa",
+				dayUnavailableFontColor: "#AAAAAA",
 				dayAvailableFontColor: "#333333",
-				dayHoveringBackgroundColor: "#eeeeee",
+				dayHoveringBackgroundColor: "#EEEEEE",
 				dayHoveringFontColor: "#333333",
 				daySelectedBackgroundColor: "#333333",
-				daySelectedFontColor: "#ffffff"
+				daySelectedFontColor: "#FFFFFF",
+				previewBackgroundColor: "#FFFFFF"
 			},
 			messages: {
 				datePickerLabel: "Pick a delivery date:",

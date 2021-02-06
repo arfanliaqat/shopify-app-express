@@ -41,13 +41,10 @@ export default function SettingsPage({}: Props) {
 	}
 
 	return (
-		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title="Settings">
+		<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title="Settings" separator>
 			<Layout>
-				<Layout.AnnotatedSection
-					title="Availability settings"
-					description="Settings which affect the the list of available dates your customers can pick from."
-				>
-					<Card sectioned>
+				<Layout.Section>
+					<Card title="Availability settings" sectioned>
 						<FormLayout>
 							<TextField
 								type="number"
@@ -76,115 +73,139 @@ export default function SettingsPage({}: Props) {
 							/>
 						</FormLayout>
 					</Card>
-				</Layout.AnnotatedSection>
-				<Layout.Section>
-					<Card title="Date picker settings" sectioned>
-						<FormLayout>
-							<FormLayout.Group>
-								<Select
-									label="Type"
-									options={[
-										{ value: "CALENDAR", label: "Calendar" },
-										{ value: "DROPDOWN", label: "Dropdown" }
-									]}
-									value={datePickerType}
-									onChange={(value) => setDatePickerType(value as PickerType)}
-								/>
-
-								<Select
-									label="Type"
-									options={datePickerLanguages}
-									value={language}
-									onChange={(value) => setLanguage(value)}
-								/>
-							</FormLayout.Group>
-
-							<FormLayout.Group>
-								<TextField
-									label="Error font color"
-									onChange={handleWidgetStyleChange("errorFontColor")}
-									value={widgetStyles?.errorFontColor}
-								/>
-							</FormLayout.Group>
-						</FormLayout>
-					</Card>
 				</Layout.Section>
-
+			</Layout>
+			<div className="pageSeparator" />
+			<Layout>
 				<Layout.Section>
-					<Card title="Calendar style" sectioned>
-						<FormLayout>
-							<FormLayout.Group>
-								<Select
-									label="Theme"
-									options={[
-										{ value: "ROUNDED", label: "Rounded" },
-										{ value: "SQUARED", label: "Squared" }
-									]}
-									value={theme}
-									onChange={(value) => setTheme(value)}
-								/>
+					<Layout>
+						<Layout.Section>
+							<Card title="Date picker settings" sectioned>
+								<FormLayout>
+									<FormLayout.Group>
+										<Select
+											label="Type"
+											options={[
+												{ value: "CALENDAR", label: "Calendar" },
+												{ value: "DROPDOWN", label: "Dropdown" }
+											]}
+											value={datePickerType}
+											onChange={(value) => setDatePickerType(value as PickerType)}
+										/>
 
-								<Checkbox
-									label="With shadow around the box"
-									checked={withShadow}
-									onChange={(checked) => setWithShadow(checked)}
-								/>
-							</FormLayout.Group>
+										<Select
+											label="Type"
+											options={datePickerLanguages}
+											value={language}
+											onChange={(value) => setLanguage(value)}
+										/>
+									</FormLayout.Group>
 
-							<FormLayout.Group>
-								<TextField
-									label="Calendar background color"
-									onChange={handleWidgetStyleChange("calendarBackgroundColor")}
-									value={widgetStyles?.calendarBackgroundColor}
-								/>
+									<FormLayout.Group>
+										<TextField
+											label="Error font color"
+											onChange={handleWidgetStyleChange("errorFontColor")}
+											value={widgetStyles?.errorFontColor}
+										/>
+									</FormLayout.Group>
+								</FormLayout>
+							</Card>
+						</Layout.Section>
 
-								<TextField
-									label="Header font color"
-									onChange={handleWidgetStyleChange("headerFontColor")}
-									value={widgetStyles?.headerFontColor}
-								/>
-							</FormLayout.Group>
+						<Layout.Section>
+							<Card title="Calendar style" sectioned>
+								<FormLayout>
+									<FormLayout.Group>
+										<Select
+											label="Theme"
+											options={[
+												{ value: "ROUNDED", label: "Rounded" },
+												{ value: "SQUARED", label: "Squared" }
+											]}
+											value={theme}
+											onChange={(value) => setTheme(value)}
+										/>
 
-							<FormLayout.Group>
-								<TextField
-									label="Days (header) font color"
-									onChange={handleWidgetStyleChange("headerDaysFontColor")}
-									value={widgetStyles?.headerDaysFontColor}
-								/>
+										<Checkbox
+											label="With shadow around the box"
+											checked={withShadow}
+											onChange={(checked) => setWithShadow(checked)}
+										/>
+									</FormLayout.Group>
 
-								<Checkbox
-									label="Bold days (header)"
-									checked={boldHeaderDays}
-									onChange={(checked) => setBoldHeaderDays(checked)}
-								/>
-							</FormLayout.Group>
+									<FormLayout.Group>
+										<TextField
+											label="Calendar background color"
+											onChange={handleWidgetStyleChange("calendarBackgroundColor")}
+											value={widgetStyles?.calendarBackgroundColor}
+										/>
 
-							<FormLayout.Group>
-								<TextField
-									label="Unavailable day font color"
-									onChange={handleWidgetStyleChange("dayUnavailableFontColor")}
-									value={widgetStyles?.dayUnavailableFontColor}
-								/>
-								<TextField
-									label="Available day font color"
-									onChange={handleWidgetStyleChange("dayAvailableFontColor")}
-									value={widgetStyles?.dayAvailableFontColor}
-								/>
-							</FormLayout.Group>
+										<TextField
+											label="Header font color"
+											onChange={handleWidgetStyleChange("headerFontColor")}
+											value={widgetStyles?.headerFontColor}
+										/>
+									</FormLayout.Group>
 
-							<FormLayout.Group>
-								<TextField
-									label="Day selected background color"
-									onChange={handleWidgetStyleChange("daySelectedBackgroundColor")}
-									value={widgetStyles?.daySelectedBackgroundColor}
-								/>
-								<TextField
-									label="Day selected font color"
-									onChange={handleWidgetStyleChange("daySelectedFontColor")}
-									value={widgetStyles?.daySelectedFontColor}
-								/>
-							</FormLayout.Group>
-						</FormLayout>
+									<FormLayout.Group>
+										<TextField
+											label="Days (header) font color"
+											onChange={handleWidgetStyleChange("headerDaysFontColor")}
+											value={widgetStyles?.headerDaysFontColor}
+										/>
+
+										<Checkbox
+											label="Bold days (header)"
+											checked={boldHeaderDays}
+											onChange={(checked) => setBoldHeaderDays(checked)}
+										/>
+									</FormLayout.Group>
+
+									<FormLayout.Group>
+										<TextField
+											label="Unavailable day font color"
+											onChange={handleWidgetStyleChange("dayUnavailableFontColor")}
+											value={widgetStyles?.dayUnavailableFontColor}
+										/>
+										<TextField
+											label="Available day font color"
+											onChange={handleWidgetStyleChange("dayAvailableFontColor")}
+											value={widgetStyles?.dayAvailableFontColor}
+										/>
+									</FormLayout.Group>
+
+									<FormLayout.Group>
+										<TextField
+											label="Day selected background color"
+											onChange={handleWidgetStyleChange("daySelectedBackgroundColor")}
+											value={widgetStyles?.daySelectedBackgroundColor}
+										/>
+										<TextField
+											label="Day selected font color"
+											onChange={handleWidgetStyleChange("daySelectedFontColor")}
+											value={widgetStyles?.daySelectedFontColor}
+										/>
+									</FormLayout.Group>
+								</FormLayout>
+							</Card>
+						</Layout.Section>
+					</Layout>
+				</Layout.Section>
+				<Layout.Section secondary>
+					<Card>
+						<Card.Section>
+							<div className="Polaris-Heading">Preview</div>
+						</Card.Section>
+						<Card.Section>
+							<div className="h10-stock-by-date" />
+						</Card.Section>
+						<Card.Section>
+							<TextField
+								label="Preview background color"
+								onChange={handleWidgetStyleChange("previewBackgroundColor")}
+								value={widgetStyles?.previewBackgroundColor}
+							/>
+						</Card.Section>
 					</Card>
 				</Layout.Section>
 			</Layout>
