@@ -28,7 +28,7 @@ export const datePickerLanguages: SelectOption[] = [
 
 const BOX_SHADOW = "0 0 5px rgba(0,0,0,0.15)"
 const BOX_BORDER_RADIUS = "10px"
-const BOLD_HEADER_DAYS_FONT_WEIGHT = "bold"
+const HEADER_FONT_WEIGHT = "bold"
 
 function getTheme(widgetSettings: WidgetSettings): string {
 	if (widgetSettings.styles.calendarBorderRadius == BOX_BORDER_RADIUS) {
@@ -42,7 +42,7 @@ function getWithShadow(widgetSettings: WidgetSettings): boolean {
 }
 
 function getBoldHeaderDays(widgetSettings: WidgetSettings): boolean {
-	return widgetSettings.styles.headerDaysFontWeight == BOLD_HEADER_DAYS_FONT_WEIGHT
+	return widgetSettings.styles.headerFontWeight == HEADER_FONT_WEIGHT
 }
 
 export default function SettingsPage({}: Props) {
@@ -87,7 +87,7 @@ export default function SettingsPage({}: Props) {
 
 	const handleBoldHeaderDaysChange = (checked: boolean) => {
 		const newWidgetSettings = { ...widgetSettings }
-		newWidgetSettings.styles.headerDaysFontWeight = checked ? BOLD_HEADER_DAYS_FONT_WEIGHT : ""
+		newWidgetSettings.styles.headerFontWeight = checked ? HEADER_FONT_WEIGHT : ""
 		setWidgetSettings(newWidgetSettings)
 	}
 

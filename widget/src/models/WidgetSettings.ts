@@ -15,7 +15,7 @@ export interface WidgetStyles {
 	headerFontColor: string
 	arrowIconColor: string
 	headerDaysFontColor: string
-	headerDaysFontWeight: string
+	headerFontWeight: string
 	dayUnavailableFontColor: string
 	dayAvailableFontColor: string
 	dayHoveringBackgroundColor: string
