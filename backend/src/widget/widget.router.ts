@@ -6,6 +6,7 @@ import { AvailableDate } from "../availabilityPeriods/availabilityPeriods.model"
 import { WidgetService } from "./widget.service"
 import { loadConnectedShop } from "../shop/shop.middleware"
 import { getLocals } from "../util/locals"
+import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 
 const router = Router()
 
@@ -35,6 +36,20 @@ router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Re
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
 		const settings = await WidgetService.findOrCreateWidgetSettings(connectedShop.id)
+		res.send(settings)
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
+
+router.post("/widget_settings", [loadConnectedShop], async (req: Request, res: Response) => {
+	try {
+		const { connectedShop } = getLocals(res)
+		if (!connectedShop || !connectedShop.id) {
+			throw new UnexpectedError("`connectedShop` should have been provided")
+		}
+		const widgetSettings = req.body as WidgetSettingsViewModel
+		const settings = await WidgetService.updateForShop(connectedShop.id, widgetSettings)
 		res.send(settings)
 	} catch (error) {
 		handleErrors(res, error)

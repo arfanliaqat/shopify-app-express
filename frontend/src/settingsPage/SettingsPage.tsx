@@ -1,8 +1,19 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { Layout, Page, Card, FormLayout, TextField, Select, SelectOption, Checkbox } from "@shopify/polaris"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import {
+	Layout,
+	Page,
+	Card,
+	FormLayout,
+	TextField,
+	Select,
+	SelectOption,
+	Checkbox,
+	PageActions
+} from "@shopify/polaris"
 import { WidgetSettings, PickerType, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
+import _ from "lodash"
 
 interface Props {}
 
@@ -49,15 +60,23 @@ export default function SettingsPage({}: Props) {
 	const [availabilityCutOff, setAvailabilityCutOff] = useState(1)
 	const [recurringAvailabilityCutOff, setRecurringAvailabilityCutOff] = useState(12)
 	const [datePickerType, setDatePickerType] = useState<PickerType>("CALENDAR")
-
+	const [initialWidgetSettings, setInitialWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
-
 	const [successMessage, setSuccessMessage] = useState<string>()
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
-	const { setApiRequest: fetchPeriod, data: pageData, isLoading } = useApi<WidgetSettings>({
+
+	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettings>({
 		onSuccess: useCallback((widgetSettings) => {
-			setWidgetSettings(widgetSettings)
+			setInitialWidgetSettings({ ...widgetSettings })
+			setWidgetSettings({ ...widgetSettings })
 		}, [])
+	})
+
+	const { setApiRequest: saveSettings, isLoading: isSaving } = useApi({
+		onSuccess: useCallback(() => {
+			setSuccessMessage("Settings saved!")
+			setReloadIncrement(reloadIncrement + 1)
+		}, [reloadIncrement])
 	})
 
 	useEffect(() => {
@@ -65,14 +84,6 @@ export default function SettingsPage({}: Props) {
 			url: `/widget_settings`
 		})
 	}, [reloadIncrement])
-
-	const { setApiRequest: savePeriod, isLoading: isSaving } = useApi({
-		onSuccess: useCallback(() => {
-			setSuccessMessage("Availability period saved!")
-			setReloadIncrement(reloadIncrement + 1)
-		}, [reloadIncrement])
-	})
-
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const newWidgetSettings = { ...widgetSettings }
 		newWidgetSettings[key] = value
@@ -104,6 +115,22 @@ export default function SettingsPage({}: Props) {
 		}
 		setWidgetSettings(newWidgetSettings)
 	}
+
+	const handleSaveSettingsClick = () => {
+		saveSettings({
+			method: "POST",
+			url: "/availability_settings",
+			postData: widgetSettings
+		})
+	}
+
+	const handleResetSettingsClick = () => {
+		// TODO open confirmation modal
+	}
+
+	const isDirty = useMemo(() => {
+		return _.isEqual(initialWidgetSettings, widgetSettings)
+	}, [initialWidgetSettings, widgetSettings])
 
 	if (!widgetSettings || isLoading) {
 		return "Loading..."
@@ -280,6 +307,21 @@ export default function SettingsPage({}: Props) {
 						</Card>
 					</Layout.Section>
 				</Layout>
+				<PageActions
+					primaryAction={{
+						content: "Save",
+						onAction: handleSaveSettingsClick,
+						loading: isSaving,
+						disabled: !isDirty
+					}}
+					secondaryActions={[
+						{
+							content: "Reset settings",
+							destructive: true,
+							onAction: handleResetSettingsClick
+						}
+					]}
+				/>
 			</Page>
 		</>
 	)

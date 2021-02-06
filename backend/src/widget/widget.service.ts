@@ -24,11 +24,11 @@ export class WidgetService {
 		const settings = await this.findWidgetSettingsByShopId(shopId)
 		if (settings) return settings
 		const newSettings = WidgetSettings.getDefault(shopId)
-		await this.insert(newSettings)
+		await this.upsert(newSettings)
 		return newSettings.settings
 	}
 
-	private static async insert(newSettings: WidgetSettings): Promise<void> {
+	private static async upsert(newSettings: WidgetSettings): Promise<void> {
 		const conn: Pool = await getConnection()
 		await conn.query(
 			`
@@ -37,5 +37,10 @@ export class WidgetService {
 			DO UPDATE SET settings = $2, updated_date = now()`,
 			[newSettings.shop_id, newSettings.settings]
 		)
+	}
+
+	static async updateForShop(shopId: string, widgetSettings: WidgetSettingsViewModel): Promise<void> {
+		const settings = new WidgetSettings(shopId, widgetSettings)
+		await this.upsert(settings)
 	}
 }
