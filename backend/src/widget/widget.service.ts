@@ -23,9 +23,7 @@ export class WidgetService {
 	static async findOrCreateWidgetSettings(shopId: string): Promise<WidgetSettingsViewModel> {
 		const settings = await this.findWidgetSettingsByShopId(shopId)
 		if (settings) return settings
-		const newSettings = WidgetSettings.getDefault(shopId)
-		await this.upsert(newSettings)
-		return newSettings.settings
+		return this.resetSettingsForShop(shopId)
 	}
 
 	private static async upsert(newSettings: WidgetSettings): Promise<void> {
@@ -42,5 +40,11 @@ export class WidgetService {
 	static async updateForShop(shopId: string, widgetSettings: WidgetSettingsViewModel): Promise<void> {
 		const settings = new WidgetSettings(shopId, widgetSettings)
 		await this.upsert(settings)
+	}
+
+	static async resetSettingsForShop(shopId: string): Promise<WidgetSettingsViewModel> {
+		const newSettings = WidgetSettings.getDefault(shopId)
+		await this.upsert(newSettings)
+		return newSettings.settings
 	}
 }

@@ -122,6 +122,13 @@ export default function SettingsPage({}: Props) {
 		})
 	}
 
+	const handleResetSettingsSuccess = (resetSettings) => {
+		setInitialWidgetSettings({ ...resetSettings })
+		setWidgetSettings({ ...resetSettings })
+		setResetSettingsModalOpen(false)
+		setSuccessMessage("Settings successfully reset!")
+	}
+
 	const isDirty = useMemo(() => {
 		if (widgetSettings && widgetSettings) {
 			return !_.isEqual(initialWidgetSettings, widgetSettings)
@@ -329,7 +336,10 @@ export default function SettingsPage({}: Props) {
 				/>
 			</Page>
 			{resetSettingsModalOpen && (
-				<ResetSettingsModal onSuccess={() => {}} onClose={() => setResetSettingsModalOpen(false)} />
+				<ResetSettingsModal
+					onSuccess={handleResetSettingsSuccess}
+					onClose={() => setResetSettingsModalOpen(false)}
+				/>
 			)}
 		</div>
 	)

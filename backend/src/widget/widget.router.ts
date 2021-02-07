@@ -56,4 +56,17 @@ router.post("/widget_settings", [loadConnectedShop], async (req: Request, res: R
 	}
 })
 
+router.post("/widget_settings/reset", [loadConnectedShop], async (req: Request, res: Response) => {
+	try {
+		const { connectedShop } = getLocals(res)
+		if (!connectedShop || !connectedShop.id) {
+			throw new UnexpectedError("`connectedShop` should have been provided")
+		}
+		const settings = await WidgetService.resetSettingsForShop(connectedShop.id)
+		res.send(settings)
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
+
 export default router

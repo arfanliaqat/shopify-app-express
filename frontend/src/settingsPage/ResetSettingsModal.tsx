@@ -1,18 +1,28 @@
 import React, { useState } from "react"
 import { Modal, TextContainer } from "@shopify/polaris"
 import ModalBackground from "../util/ModalBackground"
+import { useApi } from "../util/useApi"
+import { WidgetSettings } from "../../../backend/src/widget/widget.model"
 
 interface Props {
-	onSuccess: () => void
+	onSuccess: (widgetSettings: WidgetSettings) => void
 	onClose: () => void
 }
 
 export default function ResetSettingsModal({ onSuccess, onClose }: Props) {
 	const [active, setActive] = useState(true)
 
+	const { setApiRequest: resetSettings, isLoading } = useApi({
+		onSuccess: (widgetSettings: WidgetSettings) => {
+			onSuccess(widgetSettings)
+		}
+	})
+
 	const handleResetSettingsClick = () => {
-		console.log("Click!")
-		onSuccess()
+		resetSettings({
+			method: "post",
+			url: "/widget_settings/reset"
+		})
 	}
 	const handleCloseClick = () => {
 		setActive(false)
@@ -28,6 +38,7 @@ export default function ResetSettingsModal({ onSuccess, onClose }: Props) {
 				primaryAction={{
 					content: "Yes, reset the settings",
 					destructive: true,
+					loading: isLoading,
 					onAction: handleResetSettingsClick
 				}}
 			>
