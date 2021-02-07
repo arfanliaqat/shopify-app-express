@@ -1,8 +1,8 @@
 import React, { useState } from "react"
-import _ from "lodash"
 import { Modal } from "@shopify/polaris"
 import AvailableDatePicker from "../common/AvailableDatePicker"
 import moment, { Moment } from "moment"
+import ModalBackground from "../util/ModalBackground"
 
 interface Props {
 	date: Moment
@@ -20,15 +20,7 @@ export default function AvailableDatePickerModal({ date, onDatesSelected, onClos
 	}
 
 	return (
-		<div
-			onMouseDown={(e) => {
-				const className = (e.target as any).className || ""
-				if (_.isString(className) && className.includes("Polaris-Modal-Dialog")) {
-					e.preventDefault()
-					onClose()
-				}
-			}}
-		>
+		<ModalBackground onClose={onClose}>
 			<Modal
 				open={active}
 				onClose={() => {
@@ -50,6 +42,6 @@ export default function AvailableDatePickerModal({ date, onDatesSelected, onClos
 					/>
 				</div>
 			</Modal>
-		</div>
+		</ModalBackground>
 	)
 }

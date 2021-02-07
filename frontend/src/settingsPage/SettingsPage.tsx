@@ -14,6 +14,7 @@ import { WidgetSettings, PickerType, WidgetStyles } from "../../../widget/src/mo
 import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
 import _ from "lodash"
+import ResetSettingsModal from "./ResetSettingsModal"
 
 interface Props {}
 
@@ -63,6 +64,7 @@ export default function SettingsPage({}: Props) {
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [successMessage, setSuccessMessage] = useState<string>()
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
+	const [resetSettingsModalOpen, setResetSettingsModalOpen] = useState(false)
 
 	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettings>({
 		onSuccess: useCallback((widgetSettings) => {
@@ -118,10 +120,6 @@ export default function SettingsPage({}: Props) {
 			url: "/widget_settings",
 			postData: widgetSettings
 		})
-	}
-
-	const handleResetSettingsClick = () => {
-
 	}
 
 	const isDirty = useMemo(() => {
@@ -325,11 +323,14 @@ export default function SettingsPage({}: Props) {
 						{
 							content: "Reset settings",
 							destructive: true,
-							onAction: handleResetSettingsClick
+							onAction: () => setResetSettingsModalOpen(true)
 						}
 					]}
 				/>
 			</Page>
+			{resetSettingsModalOpen && (
+				<ResetSettingsModal onSuccess={() => {}} onClose={() => setResetSettingsModalOpen(false)} />
+			)}
 		</div>
 	)
 }
