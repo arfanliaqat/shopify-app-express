@@ -29,7 +29,7 @@ export class WidgetSettings {
 				daySelectedBackgroundColor: "#333333",
 				daySelectedFontColor: "#FFFFFF",
 				previewBackgroundColor: "#FFFFFF",
-				headerFontWeight: "bold"
+				headerDaysFontWeight: "bold"
 			},
 			messages: {
 				datePickerLabel: "Pick a delivery date:",

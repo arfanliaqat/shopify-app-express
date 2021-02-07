@@ -53,13 +53,12 @@ function getWithShadow(widgetSettings: WidgetSettings): boolean {
 }
 
 function getBoldHeaderDays(widgetSettings: WidgetSettings): boolean {
-	return widgetSettings.styles.headerFontWeight == HEADER_FONT_WEIGHT
+	return widgetSettings.styles.headerDaysFontWeight == HEADER_FONT_WEIGHT
 }
 
 export default function SettingsPage({}: Props) {
 	const [availabilityCutOff, setAvailabilityCutOff] = useState(1)
 	const [recurringAvailabilityCutOff, setRecurringAvailabilityCutOff] = useState(12)
-	const [datePickerType, setDatePickerType] = useState<PickerType>("CALENDAR")
 	const [initialWidgetSettings, setInitialWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [successMessage, setSuccessMessage] = useState<string>()
@@ -84,52 +83,52 @@ export default function SettingsPage({}: Props) {
 			url: `/widget_settings`
 		})
 	}, [reloadIncrement])
+
+	const handleDatePickerTypeChange = (pickerType: PickerType) => {
+		setWidgetSettings({ ...widgetSettings, pickerType })
+	}
+
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
-		const newWidgetSettings = { ...widgetSettings }
-		newWidgetSettings[key] = value
-		setWidgetSettings(newWidgetSettings)
+		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleWithShadowChange = (checked: boolean) => {
-		const newWidgetSettings = { ...widgetSettings }
-		newWidgetSettings.styles.calendarBoxShadow = checked ? BOX_SHADOW : ""
-		setWidgetSettings(newWidgetSettings)
+		const styles = { ...widgetSettings.styles, calendarBoxShadow: checked ? BOX_SHADOW : "" }
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleBoldHeaderDaysChange = (checked: boolean) => {
-		const newWidgetSettings = { ...widgetSettings }
-		newWidgetSettings.styles.headerFontWeight = checked ? HEADER_FONT_WEIGHT : ""
-		setWidgetSettings(newWidgetSettings)
+		const styles = { ...widgetSettings.styles, headerDaysFontWeight: checked ? HEADER_FONT_WEIGHT : "" }
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleLanguageChange = (locale: string) => {
 		setWidgetSettings({ ...widgetSettings, locale })
 	}
 
-	const handleThemeChange = (locale: string) => {
-		const newWidgetSettings = { ...widgetSettings }
-		if (locale == "ROUNDED") {
-			newWidgetSettings.styles.calendarBorderRadius = BOX_BORDER_RADIUS
-		} else {
-			newWidgetSettings.styles.calendarBorderRadius = ""
-		}
-		setWidgetSettings(newWidgetSettings)
+	const handleThemeChange = (theme: string) => {
+		const styles = { ...widgetSettings.styles, calendarBorderRadius: theme == "ROUNDED" ? BOX_BORDER_RADIUS : "" }
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleSaveSettingsClick = () => {
 		saveSettings({
 			method: "POST",
-			url: "/availability_settings",
+			url: "/widget_settings",
 			postData: widgetSettings
 		})
 	}
 
 	const handleResetSettingsClick = () => {
-		// TODO open confirmation modal
+
 	}
 
 	const isDirty = useMemo(() => {
-		return _.isEqual(initialWidgetSettings, widgetSettings)
+		if (widgetSettings && widgetSettings) {
+			return !_.isEqual(initialWidgetSettings, widgetSettings)
+		}
+		return false
 	}, [initialWidgetSettings, widgetSettings])
 
 	if (!widgetSettings || isLoading) {
@@ -137,7 +136,7 @@ export default function SettingsPage({}: Props) {
 	}
 
 	return (
-		<>
+		<div id="settingsPage">
 			{successMessage && <Toast content={successMessage} onDismiss={() => setSuccessMessage(undefined)} />}
 			<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title="Settings" separator>
 				<Layout>
@@ -187,12 +186,12 @@ export default function SettingsPage({}: Props) {
 													{ value: "CALENDAR", label: "Calendar" },
 													{ value: "DROPDOWN", label: "Dropdown" }
 												]}
-												value={datePickerType}
-												onChange={(value) => setDatePickerType(value as PickerType)}
+												value={widgetSettings.pickerType}
+												onChange={handleDatePickerTypeChange}
 											/>
 
 											<Select
-												label="Type"
+												label="Calendar language & date format"
 												options={datePickerLanguages}
 												value={widgetSettings.locale}
 												onChange={(value) => handleLanguageChange(value)}
@@ -284,6 +283,14 @@ export default function SettingsPage({}: Props) {
 												value={widgetSettings.styles.daySelectedFontColor}
 											/>
 										</FormLayout.Group>
+
+										<FormLayout.Group>
+											<TextField
+												label="Next/prev. arrows color"
+												onChange={handleWidgetStyleChange("arrowIconColor")}
+												value={widgetSettings.styles.arrowIconColor}
+											/>
+										</FormLayout.Group>
 									</FormLayout>
 								</Card>
 							</Layout.Section>
@@ -323,6 +330,6 @@ export default function SettingsPage({}: Props) {
 					]}
 				/>
 			</Page>
-		</>
+		</div>
 	)
 }
