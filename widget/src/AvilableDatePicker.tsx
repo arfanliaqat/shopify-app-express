@@ -1,21 +1,29 @@
 import { h } from "preact"
 import { useEffect, useMemo, useState } from "preact/hooks"
 import { ANCHOR_ID, SHOPIFY_APP_URL } from "./constants"
-import { AvailableDate } from "./models/AvailableDate"
 import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
-import { WidgetSettings } from "./models/WidgetSettings"
 import { getCssFromWidgetStyles } from "./util/widgetStyles"
+import { ProductAvailabilityData } from "./models/ProductAvailabilityData"
 
-interface ProductAvailabilityData {
-	settings: WidgetSettings
-	availableDates: AvailableDate[]
+function getDatePickerElement(): HTMLElement {
+	const element = document.getElementById(ANCHOR_ID)
+	if (!element) {
+		throw `[H10 - AvailabilityDatePicker] Please insert the div element with the id ${ANCHOR_ID}`
+	}
+	return element
+}
+
+function getIsPreviewMode() {
+	return getDatePickerElement().getAttribute("data-preview") == "true"
+}
+
+function getPreviewData(): ProductAvailabilityData {
+	return JSON.parse(getDatePickerElement().getAttribute("data-preview-data"))
 }
 
 function getProductId() {
-	const datePickerDiv = document.getElementById(ANCHOR_ID)
-	if (!datePickerDiv) return undefined
-	return datePickerDiv?.getAttribute("data-productid")
+	return getDatePickerElement().getAttribute("data-productid")
 }
 
 async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
@@ -48,44 +56,60 @@ export default function AvailableDatePicker() {
 		}
 	}, [settings])
 
+	const isPreviewMode = getIsPreviewMode()
 	useEffect(() => {
-		async function fetchData() {
-			const data = await fetchAvailabilityForProduct()
-			setProductAvailabilityData(data)
-			const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
-			if (firstAvailableDate) {
-				setSelectedAvailableDate(firstAvailableDate.date)
-			}
+		if (isPreviewMode) {
+			setProductAvailabilityData(getPreviewData())
 		}
-
-		fetchData()
 	}, [])
 
 	useEffect(() => {
-		const datePickerDiv = document.getElementById(ANCHOR_ID)
-		const form = datePickerDiv.closest("form")
-		const onSubmit = (e) => {
-			if (selectedAvailableDate) return
-			let halt = false
-			if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
-				halt = true
-			} else {
-				const button = e.target.closest("button")
-				if (button && button.type == "submit") {
-					halt = true
+		getDatePickerElement().addEventListener("previewDataUpdated", () => {
+			setProductAvailabilityData(getPreviewData())
+		}, false);
+	}, [])
+
+	useEffect(() => {
+		if (!isPreviewMode) {
+			async function fetchData() {
+				const data = await fetchAvailabilityForProduct()
+				setProductAvailabilityData(data)
+				const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
+				if (firstAvailableDate) {
+					setSelectedAvailableDate(firstAvailableDate.date)
 				}
 			}
-			if (halt) {
-				setFormError(settings.messages.noDateSelectedError)
-				e.preventDefault()
-				return false
+			fetchData()
+		}
+	}, [])
+
+	useEffect(() => {
+		if (!isPreviewMode) {
+			const datePickerDiv = document.getElementById(ANCHOR_ID)
+			const form = datePickerDiv.closest("form")
+			const onSubmit = (e) => {
+				if (selectedAvailableDate) return
+				let halt = false
+				if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
+					halt = true
+				} else {
+					const button = e.target.closest("button")
+					if (button && button.type == "submit") {
+						halt = true
+					}
+				}
+				if (halt) {
+					setFormError(settings.messages.noDateSelectedError)
+					e.preventDefault()
+					return false
+				}
 			}
-		}
-		if (form) {
-			form.addEventListener("click", onSubmit)
-		}
-		return () => {
-			form.removeEventListener("click", onSubmit)
+			if (form) {
+				form.addEventListener("click", onSubmit)
+			}
+			return () => {
+				form.removeEventListener("click", onSubmit)
+			}
 		}
 	}, [selectedAvailableDate, settings])
 

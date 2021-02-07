@@ -15,6 +15,7 @@ import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
 import _ from "lodash"
 import ResetSettingsModal from "./ResetSettingsModal"
+import Preview from "./Preview"
 
 interface Props {}
 
@@ -307,7 +308,7 @@ export default function SettingsPage({}: Props) {
 								<div className="Polaris-Heading">Preview</div>
 							</Card.Section>
 							<Card.Section>
-								<div className="h10-stock-by-date" />
+								<Preview widgetSettings={widgetSettings} />
 							</Card.Section>
 							<Card.Section>
 								<TextField
