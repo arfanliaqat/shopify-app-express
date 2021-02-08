@@ -216,88 +216,94 @@ export default function SettingsPage({}: Props) {
 							</Layout.Section>
 
 							<Layout.Section>
-								<Card title="Calendar style" sectioned>
-									<FormLayout>
-										<FormLayout.Group>
-											<Select
-												label="Theme"
-												options={[
-													{ value: "ROUNDED", label: "Rounded" },
-													{ value: "SQUARED", label: "Squared" }
-												]}
-												value={getTheme(widgetSettings)}
-												onChange={handleThemeChange}
-											/>
+								<Card title="Date picker settings">
+									<Card.Section>
+										<FormLayout>
+											<FormLayout.Group>
+												<Select
+													label="Theme"
+													options={[
+														{ value: "ROUNDED", label: "Rounded" },
+														{ value: "SQUARED", label: "Squared" }
+													]}
+													value={getTheme(widgetSettings)}
+													onChange={handleThemeChange}
+												/>
+
+												<TextField
+													label="Calendar background color"
+													onChange={handleWidgetStyleChange("calendarBackgroundColor")}
+													value={widgetSettings.styles.calendarBackgroundColor}
+												/>
+											</FormLayout.Group>
 
 											<Checkbox
 												label="With shadow around the box"
 												checked={getWithShadow(widgetSettings)}
 												onChange={handleWithShadowChange}
 											/>
-										</FormLayout.Group>
+										</FormLayout>
+									</Card.Section>
+									<Card.Section>
+										<FormLayout>
+											<FormLayout.Group>
+												<TextField
+													label="Header font color"
+													onChange={handleWidgetStyleChange("headerFontColor")}
+													value={widgetSettings.styles.headerFontColor}
+												/>
 
-										<FormLayout.Group>
-											<TextField
-												label="Calendar background color"
-												onChange={handleWidgetStyleChange("calendarBackgroundColor")}
-												value={widgetSettings.styles.calendarBackgroundColor}
-											/>
-
-											<TextField
-												label="Header font color"
-												onChange={handleWidgetStyleChange("headerFontColor")}
-												value={widgetSettings.styles.headerFontColor}
-											/>
-										</FormLayout.Group>
-
-										<FormLayout.Group>
-											<TextField
-												label="Days (header) font color"
-												onChange={handleWidgetStyleChange("headerDaysFontColor")}
-												value={widgetSettings.styles.headerDaysFontColor}
-											/>
+												<TextField
+													label="Days (header) font color"
+													onChange={handleWidgetStyleChange("headerDaysFontColor")}
+													value={widgetSettings.styles.headerDaysFontColor}
+												/>
+											</FormLayout.Group>
 
 											<Checkbox
 												label="Bold days (header)"
 												checked={getBoldHeaderDays(widgetSettings)}
 												onChange={handleBoldHeaderDaysChange}
 											/>
-										</FormLayout.Group>
+										</FormLayout>
+									</Card.Section>
+									<Card.Section>
+										<FormLayout>
+											<FormLayout.Group>
+												<TextField
+													label="Unavailable day font color"
+													onChange={handleWidgetStyleChange("dayUnavailableFontColor")}
+													value={widgetSettings.styles.dayUnavailableFontColor}
+												/>
+												<TextField
+													label="Available day font color"
+													onChange={handleWidgetStyleChange("dayAvailableFontColor")}
+													value={widgetSettings.styles.dayAvailableFontColor}
+												/>
+											</FormLayout.Group>
 
-										<FormLayout.Group>
-											<TextField
-												label="Unavailable day font color"
-												onChange={handleWidgetStyleChange("dayUnavailableFontColor")}
-												value={widgetSettings.styles.dayUnavailableFontColor}
-											/>
-											<TextField
-												label="Available day font color"
-												onChange={handleWidgetStyleChange("dayAvailableFontColor")}
-												value={widgetSettings.styles.dayAvailableFontColor}
-											/>
-										</FormLayout.Group>
+											<FormLayout.Group>
+												<TextField
+													label="Day selected background color"
+													onChange={handleWidgetStyleChange("daySelectedBackgroundColor")}
+													value={widgetSettings.styles.daySelectedBackgroundColor}
+												/>
+												<TextField
+													label="Day selected font color"
+													onChange={handleWidgetStyleChange("daySelectedFontColor")}
+													value={widgetSettings.styles.daySelectedFontColor}
+												/>
+											</FormLayout.Group>
 
-										<FormLayout.Group>
-											<TextField
-												label="Day selected background color"
-												onChange={handleWidgetStyleChange("daySelectedBackgroundColor")}
-												value={widgetSettings.styles.daySelectedBackgroundColor}
-											/>
-											<TextField
-												label="Day selected font color"
-												onChange={handleWidgetStyleChange("daySelectedFontColor")}
-												value={widgetSettings.styles.daySelectedFontColor}
-											/>
-										</FormLayout.Group>
-
-										<FormLayout.Group>
-											<TextField
-												label="Next/prev. arrows color"
-												onChange={handleWidgetStyleChange("arrowIconColor")}
-												value={widgetSettings.styles.arrowIconColor}
-											/>
-										</FormLayout.Group>
-									</FormLayout>
+											<FormLayout.Group>
+												<TextField
+													label="Next/prev. arrows color"
+													onChange={handleWidgetStyleChange("arrowIconColor")}
+													value={widgetSettings.styles.arrowIconColor}
+												/>
+											</FormLayout.Group>
+										</FormLayout>
+									</Card.Section>
 								</Card>
 							</Layout.Section>
 						</Layout>
