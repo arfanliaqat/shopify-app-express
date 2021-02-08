@@ -5,20 +5,29 @@ import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import moment from "moment"
 import { ProductAvailabilityData } from "../../../widget/src/models/ProductAvailabilityData"
+import { getDaysBetween } from "../util/tools"
+import _ from "lodash"
 
 interface Props {
 	widgetSettings: WidgetSettings
 }
 
 function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvailabilityData {
+	const start = moment().startOf("day").add(1, "day")
+	const end = start.clone().add(12, "weeks")
+	const startOfFirstWeek = start.clone().startOf("week")
 	return {
 		settings,
-		availableDates: [
-			{
-				date: moment().add(1, "day").format(SYSTEM_DATE_FORMAT),
-				isSoldOut: false
-			}
-		]
+		availableDates: _.flatten(
+			getDaysBetween(startOfFirstWeek, end, "week").map((startOfWeek) => {
+				return getDaysBetween(startOfWeek.clone().day("monday"), startOfWeek.clone().add(5, "day"), "day")
+					.filter((date) => date.isAfter(start))
+					.map((date) => ({
+						date: date.format(SYSTEM_DATE_FORMAT),
+						isSoldOut: true
+					}))
+			})
+		)
 	}
 }
 
