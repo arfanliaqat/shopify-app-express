@@ -41,5 +41,9 @@ export default function Preview({ widgetSettings }: Props) {
 		setTimeout(() => document.getElementById(ANCHOR_ID).dispatchEvent(event), 100)
 	}, [jsonWidgetSettings])
 
-	return <div id={ANCHOR_ID} data-preview="true" data-preview-data={jsonWidgetSettings} />
+	return (
+		<div className="widgetPreview" style={{ background: widgetSettings.styles.previewBackgroundColor }}>
+			<div id={ANCHOR_ID} data-preview="true" data-preview-data={jsonWidgetSettings} />
+		</div>
+	)
 }

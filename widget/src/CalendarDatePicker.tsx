@@ -3,7 +3,7 @@ import { AvailableDate } from "./models/AvailableDate"
 import { ArrowLeftCircle, ArrowRightCircle } from "./Icons"
 import { getDaysBetween } from "../../frontend/src/util/tools"
 import { Moment } from "moment"
-import {  useMemo, useState } from "preact/hooks"
+import { useEffect, useMemo, useState } from "preact/hooks"
 import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/src/util/constants"
 import classNames from "classnames"
 import { WidgetSettings } from "./models/WidgetSettings"
@@ -16,20 +16,27 @@ interface Props {
 	settings: WidgetSettings
 }
 
+
 export default function CalendarDatePicker({ availableDates, settings }: Props) {
+
+	const getMonthStart = () => {
+		return momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
+	}
 
 	const [selectedDate, setSelectedDate] = useState<string>(availableDates[0]?.date)
 	const momentSelectedDate = selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT) : undefined
-	const [monthStart, setMonthStart] = useState<Moment>(
-		momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
-	)
+	const [monthStart, setMonthStart] = useState<Moment>(getMonthStart())
 
 	const currentMonth = monthStart.month()
 	const calendarStart = monthStart.clone().startOf("week")
 	const calendarEnd = monthStart.clone().endOf("month").endOf("week")
 
 	const availableDatesSet = useMemo(() => new Set(availableDates.map(ad => ad.date)), [availableDates])
-	const formattedSelectedDate = useMemo(() => parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT), [])
+	const formattedSelectedDate = useMemo(() => {
+		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT)
+	}, [settings])
+
+	useEffect(() => setMonthStart(getMonthStart()), [settings])
 
 	const moveMonth = (delta) => () => {
 		const newMonthStart = monthStart.clone().add(delta, "months")

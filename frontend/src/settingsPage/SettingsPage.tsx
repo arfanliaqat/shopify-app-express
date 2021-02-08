@@ -302,22 +302,24 @@ export default function SettingsPage({}: Props) {
 							</Layout.Section>
 						</Layout>
 					</Layout.Section>
-					<Layout.Section secondary>
-						<Card>
-							<Card.Section>
-								<div className="Polaris-Heading">Preview</div>
-							</Card.Section>
-							<Card.Section>
-								<Preview widgetSettings={widgetSettings} />
-							</Card.Section>
-							<Card.Section>
-								<TextField
-									label="Preview background color"
-									onChange={handleWidgetStyleChange("previewBackgroundColor")}
-									value={widgetSettings.styles.previewBackgroundColor}
-								/>
-							</Card.Section>
-						</Card>
+					<Layout.Section oneThird>
+						<div className="previewCard">
+							<Card>
+								<Card.Section>
+									<div className="Polaris-Heading">Preview</div>
+								</Card.Section>
+								<Card.Section>
+									<Preview widgetSettings={widgetSettings} />
+								</Card.Section>
+								<Card.Section>
+									<TextField
+										label="Preview background color"
+										onChange={handleWidgetStyleChange("previewBackgroundColor")}
+										value={widgetSettings.styles.previewBackgroundColor}
+									/>
+								</Card.Section>
+							</Card>
+						</div>
 					</Layout.Section>
 				</Layout>
 				<PageActions
