@@ -1,0 +1,40 @@
+import React, { useState } from "react"
+import { Popover, ColorPicker, TextField, rgbToHsb, hsbToHex } from "@shopify/polaris"
+import { hexToRgb } from "../util/tools"
+
+interface Props {
+	label: string
+	onChange: (value: string) => void
+	value: string
+}
+
+export default function ColorPickerField({ label, onChange, value }: Props) {
+	const [openPicker, setOpenPicker] = useState(false)
+	return (
+		<>
+			<Popover
+				active={openPicker}
+				sectioned
+				preferredAlignment="left"
+				activator={
+					<TextField
+						label={label}
+						onChange={onChange}
+						value={value}
+						onFocus={() => setOpenPicker(true)}
+						maxLength={7}
+					/>
+				}
+				onClose={() => {
+					setOpenPicker(false)
+				}}
+			>
+				<Popover.Pane fixed>
+					<Popover.Section>
+						<ColorPicker color={rgbToHsb(hexToRgb(value))} onChange={(hsb) => onChange(hsbToHex(hsb))} />
+					</Popover.Section>
+				</Popover.Pane>
+			</Popover>
+		</>
+	)
+}

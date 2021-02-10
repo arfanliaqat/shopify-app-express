@@ -16,6 +16,7 @@ import { Toast } from "@shopify/app-bridge-react"
 import _ from "lodash"
 import ResetSettingsModal from "./ResetSettingsModal"
 import Preview from "./Preview"
+import ColorPickerField from "./ColorPickerField"
 
 interface Props {}
 
@@ -205,7 +206,7 @@ export default function SettingsPage({}: Props) {
 										</FormLayout.Group>
 
 										<FormLayout.Group>
-											<TextField
+											<ColorPickerField
 												label="Error font color"
 												onChange={handleWidgetStyleChange("errorFontColor")}
 												value={widgetSettings.styles.errorFontColor}
@@ -230,7 +231,7 @@ export default function SettingsPage({}: Props) {
 													onChange={handleThemeChange}
 												/>
 
-												<TextField
+												<ColorPickerField
 													label="Calendar background color"
 													onChange={handleWidgetStyleChange("calendarBackgroundColor")}
 													value={widgetSettings.styles.calendarBackgroundColor}
@@ -247,13 +248,13 @@ export default function SettingsPage({}: Props) {
 									<Card.Section>
 										<FormLayout>
 											<FormLayout.Group>
-												<TextField
+												<ColorPickerField
 													label="Header font color"
 													onChange={handleWidgetStyleChange("headerFontColor")}
 													value={widgetSettings.styles.headerFontColor}
 												/>
 
-												<TextField
+												<ColorPickerField
 													label="Days (header) font color"
 													onChange={handleWidgetStyleChange("headerDaysFontColor")}
 													value={widgetSettings.styles.headerDaysFontColor}
@@ -270,12 +271,12 @@ export default function SettingsPage({}: Props) {
 									<Card.Section>
 										<FormLayout>
 											<FormLayout.Group>
-												<TextField
+												<ColorPickerField
 													label="Unavailable day font color"
 													onChange={handleWidgetStyleChange("dayUnavailableFontColor")}
 													value={widgetSettings.styles.dayUnavailableFontColor}
 												/>
-												<TextField
+												<ColorPickerField
 													label="Available day font color"
 													onChange={handleWidgetStyleChange("dayAvailableFontColor")}
 													value={widgetSettings.styles.dayAvailableFontColor}
@@ -283,12 +284,12 @@ export default function SettingsPage({}: Props) {
 											</FormLayout.Group>
 
 											<FormLayout.Group>
-												<TextField
+												<ColorPickerField
 													label="Day selected background color"
 													onChange={handleWidgetStyleChange("daySelectedBackgroundColor")}
 													value={widgetSettings.styles.daySelectedBackgroundColor}
 												/>
-												<TextField
+												<ColorPickerField
 													label="Day selected font color"
 													onChange={handleWidgetStyleChange("daySelectedFontColor")}
 													value={widgetSettings.styles.daySelectedFontColor}
@@ -296,7 +297,7 @@ export default function SettingsPage({}: Props) {
 											</FormLayout.Group>
 
 											<FormLayout.Group>
-												<TextField
+												<ColorPickerField
 													label="Next/prev. arrows color"
 													onChange={handleWidgetStyleChange("arrowIconColor")}
 													value={widgetSettings.styles.arrowIconColor}
@@ -318,7 +319,7 @@ export default function SettingsPage({}: Props) {
 									<Preview widgetSettings={widgetSettings} />
 								</Card.Section>
 								<Card.Section>
-									<TextField
+									<ColorPickerField
 										label="Preview background color"
 										onChange={handleWidgetStyleChange("previewBackgroundColor")}
 										value={widgetSettings.styles.previewBackgroundColor}
