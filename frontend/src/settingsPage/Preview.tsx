@@ -47,7 +47,7 @@ export default function Preview({ widgetSettings }: Props) {
 	useEffect(() => {
 		// eslint-disable-next-line no-undef
 		const event = new CustomEvent(PREVIEW_DATA_UPDATED_EVENT_NAME)
-		setTimeout(() => document.getElementById(ANCHOR_ID).dispatchEvent(event), 100)
+		setTimeout(() => document.getElementById(ANCHOR_ID).dispatchEvent(event), 10)
 	}, [jsonWidgetSettings])
 
 	return (

@@ -150,31 +150,27 @@ export default function SettingsPage({}: Props) {
 					<Layout.Section>
 						<Card title="Availability settings" sectioned>
 							<FormLayout>
-								<TextField
-									type="number"
-									label="Availability cut off"
-									onChange={(value) => setAvailabilityCutOff(parseInt(value))}
-									suffix="days"
-									value={availabilityCutOff + ""}
-									min={0}
-									max={19}
-									helpText={`
-									For example, if the next available date is the Feb 20, on Feb ${20 - availabilityCutOff - 2} the date
-									will still be available in the date picker, but on Feb ${20 - availabilityCutOff - 1} it won’t be any more.`}
-								/>
+								<FormLayout.Group>
+									<TextField
+										type="number"
+										label="First available date"
+										onChange={(value) => setAvailabilityCutOff(parseInt(value))}
+										suffix="days from today"
+										value={availabilityCutOff + ""}
+										min={0}
+										max={19}
+									/>
 
-								<TextField
-									type="number"
-									label="Recurring availability generation cut off"
-									onChange={(value) => setRecurringAvailabilityCutOff(parseInt(value))}
-									suffix="weeks"
-									value={recurringAvailabilityCutOff + ""}
-									min={0}
-									max={20}
-									helpText={`
-									When using the recurring availability feature, our system will generate availability
-									dates up to ${recurringAvailabilityCutOff} weeks in advance.`}
-								/>
+									<TextField
+										type="number"
+										label="Last available date"
+										onChange={(value) => setRecurringAvailabilityCutOff(parseInt(value))}
+										suffix="weeks from today"
+										value={recurringAvailabilityCutOff + ""}
+										min={0}
+										max={20}
+									/>
+								</FormLayout.Group>
 							</FormLayout>
 						</Card>
 					</Layout.Section>
