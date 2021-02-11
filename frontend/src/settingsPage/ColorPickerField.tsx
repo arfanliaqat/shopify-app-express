@@ -10,6 +10,12 @@ interface Props {
 
 export default function ColorPickerField({ label, onChange, value }: Props) {
 	const [openPicker, setOpenPicker] = useState(false)
+	const colorSquareStyle = {
+		backgroundColor: value,
+		width: "12px",
+		height: "12px"
+	}
+
 	return (
 		<>
 			<Popover
@@ -23,6 +29,7 @@ export default function ColorPickerField({ label, onChange, value }: Props) {
 						value={value}
 						onFocus={() => setOpenPicker(true)}
 						maxLength={7}
+						prefix={<div style={colorSquareStyle} />}
 					/>
 				}
 				onClose={() => {
