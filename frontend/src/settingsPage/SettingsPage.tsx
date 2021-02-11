@@ -60,8 +60,6 @@ function getBoldHeaderDays(widgetSettings: WidgetSettings): boolean {
 }
 
 export default function SettingsPage({}: Props) {
-	const [availabilityCutOff, setAvailabilityCutOff] = useState(1)
-	const [recurringAvailabilityCutOff, setRecurringAvailabilityCutOff] = useState(12)
 	const [initialWidgetSettings, setInitialWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [successMessage, setSuccessMessage] = useState<string>()
@@ -87,6 +85,14 @@ export default function SettingsPage({}: Props) {
 			url: `/widget_settings`
 		})
 	}, [reloadIncrement])
+
+	const handleFirstAvailableDateInDays = (value: string) => {
+		setWidgetSettings({ ...widgetSettings, firstAvailableDateInDays: parseInt(value) })
+	}
+
+	const handleLastAvailableDateInWeeks = (value: string) => {
+		setWidgetSettings({ ...widgetSettings, lastAvailableDateInWeeks: parseInt(value) })
+	}
 
 	const handleDatePickerTypeChange = (pickerType: PickerType) => {
 		setWidgetSettings({ ...widgetSettings, pickerType })
@@ -154,9 +160,9 @@ export default function SettingsPage({}: Props) {
 									<TextField
 										type="number"
 										label="First available date"
-										onChange={(value) => setAvailabilityCutOff(parseInt(value))}
+										onChange={handleFirstAvailableDateInDays}
 										suffix="days from today"
-										value={availabilityCutOff + ""}
+										value={widgetSettings.firstAvailableDateInDays + ""}
 										min={0}
 										max={19}
 									/>
@@ -164,9 +170,9 @@ export default function SettingsPage({}: Props) {
 									<TextField
 										type="number"
 										label="Last available date"
-										onChange={(value) => setRecurringAvailabilityCutOff(parseInt(value))}
+										onChange={handleLastAvailableDateInWeeks}
 										suffix="weeks from today"
-										value={recurringAvailabilityCutOff + ""}
+										value={widgetSettings.lastAvailableDateInWeeks + ""}
 										min={0}
 										max={20}
 									/>
