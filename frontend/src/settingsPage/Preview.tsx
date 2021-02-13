@@ -29,8 +29,14 @@ function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvaila
 			})
 		)
 	}
-	const nextWeekThursday = moment().add(1, "week").day("thursday").format(SYSTEM_DATE_FORMAT)
-	const nextWeekFriday = moment().add(1, "week").day("friday").format(SYSTEM_DATE_FORMAT)
+	const nextWeekThursday = moment(data.availableDates[0].date, SYSTEM_DATE_FORMAT)
+		.add(1, "week")
+		.day("thursday")
+		.format(SYSTEM_DATE_FORMAT)
+	const nextWeekFriday = moment(data.availableDates[0].date, SYSTEM_DATE_FORMAT)
+		.add(1, "week")
+		.day("friday")
+		.format(SYSTEM_DATE_FORMAT)
 	const thursdayDate = data.availableDates.find((ad) => ad.date == nextWeekThursday)
 	const fridayDate = data.availableDates.find((ad) => ad.date == nextWeekFriday)
 	if (thursdayDate) thursdayDate.isSoldOut = true
