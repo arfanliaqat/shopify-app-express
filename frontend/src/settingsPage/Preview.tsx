@@ -16,19 +16,26 @@ function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvaila
 	const start = moment().startOf("day").add(settings.firstAvailableDateInDays, "day")
 	const end = start.clone().add(settings.lastAvailableDateInWeeks, "weeks")
 	const startOfFirstWeek = start.clone().startOf("week")
-	return {
+	const data = {
 		settings,
 		availableDates: _.flatten(
 			getDaysBetween(startOfFirstWeek, end, "week").map((startOfWeek) => {
-				return getDaysBetween(startOfWeek.clone().day("monday"), startOfWeek.clone().add(5, "day"), "day")
+				return getDaysBetween(startOfWeek.clone().day("monday"), startOfWeek.clone().day("saturday"), "day")
 					.filter((date) => date.isAfter(start))
 					.map((date) => ({
 						date: date.format(SYSTEM_DATE_FORMAT),
-						isSoldOut: true
+						isSoldOut: false
 					}))
 			})
 		)
 	}
+	const nextWeekThursday = moment().add(1, "week").day("thursday").format(SYSTEM_DATE_FORMAT)
+	const nextWeekFriday = moment().add(1, "week").day("friday").format(SYSTEM_DATE_FORMAT)
+	const thursdayDate = data.availableDates.find((ad) => ad.date == nextWeekThursday)
+	const fridayDate = data.availableDates.find((ad) => ad.date == nextWeekFriday)
+	if (thursdayDate) thursdayDate.isSoldOut = true
+	if (fridayDate) fridayDate.isSoldOut = true
+	return data
 }
 
 export default function Preview({ widgetSettings }: Props) {

@@ -10,7 +10,7 @@ import {
 	Checkbox,
 	PageActions
 } from "@shopify/polaris"
-import { WidgetSettings, PickerType, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import { WidgetSettings, PickerType, WidgetStyles, WidgetMessages } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
 import _ from "lodash"
@@ -103,6 +103,11 @@ export default function SettingsPage({}: Props) {
 		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
+	const handleWidgetMessageChange = (key: keyof WidgetMessages) => (value: string) => {
+		const messages: WidgetMessages = { ...widgetSettings.messages, [key]: value }
+		setWidgetSettings({ ...widgetSettings, messages })
+	}
+
 	const handleWithShadowChange = (checked: boolean) => {
 		const styles = { ...widgetSettings.styles, calendarBoxShadow: checked ? BOX_SHADOW : "" }
 		setWidgetSettings({ ...widgetSettings, styles })
@@ -173,7 +178,7 @@ export default function SettingsPage({}: Props) {
 										onChange={handleLastAvailableDateInWeeks}
 										suffix="weeks from today"
 										value={widgetSettings.lastAvailableDateInWeeks + ""}
-										min={0}
+										min={1}
 										max={20}
 									/>
 								</FormLayout.Group>
@@ -329,6 +334,41 @@ export default function SettingsPage({}: Props) {
 								</Card.Section>
 							</Card>
 						</div>
+					</Layout.Section>
+				</Layout>
+				<div className="pageSeparator" />
+				<Layout>
+					<Layout.Section>
+						<Card title="Messages">
+							<Card.Section>
+								<FormLayout>
+									<TextField
+										label="Date picker label"
+										maxLength={300}
+										onChange={handleWidgetMessageChange("datePickerLabel")}
+										value={widgetSettings.messages.datePickerLabel}
+									/>
+									<TextField
+										label="No date selected error"
+										maxLength={300}
+										onChange={handleWidgetMessageChange("noDateSelectedError")}
+										value={widgetSettings.messages.noDateSelectedError}
+									/>
+									<TextField
+										label="No available dates error"
+										maxLength={300}
+										onChange={handleWidgetMessageChange("noAvailableDatesError")}
+										value={widgetSettings.messages.noAvailableDatesError}
+									/>
+									<TextField
+										label="Sold out"
+										maxLength={100}
+										onChange={handleWidgetMessageChange("soldOut")}
+										value={widgetSettings.messages.soldOut}
+									/>
+								</FormLayout>
+							</Card.Section>
+						</Card>
 					</Layout.Section>
 				</Layout>
 				<PageActions

@@ -35,7 +35,13 @@ export default function CalendarDatePicker({ availableDates, settings }: Props) 
 		setSelectedDate(availableDates[0]?.date)
 	}, [availableDates])
 
-	const availableDatesSet = useMemo(() => new Set(availableDates.map(ad => ad.date)), [availableDates])
+	const availableDatesSet = useMemo(() => {
+		return new Set(availableDates
+			.filter(ad => !ad.isSoldOut)
+			.map(ad => ad.date)
+		)
+	}, [availableDates])
+
 	const formattedSelectedDate = useMemo(() => {
 		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT)
 	}, [settings])

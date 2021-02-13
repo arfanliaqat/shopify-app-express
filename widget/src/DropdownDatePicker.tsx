@@ -26,8 +26,8 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 			const valueDate = momentDate.format(TAG_DATE_FORMAT)
 			return <option value={valueDate} disabled={availableDate.isSoldOut}
 						   selected={valueDate == selectedAvailableDate}>
-				{momentDate.format("LL")}
-				{availableDate.isSoldOut ? ` (${settings.messages.soldOut})` : ""}
+				{momentDate.format("dddd, LL")}
+				{availableDate.isSoldOut && settings.messages.soldOut ? ` (${settings.messages.soldOut})` : ""}
 			</option>
 		})}
 	</select>
