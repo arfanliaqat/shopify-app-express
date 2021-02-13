@@ -9,6 +9,7 @@ import { ShopResource } from "../shopResource/shopResource.model"
 import { SYSTEM_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPeriods.builder"
 import { ShopResourceService } from "../shopResource/shopResource.service"
+import { WidgetSettingsBuilder } from "../widget/widget.builder"
 
 describe("HooksService", () => {
 	let availableDate: Moment
@@ -37,6 +38,7 @@ describe("HooksService", () => {
 		await DatabaseTestService.clearDatabase()
 		availableDate = moment("01/12/2020", "DD/MM/YYYY")
 		shop = await new ShopBuilder().buildAndSave()
+		await new WidgetSettingsBuilder(shop!.id!).withFirstAvailableDateInDays(0).buildAndSave()
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 	})
 

@@ -7,7 +7,6 @@ import { BadParameter, handleAxiosErrors, UnexpectedError } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import Axios from "axios"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
-import { CurrentAvailability } from "../currentAvailabilities/currentAvailabilities.model"
 
 export interface ShopifyResource {
 	id: string

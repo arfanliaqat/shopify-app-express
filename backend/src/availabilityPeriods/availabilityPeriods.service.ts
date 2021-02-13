@@ -6,6 +6,7 @@ import { UnexpectedError } from "../util/error"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
+import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 
 export class AvailabilityPeriodService {
 	static async findAvailabilityPeriods(
@@ -21,15 +22,19 @@ export class AvailabilityPeriodService {
 			       quantity_is_shared
 			FROM availability_periods
 			WHERE shop_resource_id = $1
-			AND (start_date between $2 and $3 OR end_date between $2 and $3)`,
+			AND (start_date < $3 AND end_date > $2)`,
 			[shopResourceId, mFrom.format(SYSTEM_DATE_FORMAT), mTo.format(SYSTEM_DATE_FORMAT)]
 		)
 		return AvailabilityPeriod.createFromSchemas(result.rows)
 	}
 
-	static async findFutureAvailableDates(shopResourceId: string): Promise<AvailableDate[]> {
-		const from = moment().startOf("day")
-		const to = moment().startOf("day").add(3, "months")
+	static async findFutureAvailableDates(
+		shopResourceId: string,
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<AvailableDate[]> {
+		const today = moment().startOf("day")
+		const from = today.clone().add(widgetSettings.firstAvailableDateInDays, "days")
+		const to = today.clone().add(widgetSettings.lastAvailableDateInWeeks, "weeks").endOf("week").startOf("day")
 
 		// Fetched future availability periods for this shop resource
 		const periods = await this.findAvailabilityPeriods(shopResourceId, from, to)
@@ -42,11 +47,12 @@ export class AvailabilityPeriodService {
 		const availableDates: AvailableDate[] = []
 		periods.forEach((period) => {
 			period.availableDates.forEach((date) => {
-				if (!date.isBefore(from, "day")) {
+				if (!date.isBefore(from, "day") && !date.isAfter(to, "day")) {
 					availableDates.push(new AvailableDate(period.id!, date, false, period.quantityIsShared))
 				}
 			})
 		})
+
 		if (!availableDates.length) {
 			return []
 		}
@@ -110,7 +116,8 @@ export class AvailabilityPeriodService {
 		shopResourceId: string,
 		availableDates: Moment[],
 		quantity: number,
-		quantityIsShared: boolean
+		quantityIsShared: boolean,
+		widgetSettings?: WidgetSettingsViewModel
 	): Promise<AvailabilityPeriod | undefined> {
 		if (availableDates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
 		const conn: Pool = await getConnection()
@@ -132,12 +139,17 @@ export class AvailabilityPeriodService {
 				quantityIsShared
 			]
 		)
-		await CurrentAvailabilityService.refreshCurrentAvailability(shopResourceId)
+		if (widgetSettings) {
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResourceId, widgetSettings)
+		}
 		const schema = result.rows[0]
 		return schema ? AvailabilityPeriod.createFromSchema(schema) : undefined
 	}
 
-	static async update(availabilityPeriod: AvailabilityPeriod): Promise<void> {
+	static async update(
+		availabilityPeriod: AvailabilityPeriod,
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<void> {
 		const conn: Pool = await getConnection()
 		if (!availabilityPeriod.id) throw new UnexpectedError("`id` is required to update the availability period")
 		if (availabilityPeriod.availableDates.length == 0) throw new UnexpectedError("`dates` cannot be empty")
@@ -156,15 +168,18 @@ export class AvailabilityPeriodService {
 				availabilityPeriod.id
 			]
 		)
-		await CurrentAvailabilityService.refreshCurrentAvailability(availabilityPeriod.shopResourceId)
+		await CurrentAvailabilityService.refreshCurrentAvailability(availabilityPeriod.shopResourceId, widgetSettings)
 	}
 
-	static async deleteAvailabilityPeriod(availabilityPeriod: AvailabilityPeriod): Promise<void> {
+	static async deleteAvailabilityPeriod(
+		availabilityPeriod: AvailabilityPeriod,
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<void> {
 		const conn: Pool = await getConnection()
 		if (!availabilityPeriod.id) throw new UnexpectedError("`id` is required to update the availability period")
 		await conn.query<AvailabilityPeriodSchema>(`DELETE FROM availability_periods WHERE id = $1`, [
 			availabilityPeriod.id
 		])
-		await CurrentAvailabilityService.refreshCurrentAvailability(availabilityPeriod.shopResourceId)
+		await CurrentAvailabilityService.refreshCurrentAvailability(availabilityPeriod.shopResourceId, widgetSettings)
 	}
 }

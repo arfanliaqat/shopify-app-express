@@ -2,6 +2,7 @@ import { AvailabilityPeriod } from "./availabilityPeriods.model"
 import moment, { Moment } from "moment"
 import { ShopResource } from "../shopResource/shopResource.model"
 import { AvailabilityPeriodService } from "./availabilityPeriods.service"
+import { WidgetSettings } from "../widget/widget.model"
 
 export class AvailabilityPeriodBuilder {
 	private shopResource?: ShopResource

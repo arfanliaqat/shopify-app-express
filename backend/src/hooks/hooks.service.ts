@@ -9,6 +9,7 @@ import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
+import { WidgetService } from "../widget/widget.service"
 
 export function getChosenDate(lineItem: LineItem): Moment | undefined {
 	const chosenDateProperty = lineItem.properties.find((property: Property) => {
@@ -137,6 +138,9 @@ export class HooksService {
 			service.releaseClient()
 		}
 
-		await CurrentAvailabilityService.refreshCurrentAvailabilities(eventShopResourcesArray)
+		const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
+		if (widgetSettings) {
+			await CurrentAvailabilityService.refreshCurrentAvailabilities(eventShopResourcesArray, widgetSettings)
+		}
 	}
 }

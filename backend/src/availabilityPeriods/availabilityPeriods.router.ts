@@ -10,6 +10,7 @@ import { AvailabilityPeriod } from "./availabilityPeriods.model"
 import { loadAvailabilityPeriod } from "./availabilityPeriods.middleware"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { ProductOrderService } from "../productOrders/productOrders.service"
+import { WidgetService } from "../widget/widget.service"
 
 const router = Router()
 
@@ -62,17 +63,20 @@ router.post(
 	[loadConnectedShop, loadShopResource],
 	async (req: Request, res: Response) => {
 		try {
-			const { shopResource } = getLocals(res)
+			const { shopResource, connectedShop } = getLocals(res)
+			if (!connectedShop) throw new UnexpectedError("connectedShop cannot be undefined")
 			const errors = [] as FormError[]
 			const availableDates = validateDates(errors, req.body.dates)
 			const quantity = validateQuantity(errors, req.body.quantity)
 			const quantityIsShared = !!req.body.quantityIsShared
 			if (!availableDates || !quantity || errors.length > 0) throw new FormErrors(errors)
+			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
 			const availabilityPeriod = await AvailabilityPeriodService.createAvailabilityPeriod(
 				shopResource?.id || "",
 				availableDates,
 				quantity,
-				quantityIsShared
+				quantityIsShared,
+				widgetSettings
 			)
 			res.send(availabilityPeriod?.toViewModel())
 		} catch (error) {
@@ -121,8 +125,9 @@ router.post(
 	[loadConnectedShop, loadAvailabilityPeriod],
 	async (req: Request, res: Response) => {
 		try {
-			const { availabilityPeriod } = getLocals(res)
+			const { availabilityPeriod, connectedShop } = getLocals(res)
 			if (!availabilityPeriod) throw new UnexpectedError("availabilityPeriod cannot be undefined")
+			if (!connectedShop) throw new UnexpectedError("connectedShop cannot be undefined")
 			const errors = [] as FormError[]
 			const newDates = validateDates(errors, req.body.newDates)
 			const deletedDates = validateDates(errors, req.body.deletedDates)
@@ -135,7 +140,8 @@ router.post(
 			availabilityPeriod.setPausedDates(pausedDates)
 			availabilityPeriod.quantity = quantity
 			availabilityPeriod.quantityIsShared = quantityIsShared
-			await AvailabilityPeriodService.update(availabilityPeriod)
+			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
+			await AvailabilityPeriodService.update(availabilityPeriod, widgetSettings)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)
@@ -148,10 +154,11 @@ router.delete(
 	[loadConnectedShop, loadAvailabilityPeriod],
 	async (req: Request, res: Response) => {
 		try {
-			const { availabilityPeriod } = getLocals(res)
+			const { availabilityPeriod, connectedShop } = getLocals(res)
 			if (!availabilityPeriod) throw new UnexpectedError("availabilityPeriod cannot be undefined")
-			// TODO: prevent deletion of there are orders...
-			await AvailabilityPeriodService.deleteAvailabilityPeriod(availabilityPeriod)
+			if (!connectedShop) throw new UnexpectedError("connectedShop cannot be undefined")
+			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
+			await AvailabilityPeriodService.deleteAvailabilityPeriod(availabilityPeriod, widgetSettings)
 			res.send({})
 		} catch (error) {
 			handleErrors(res, error)

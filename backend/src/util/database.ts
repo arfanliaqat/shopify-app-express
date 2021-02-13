@@ -69,6 +69,7 @@ export class DatabaseTestService {
 			await client.query("DELETE FROM product_orders")
 			await client.query("DELETE FROM shop_resources")
 			await client.query("DELETE FROM access_tokens")
+			await client.query("DELETE FROM widget_settings")
 			await client.query("DELETE FROM shops")
 		} finally {
 			client.release()

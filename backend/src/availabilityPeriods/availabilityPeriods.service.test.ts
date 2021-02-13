@@ -9,6 +9,8 @@ import { AvailabilityPeriodService } from "./availabilityPeriods.service"
 import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
+import { WidgetSettings } from "../widget/widget.model"
+import { WidgetSettingsBuilder } from "../widget/widget.builder"
 
 describe("AvailabilityPeriodService", () => {
 	let refDate: Moment
@@ -16,6 +18,7 @@ describe("AvailabilityPeriodService", () => {
 	let shopResource: ShopResource | undefined
 	let availableDate1: Moment | undefined
 	let availableDate2: Moment | undefined
+	let widgetSettings: WidgetSettings
 
 	async function createAvailabilityPeriod(dates: Moment[]) {
 		await new AvailabilityPeriodBuilder()
@@ -29,6 +32,7 @@ describe("AvailabilityPeriodService", () => {
 		await DatabaseTestService.clearDatabase()
 		refDate = moment().startOf("day").startOf("week").add(1, "week")
 		shop = await new ShopBuilder().buildAndSave()
+		widgetSettings = await new WidgetSettingsBuilder(shop!.id!).withFirstAvailableDateInDays(0).buildAndSave()
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		availableDate1 = refDate
 		availableDate2 = refDate.clone().add(1, "day")
@@ -37,7 +41,10 @@ describe("AvailabilityPeriodService", () => {
 	test("It retrieves future available dates for a given product", async () => {
 		await createAvailabilityPeriod([availableDate1!, availableDate2!])
 
-		const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+		const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+			shopResource!.id!,
+			widgetSettings.settings
+		)
 		expect(futureAvailableDates).toHaveLength(2)
 		expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 		expect(futureAvailableDates[1].date.isSame(availableDate2)).toBeTruthy()
@@ -65,7 +72,10 @@ describe("AvailabilityPeriodService", () => {
 
 		// Both availability periods are not sold out yet
 		{
-			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
 			expect(futureAvailableDates).toHaveLength(3)
 			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
@@ -84,7 +94,10 @@ describe("AvailabilityPeriodService", () => {
 
 		// The first availability period is sold out, the second isn't
 		{
-			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
 			expect(futureAvailableDates).toHaveLength(3)
 			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
@@ -119,7 +132,10 @@ describe("AvailabilityPeriodService", () => {
 
 		// availableDate1 is sold out
 		{
-			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
 			expect(futureAvailableDates).toHaveLength(2)
 			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
@@ -137,7 +153,10 @@ describe("AvailabilityPeriodService", () => {
 
 		// Both availability periods are not sold out yet
 		{
-			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
 			expect(futureAvailableDates).toHaveLength(2)
 			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
@@ -146,11 +165,14 @@ describe("AvailabilityPeriodService", () => {
 		}
 
 		period!.setPausedDates([availableDate1!])
-		await AvailabilityPeriodService.update(period!)
+		await AvailabilityPeriodService.update(period!, widgetSettings.settings)
 
 		// availableDate1 is sold out
 		{
-			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
 			expect(futureAvailableDates).toHaveLength(2)
 			expect(futureAvailableDates[0].date.isSame(availableDate1)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeTruthy()
@@ -171,16 +193,71 @@ describe("AvailabilityPeriodService", () => {
 
 		// The date in the past isn't showing in the list of available dates
 		{
-			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource!.id!)
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
 			expect(futureAvailableDates).toHaveLength(1)
 			expect(futureAvailableDates[0].date.isSame(date2)).toBeTruthy()
 			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
 		}
 	})
 
+	test("Dates can't be before the settings' first available date", async () => {
+		const date1 = moment().startOf("day").subtract(1, "day")
+		const date2 = moment().startOf("day").add(1, "day")
+		const date3 = moment().startOf("day").add(10, "day")
+
+		widgetSettings.settings.firstAvailableDateInDays = 5
+
+		await new AvailabilityPeriodBuilder()
+			.forShopResource(shopResource!)
+			.withDates([date1!, date2!, date3!])
+			.withQuantity(5)
+			.buildAndSave()
+
+		// The date in the past isn't showing in the list of available dates
+		{
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
+			expect(futureAvailableDates).toHaveLength(1)
+			expect(futureAvailableDates[0].date.isSame(date3)).toBeTruthy()
+			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
+		}
+	})
+
+	test("Dates can't be after the settings' last available date", async () => {
+		const date1 = moment().startOf("day").subtract(1, "day")
+		const date2 = moment().startOf("day").add(1, "day")
+		const date3 = moment().startOf("day").add(10, "day")
+		const date4 = moment().startOf("day").add(3, "weeks")
+
+		widgetSettings.settings.firstAvailableDateInDays = 5
+		widgetSettings.settings.lastAvailableDateInWeeks = 2
+
+		await new AvailabilityPeriodBuilder()
+			.forShopResource(shopResource!)
+			.withDates([date1!, date2!, date3!, date4!])
+			.withQuantity(5)
+			.buildAndSave()
+
+		// The date in the past isn't showing in the list of available dates
+		{
+			const futureAvailableDates = await AvailabilityPeriodService.findFutureAvailableDates(
+				shopResource!.id!,
+				widgetSettings.settings
+			)
+			expect(futureAvailableDates).toHaveLength(1)
+			expect(futureAvailableDates[0].date.isSame(date3)).toBeTruthy()
+			expect(futureAvailableDates[0].isSoldOut).toBeFalsy()
+		}
+	})
+
 	test("It refreshes the current availabilities cache when creating an availability period", async () => {
 		{
-			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!, widgetSettings.settings)
 			const { results } = await ShopResourceService.searchShopResources(shop!, {})
 			const product = results[0]
 			expect(product.availableDates).toBe(0)
@@ -191,11 +268,12 @@ describe("AvailabilityPeriodService", () => {
 			shopResource!.id!,
 			[moment().startOf("week").add(1, "week")],
 			5,
-			true
+			true,
+			widgetSettings.settings
 		)
 
 		{
-			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!, widgetSettings.settings)
 			const { results } = await ShopResourceService.searchShopResources(shop!, {})
 			const product = results[0]
 			expect(product.availableDates).toBe(1)
@@ -211,11 +289,12 @@ describe("AvailabilityPeriodService", () => {
 			shopResource!.id!,
 			[availableDate1],
 			5,
-			true
+			true,
+			widgetSettings.settings
 		)
 
 		{
-			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!, widgetSettings.settings)
 			const { results } = await ShopResourceService.searchShopResources(shop!, {})
 			const product = results[0]
 			expect(product.availableDates).toBe(1)
@@ -223,10 +302,10 @@ describe("AvailabilityPeriodService", () => {
 		}
 
 		period!.addNewDates([availableDate2])
-		await AvailabilityPeriodService.update(period!)
+		await AvailabilityPeriodService.update(period!, widgetSettings.settings)
 
 		{
-			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!, widgetSettings.settings)
 			const { results } = await ShopResourceService.searchShopResources(shop!, {})
 			const product = results[0]
 			expect(product.availableDates).toBe(2)
@@ -239,21 +318,22 @@ describe("AvailabilityPeriodService", () => {
 			shopResource!.id!,
 			[moment().startOf("week").add(1, "week")],
 			5,
-			true
+			true,
+			widgetSettings.settings
 		)
 
 		{
-			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!, widgetSettings.settings)
 			const { results } = await ShopResourceService.searchShopResources(shop!, {})
 			const product = results[0]
 			expect(product.availableDates).toBe(1)
 			expect(product.soldOutDates).toBe(0)
 		}
 
-		await AvailabilityPeriodService.deleteAvailabilityPeriod(period!)
+		await AvailabilityPeriodService.deleteAvailabilityPeriod(period!, widgetSettings.settings)
 
 		{
-			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!)
+			await CurrentAvailabilityService.refreshCurrentAvailability(shopResource!.id!, widgetSettings.settings)
 			const { results } = await ShopResourceService.searchShopResources(shop!, {})
 			const product = results[0]
 			expect(product.availableDates).toBe(0)

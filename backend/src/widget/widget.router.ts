@@ -7,6 +7,7 @@ import { WidgetService } from "./widget.service"
 import { loadConnectedShop } from "../shop/shop.middleware"
 import { getLocals } from "../util/locals"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
+import { WidgetSettings } from "./widget.model"
 
 const router = Router()
 
@@ -18,7 +19,11 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			res.status(404).send({ reason: "Resource not found" })
 			return
 		}
-		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource.id)
+		let widgetSettings = await WidgetService.findWidgetSettingsByShopId(shopResource.shopId)
+		if (!widgetSettings) {
+			widgetSettings = WidgetSettings.getDefault(shopResource.shopId).settings
+		}
+		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource.id, widgetSettings)
 		const settings = await WidgetService.findOrCreateWidgetSettings(shopResource.shopId)
 		res.send({
 			settings,

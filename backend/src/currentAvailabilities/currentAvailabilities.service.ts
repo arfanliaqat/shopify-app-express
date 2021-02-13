@@ -5,32 +5,45 @@ import { CurrentAvailability, CurrentAvailabilitySchema } from "./currentAvailab
 import { AvailabilityPeriodService } from "../availabilityPeriods/availabilityPeriods.service"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { Shop } from "../shop/shop.model"
+import { WidgetService } from "../widget/widget.service"
+import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 
 export class CurrentAvailabilityService {
 	static async refreshAllByShop(shop: Shop): Promise<void> {
+		if (!shop.id) throw "shop.id shouldn't be null"
+		const widgetSettings = await WidgetService.findWidgetSettingsByShopId(shop.id)
 		const shopResources = await ShopResourceService.findAllShopResource(shop)
 		for (const shopResource of shopResources) {
-			if (shopResource.id) {
-				await this.refreshCurrentAvailability(shopResource.id)
+			if (shopResource.id && widgetSettings) {
+				await this.refreshCurrentAvailability(shopResource.id, widgetSettings)
 			}
 		}
 	}
 
-	static async refreshCurrentAvailability(shopResourceId: string): Promise<CurrentAvailability> {
-		const currentAvailability = await this.findNewState(shopResourceId)
+	static async refreshCurrentAvailability(
+		shopResourceId: string,
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<CurrentAvailability> {
+		const currentAvailability = await this.findNewState(shopResourceId, widgetSettings)
 		return await this.save(currentAvailability)
 	}
 
-	static async refreshCurrentAvailabilities(shopResources: ShopResource[]): Promise<void> {
+	static async refreshCurrentAvailabilities(
+		shopResources: ShopResource[],
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<void> {
 		for (const shopResource of shopResources) {
 			if (shopResource.id) {
-				await this.refreshCurrentAvailability(shopResource.id)
+				await this.refreshCurrentAvailability(shopResource.id, widgetSettings)
 			}
 		}
 	}
 
-	static async findNewState(shopResourceId: string): Promise<CurrentAvailability> {
-		const allDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResourceId)
+	static async findNewState(
+		shopResourceId: string,
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<CurrentAvailability> {
+		const allDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResourceId, widgetSettings)
 		const availableDates = allDates.filter((d) => !d.isSoldOut)
 		const nextAvailabilityDate = availableDates.length > 0 ? availableDates[0].date : undefined
 		const lastAvailabilityDate =

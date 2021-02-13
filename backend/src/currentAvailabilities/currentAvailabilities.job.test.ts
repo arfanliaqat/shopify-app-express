@@ -8,6 +8,7 @@ import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
 import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPeriods.builder"
 import { CurrentAvailabilityService } from "./currentAvailabilities.service"
 import { SYSTEM_DATE_FORMAT } from "../util/constants"
+import { WidgetSettingsBuilder } from "../widget/widget.builder"
 
 describe("CurrentAvailabilityJob", () => {
 	let refDate: Moment
@@ -20,6 +21,7 @@ describe("CurrentAvailabilityJob", () => {
 		await DatabaseTestService.clearDatabase()
 		refDate = moment().startOf("week").add(1, "week")
 		shop = await new ShopBuilder().buildAndSave()
+		await new WidgetSettingsBuilder(shop!.id!).withFirstAvailableDateInDays(0).buildAndSave()
 		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		availableDate1 = refDate
 		availableDate2 = refDate.clone().add(1, "day")

@@ -3,6 +3,7 @@ import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 import { WidgetSettings } from "./widget.model"
+import { UnexpectedError } from "../util/error"
 
 export class WidgetService {
 	static async findById(shopId: string): Promise<Shop | undefined> {
@@ -26,7 +27,7 @@ export class WidgetService {
 		return this.resetSettingsForShop(shopId)
 	}
 
-	private static async upsert(newSettings: WidgetSettings): Promise<void> {
+	static async upsert(newSettings: WidgetSettings): Promise<void> {
 		const conn: Pool = await getConnection()
 		await conn.query(
 			`
@@ -46,5 +47,16 @@ export class WidgetService {
 		const newSettings = WidgetSettings.getDefault(shopId)
 		await this.upsert(newSettings)
 		return newSettings.settings
+	}
+
+	static async findWidgetSettingsByShop(shop: Shop): Promise<WidgetSettingsViewModel> {
+		if (!shop.id) {
+			throw new UnexpectedError("Shop id cannot be null")
+		}
+		const widgetSettings = await this.findWidgetSettingsByShopId(shop.id)
+		if (!widgetSettings) {
+			throw new UnexpectedError("Widget settings not found")
+		}
+		return widgetSettings
 	}
 }
