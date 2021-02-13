@@ -65,7 +65,8 @@ export default function AvailableDatePicker() {
 
 	useEffect(() => {
 		getDatePickerElement().addEventListener("previewDataUpdated", () => {
-			setProductAvailabilityData(getPreviewData())
+			const previewDate = getPreviewData()
+			setProductAvailabilityData(previewDate)
 		}, false);
 	}, [])
 

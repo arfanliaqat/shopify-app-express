@@ -13,8 +13,8 @@ interface Props {
 }
 
 function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvailabilityData {
-	const start = moment().startOf("day").add(1, "day")
-	const end = start.clone().add(12, "weeks")
+	const start = moment().startOf("day").add(settings.firstAvailableDateInDays, "day")
+	const end = start.clone().add(settings.lastAvailableDateInWeeks, "weeks")
 	const startOfFirstWeek = start.clone().startOf("week")
 	return {
 		settings,
