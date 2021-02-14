@@ -66,6 +66,9 @@ export default function Preview({ widgetSettings }: Props) {
 	return (
 		<div className="widgetPreview" style={{ background: widgetSettings.styles.previewBackgroundColor }}>
 			<div id={ANCHOR_ID} data-preview="true" data-preview-data={jsonWidgetSettings} />
+			<div className="errorMessagePreview" style={{ color: widgetSettings.styles.errorFontColor }}>
+				This is an example error message.
+			</div>
 		</div>
 	)
 }
