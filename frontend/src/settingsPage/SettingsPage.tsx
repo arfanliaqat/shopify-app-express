@@ -10,6 +10,7 @@ import DatePickerSettingsCard from "./DatePickerSettingsCard"
 import CalendarStylesCard from "./CalendarStylesCard"
 import MessagesCard from "./MessagesCard"
 import PreviewCard from "./PreviewCard"
+import SettingsPageSkeleton from "./SettingsPageSkeleton"
 
 interface Props {}
 
@@ -63,7 +64,7 @@ export default function SettingsPage({}: Props) {
 	}, [initialWidgetSettings, widgetSettings])
 
 	if (!widgetSettings || isLoading) {
-		return "Loading..."
+		return <SettingsPageSkeleton />
 	}
 
 	return (
