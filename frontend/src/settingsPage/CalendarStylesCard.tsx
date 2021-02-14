@@ -1,4 +1,4 @@
-import React  from "react"
+import React from "react"
 import { Card, Checkbox, FormLayout, Select } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"

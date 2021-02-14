@@ -38,7 +38,10 @@ export default function ColorPickerField({ label, onChange, value }: Props) {
 			>
 				<Popover.Pane fixed>
 					<Popover.Section>
-						<ColorPicker color={rgbToHsb(hexToRgb(value))} onChange={(hsb) => onChange(hsbToHex(hsb))} />
+						<ColorPicker
+							color={rgbToHsb(hexToRgb(value || "#ffffff"))}
+							onChange={(hsb) => onChange(hsbToHex(hsb))}
+						/>
 					</Popover.Section>
 				</Popover.Pane>
 			</Popover>

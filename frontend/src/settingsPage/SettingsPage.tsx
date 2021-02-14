@@ -11,6 +11,7 @@ import CalendarStylesCard from "./CalendarStylesCard"
 import MessagesCard from "./MessagesCard"
 import PreviewCard from "./PreviewCard"
 import SettingsPageSkeleton from "./SettingsPageSkeleton"
+import DropdownStylesCard from "./DropdownStylesCard"
 
 interface Props {}
 
@@ -90,12 +91,23 @@ export default function SettingsPage({}: Props) {
 								/>
 							</Layout.Section>
 
-							<Layout.Section>
-								<CalendarStylesCard
-									widgetSettings={widgetSettings}
-									onWidgetSettingsChange={setWidgetSettings}
-								/>
-							</Layout.Section>
+							{widgetSettings.pickerType == "CALENDAR" && (
+								<Layout.Section>
+									<CalendarStylesCard
+										widgetSettings={widgetSettings}
+										onWidgetSettingsChange={setWidgetSettings}
+									/>
+								</Layout.Section>
+							)}
+
+							{widgetSettings.pickerType == "DROPDOWN" && (
+								<Layout.Section>
+									<DropdownStylesCard
+										widgetSettings={widgetSettings}
+										onWidgetSettingsChange={setWidgetSettings}
+									/>
+								</Layout.Section>
+							)}
 						</Layout>
 					</Layout.Section>
 					<Layout.Section oneThird>

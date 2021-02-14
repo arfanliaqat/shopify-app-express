@@ -25,6 +25,10 @@ export interface WidgetStyles {
 	daySelectedBackgroundColor: string
 	daySelectedFontColor: string
 	previewBackgroundColor: string
+	dropdownBorderColor: string
+	dropdownBorderWidth: string
+	dropdownBackgroundColor: string
+	dropdownTextColor: string
 }
 
 export interface WidgetMessages {

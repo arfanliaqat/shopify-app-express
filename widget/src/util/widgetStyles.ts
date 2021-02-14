@@ -15,7 +15,11 @@ const queries: WidgetStyles = {
 	dayHoveringFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover:not(.h10cal-selected) > span { color: $$ }",
 	daySelectedBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-selected > span { background-color: $$ }",
 	daySelectedFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-selected > span { color: $$ }",
-	previewBackgroundColor: ""
+	previewBackgroundColor: "",
+	dropdownBorderColor: ".h10-dropdown { border-color: $$ }",
+	dropdownBorderWidth: ".h10-dropdown { border-width: $$ }",
+	dropdownBackgroundColor: ".h10-dropdown { background-color: $$ }",
+	dropdownTextColor: ".h10-dropdown { color: $$ }"
 }
 
 export function getCssFromWidgetStyles(widgetStyles: WidgetStyles): string {
