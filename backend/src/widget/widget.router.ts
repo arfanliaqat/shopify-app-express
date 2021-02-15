@@ -11,6 +11,24 @@ import { WidgetSettings } from "./widget.model"
 
 const router = Router()
 
+router.get("/settings", async (req: Request, res: Response) => {
+	try {
+		const shopDomain = req.query.shopDomain?.toString()
+		if (!shopDomain) {
+			res.status(404).send({ reason: "Shop domain not found" })
+			return
+		}
+		const widgetSettings = await WidgetService.findWidgetSettingsByShopDomain(shopDomain)
+		if (!widgetSettings) {
+			res.status(404).send({ reason: "Widget settings not found" })
+			return
+		}
+		res.send(widgetSettings)
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
+
 router.get("/product_availability/:productId", async (req: Request, res: Response) => {
 	try {
 		const productId = parseInt(req.params.productId)

@@ -21,6 +21,15 @@ export class WidgetService {
 		return result.rows[0]?.settings
 	}
 
+	static async findWidgetSettingsByShopDomain(shopDomain: string): Promise<WidgetSettingsViewModel | undefined> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<{ settings: WidgetSettingsViewModel }>(
+			`SELECT settings FROM shops s JOIN widget_settings ws on s.id = ws.shop_id WHERE s.domain = $1`,
+			[shopDomain]
+		)
+		return result.rows[0]?.settings
+	}
+
 	static async findOrCreateWidgetSettings(shopId: string): Promise<WidgetSettingsViewModel> {
 		const settings = await this.findWidgetSettingsByShopId(shopId)
 		if (settings) return settings
