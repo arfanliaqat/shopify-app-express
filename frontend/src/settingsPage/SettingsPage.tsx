@@ -12,6 +12,7 @@ import MessagesCard from "./MessagesCard"
 import PreviewCard from "./PreviewCard"
 import SettingsPageSkeleton from "./SettingsPageSkeleton"
 import DropdownStylesCard from "./DropdownStylesCard"
+import { isStockByDateApp } from "../app"
 
 interface Props {}
 
@@ -71,7 +72,7 @@ export default function SettingsPage({}: Props) {
 	return (
 		<div id="settingsPage">
 			{successMessage && <Toast content={successMessage} onDismiss={() => setSuccessMessage(undefined)} />}
-			<Page breadcrumbs={[{ content: "Products", url: "/app" }]} title="Settings" separator>
+			<Page breadcrumbs={isStockByDateApp && [{ content: "Products", url: "/app" }]} title="Settings" separator>
 				<Layout>
 					<Layout.Section>
 						<AvailabilitySettingsCard

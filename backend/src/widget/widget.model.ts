@@ -1,4 +1,5 @@
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
+import { allWeekDays } from "../util/constants"
 
 export interface WidgetSettingsSchema {
 	shop_id: string
@@ -16,6 +17,7 @@ export class WidgetSettings {
 			locale: "en",
 			firstAvailableDateInDays: 1,
 			lastAvailableDateInWeeks: 12,
+			availableWeekDays: allWeekDays,
 			styles: {
 				errorFontColor: "#8b0000",
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",

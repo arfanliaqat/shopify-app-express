@@ -11,6 +11,7 @@ import NotFoundPage from "./NotFoundPage"
 
 import "./styles/main.less"
 import SettingsPage from "./settingsPage/SettingsPage"
+import { AppOption } from "../../backend/src/util/constants"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -35,19 +36,29 @@ function Link({ children, url = "", external, ref, ...rest }: any) {
 	)
 }
 
+export const isStockByDateApp = ((window as any).APP as AppOption) == "STOCK_BY_DATE"
+
 ReactDOM.render(
 	<AppProvider i18n={translations} linkComponent={Link}>
 		<Provider config={window.shopifyConfig}>
 			<BrowserRouter>
 				<Switch>
-					<Route exact path="/app" component={HomePage} />
-					<Route exact path="/app/resources/:shopResourceId/calendar/:year/:month" component={CalendarPage} />
-					<Route
-						exact
-						path="/app/availability_periods/:availabilityPeriodId"
-						component={AvailabilityPeriodPage}
-					/>
-					<Route exact path="/app/settings" component={SettingsPage} />
+					<Route exact path="/app" component={isStockByDateApp ? HomePage : SettingsPage} />
+					{isStockByDateApp && (
+						<Route
+							exact
+							path="/app/resources/:shopResourceId/calendar/:year/:month"
+							component={CalendarPage}
+						/>
+					)}
+					{isStockByDateApp && (
+						<Route
+							exact
+							path="/app/availability_periods/:availabilityPeriodId"
+							component={AvailabilityPeriodPage}
+						/>
+					)}
+					{isStockByDateApp && <Route exact path="/app/settings" component={SettingsPage} />}
 					<Route path="*" component={NotFoundPage} />
 				</Switch>
 			</BrowserRouter>

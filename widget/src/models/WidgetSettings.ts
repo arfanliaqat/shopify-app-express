@@ -5,6 +5,7 @@ export interface WidgetSettings {
 	locale: string,
 	firstAvailableDateInDays: number,
 	lastAvailableDateInWeeks: number,
+	availableWeekDays: string[],
 	styles: WidgetStyles
 	messages: WidgetMessages
 }
