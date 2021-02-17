@@ -12,7 +12,7 @@ import MessagesCard from "./MessagesCard"
 import PreviewCard from "./PreviewCard"
 import SettingsPageSkeleton from "./SettingsPageSkeleton"
 import DropdownStylesCard from "./DropdownStylesCard"
-import { isStockByDateApp } from "../app"
+import { isStockByDateApp } from "../common/constants"
 
 interface Props {}
 

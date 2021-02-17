@@ -11,7 +11,7 @@ import NotFoundPage from "./NotFoundPage"
 
 import "./styles/main.less"
 import SettingsPage from "./settingsPage/SettingsPage"
-import { AppOption } from "../../backend/src/util/constants"
+import { isStockByDateApp } from "./common/constants"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -35,8 +35,6 @@ function Link({ children, url = "", external, ref, ...rest }: any) {
 		</ReactRouterLink>
 	)
 }
-
-export const isStockByDateApp = ((window as any).APP as AppOption) == "STOCK_BY_DATE"
 
 ReactDOM.render(
 	<AppProvider i18n={translations} linkComponent={Link}>

@@ -12,7 +12,7 @@ export const SHORT_DISPLAY_FORMAT_WITH_YEAR = "ddd D MMM YYYY"
 export const TAG_DATE_FORMAT = "DD/MM/YYYY"
 export const TAG_LABEL = "Delivery Date"
 
-export type AppOption = "DATE_PICKER" | "STOCK_BY_DATE"
-export const APP = (process.env.APP as AppOption) || "STOCK_BY_DATE"
+export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"
+export const APP_NAME = (process.env.APP_NAME as AppName) || "STOCK_BY_DATE"
 
 export const allWeekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]

@@ -2,7 +2,7 @@ import { WidgetSettings } from "../models/WidgetSettings"
 import moment, { Moment } from "moment"
 
 export function getMoment(settings: WidgetSettings): Moment {
-	return moment(settings.locale)
+	return moment(moment(), settings.locale)
 }
 
 export function parseMoment(settings: WidgetSettings, strDate: string, dateFormat: string): Moment {

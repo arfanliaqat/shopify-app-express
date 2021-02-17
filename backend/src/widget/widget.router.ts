@@ -13,12 +13,12 @@ const router = Router()
 
 router.get("/settings", async (req: Request, res: Response) => {
 	try {
-		const shopDomain = req.query.shopDomain?.toString()
-		if (!shopDomain) {
-			res.status(404).send({ reason: "Shop domain not found" })
+		const shop = req.query.shop?.toString()
+		if (!shop) {
+			res.status(404).send({ reason: "'shop' param missing" })
 			return
 		}
-		const widgetSettings = await WidgetService.findWidgetSettingsByShopDomain(shopDomain)
+		const widgetSettings = await WidgetService.findWidgetSettingsByShopDomain(shop)
 		if (!widgetSettings) {
 			res.status(404).send({ reason: "Widget settings not found" })
 			return

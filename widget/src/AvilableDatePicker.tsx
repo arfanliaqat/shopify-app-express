@@ -1,35 +1,54 @@
 import { h } from "preact"
 import { useEffect, useMemo, useState } from "preact/hooks"
-import { ANCHOR_ID, SHOPIFY_APP_URL } from "./constants"
+import { SHOPIFY_APP_URL, getAnchorElement, getAppName } from "./constants"
 import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
 import { getCssFromWidgetStyles } from "./util/widgetStyles"
 import { ProductAvailabilityData } from "./models/ProductAvailabilityData"
+import { WidgetSettings } from "./models/WidgetSettings"
+import { AvailableDate } from "./models/AvailableDate"
+import { getMoment } from "./util/dates"
+import { getDaysBetween } from "../../frontend/src/util/tools"
+import { SYSTEM_DATE_FORMAT } from "../../backend/src/util/constants"
 
-function getDatePickerElement(): HTMLElement {
-	const element = document.getElementById(ANCHOR_ID)
-	if (!element) {
-		throw `[H10 - AvailabilityDatePicker] Please insert the div element with the id ${ANCHOR_ID}`
-	}
-	return element
+function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
+	if (!settings) return []
+	const today = getMoment(settings).startOf("day")
+	const firstDay = today.clone().add(settings.firstAvailableDateInDays, "days")
+	const lastDay = today.clone().add(settings.lastAvailableDateInWeeks, "weeks").endOf("weeks")
+	const availableWeekDaysSet = new Set(settings.availableWeekDays)
+	return getDaysBetween(firstDay, lastDay, "day")
+		.filter((date) => availableWeekDaysSet.has(date.format("dddd").toUpperCase()))
+		.map((date) => ({
+			date: date.format(SYSTEM_DATE_FORMAT),
+			isSoldOut: false
+		}))
+}
+
+function getCurrentDomain() {
+	let url = window.location.href
+	const start = url.indexOf("://") + 3
+	url = url.substring(start)
+	const end = url.indexOf("/")
+	return url.substring(0, end)
 }
 
 function getIsPreviewMode() {
-	return getDatePickerElement().getAttribute("data-preview") == "true"
+	return getAnchorElement().getAttribute("data-preview") == "true"
 }
 
 function getPreviewData(): ProductAvailabilityData {
-	return JSON.parse(getDatePickerElement().getAttribute("data-preview-data"))
+	return JSON.parse(getAnchorElement().getAttribute("data-preview-data"))
 }
 
 function getProductId() {
-	return getDatePickerElement().getAttribute("data-productid")
+	return getAnchorElement().getAttribute("data-productid")
 }
 
 async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	const productId = getProductId()
 	if (!productId) {
-		throw "[H10 - AvailableDatePicker] productId not found"
+		throw "[H10 - Stock By Date] productId not found"
 	}
 	const response = await fetch(SHOPIFY_APP_URL + "/product_availability/" + productId, {
 		headers: {
@@ -37,9 +56,25 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 		}
 	})
 	if (response.status != 200) {
-		throw "[H10 - AvailableDatePicker] failed to fetch product availability"
+		throw "[H10 - Stock By Date] failed to fetch product availability"
 	}
 	return (await response.json()) as ProductAvailabilityData
+}
+
+async function fetchWidgetSettings(): Promise<WidgetSettings> {
+	const productId = getProductId()
+	if (!productId) {
+		throw "[H10 - Date Picker] productId not found"
+	}
+	const response = await fetch(SHOPIFY_APP_URL + "/settings?shop=" + getCurrentDomain(), {
+		headers: {
+			Accept: "application/json"
+		}
+	})
+	if (response.status != 200) {
+		throw "[H10 - Date Picker] failed to fetch widget settings"
+	}
+	return (await response.json()) as WidgetSettings
 }
 
 export default function AvailableDatePicker() {
@@ -48,7 +83,9 @@ export default function AvailableDatePicker() {
 	const [formError, setFormError] = useState<string>(undefined)
 
 	const settings = productAvailabilityData?.settings
-	const availableDates = productAvailabilityData?.availableDates || []
+	const availableDates = useMemo(() => getAppName() == "STOCK_BY_DATE"
+		? (productAvailabilityData?.availableDates || [])
+		: generateAvailableDates(settings), [settings])
 
 	const widgetStyles = useMemo(() => {
 		if (settings) {
@@ -64,29 +101,42 @@ export default function AvailableDatePicker() {
 	}, [])
 
 	useEffect(() => {
-		getDatePickerElement().addEventListener("previewDataUpdated", () => {
+		getAnchorElement().addEventListener("previewDataUpdated", () => {
 			const previewDate = getPreviewData()
 			setProductAvailabilityData(previewDate)
+			setFormError(undefined)
 		}, false);
 	}, [])
 
 	useEffect(() => {
 		if (!isPreviewMode) {
-			async function fetchData() {
-				const data = await fetchAvailabilityForProduct()
-				setProductAvailabilityData(data)
-				const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
-				if (firstAvailableDate) {
-					setSelectedAvailableDate(firstAvailableDate.date)
+			if (getAppName() == "STOCK_BY_DATE") {
+				async function fetchStockByDateData() {
+					const data = await fetchAvailabilityForProduct()
+					setProductAvailabilityData(data)
+					const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
+					if (firstAvailableDate) {
+						setSelectedAvailableDate(firstAvailableDate.date)
+					}
 				}
+				fetchStockByDateData()
+			} else {
+				async function fetchDatePickerData() {
+					const data = await fetchWidgetSettings()
+					setProductAvailabilityData({
+						settings: data,
+						availableDates: []
+					})
+				}
+				fetchDatePickerData()
 			}
-			fetchData()
+
 		}
 	}, [])
 
 	useEffect(() => {
 		if (!isPreviewMode) {
-			const datePickerDiv = document.getElementById(ANCHOR_ID)
+			const datePickerDiv = getAnchorElement()
 			const form = datePickerDiv.closest("form")
 			const onSubmit = (e) => {
 				if (selectedAvailableDate) return

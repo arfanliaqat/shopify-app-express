@@ -18,7 +18,7 @@ import hooksRouter from "./hooks/hooks.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
 import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabilities.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
-import { appUrl, isDev, APP } from "./util/constants"
+import { appUrl, isDev, APP_NAME } from "./util/constants"
 import { noApiCallCache } from "./util/middlewares"
 
 import "./currentAvailabilities/currentAvailabilities.job"
@@ -70,7 +70,7 @@ app.get("/app*", loadConnectedShop, async (req, res) => {
 	res.render("index", {
 		apiKey: process.env.SHOPIFY_API_PUBLIC_KEY,
 		shopOrigin: connectedShop.domain,
-		APP
+		APP_NAME
 	})
 })
 

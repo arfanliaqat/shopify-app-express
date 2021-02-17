@@ -1,5 +1,9 @@
 import React, { useEffect, useMemo } from "react"
-import { ANCHOR_ID, PREVIEW_DATA_UPDATED_EVENT_NAME } from "../../../widget/src/constants"
+import {
+	STOCK_BY_DATE_ANCHOR_ID,
+	DATE_PICKER_ANCHOR_ID,
+	PREVIEW_DATA_UPDATED_EVENT_NAME,
+} from "../../../widget/src/constants"
 import { getScriptTagsToCreate } from "../../../backend/src/scriptTags/scriptTags.model"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
@@ -7,40 +11,53 @@ import moment from "moment"
 import { ProductAvailabilityData } from "../../../widget/src/models/ProductAvailabilityData"
 import { getDaysBetween } from "../util/tools"
 import _ from "lodash"
+import { isStockByDateApp } from "../common/constants"
+import { AvailableDate } from "../../../widget/src/models/AvailableDate"
+
+const ANCHOR_ID = isStockByDateApp ? STOCK_BY_DATE_ANCHOR_ID : DATE_PICKER_ANCHOR_ID
 
 interface Props {
 	widgetSettings: WidgetSettings
 }
 
-function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvailabilityData {
+function getMockAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	const start = moment().startOf("day").add(settings.firstAvailableDateInDays, "day")
 	const end = start.clone().add(settings.lastAvailableDateInWeeks, "weeks")
 	const startOfFirstWeek = start.clone().startOf("week")
+	if (!isStockByDateApp) {
+		return []
+	}
+	return _.flatten(
+		getDaysBetween(startOfFirstWeek, end, "week").map((startOfWeek) => {
+			return getDaysBetween(startOfWeek.clone().day("monday"), startOfWeek.clone().day("saturday"), "day")
+				.filter((date) => date.isAfter(start))
+				.map((date) => ({
+					date: date.format(SYSTEM_DATE_FORMAT),
+					isSoldOut: false
+				}))
+		})
+	)
+}
+
+function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvailabilityData {
 	const data = {
 		settings,
-		availableDates: _.flatten(
-			getDaysBetween(startOfFirstWeek, end, "week").map((startOfWeek) => {
-				return getDaysBetween(startOfWeek.clone().day("monday"), startOfWeek.clone().day("saturday"), "day")
-					.filter((date) => date.isAfter(start))
-					.map((date) => ({
-						date: date.format(SYSTEM_DATE_FORMAT),
-						isSoldOut: false
-					}))
-			})
-		)
+		availableDates: getMockAvailableDates(settings)
 	}
-	const nextWeekThursday = moment(data.availableDates[0].date, SYSTEM_DATE_FORMAT)
-		.add(1, "week")
-		.day("thursday")
-		.format(SYSTEM_DATE_FORMAT)
-	const nextWeekFriday = moment(data.availableDates[0].date, SYSTEM_DATE_FORMAT)
-		.add(1, "week")
-		.day("friday")
-		.format(SYSTEM_DATE_FORMAT)
-	const thursdayDate = data.availableDates.find((ad) => ad.date == nextWeekThursday)
-	const fridayDate = data.availableDates.find((ad) => ad.date == nextWeekFriday)
-	if (thursdayDate) thursdayDate.isSoldOut = true
-	if (fridayDate) fridayDate.isSoldOut = true
+	if (isStockByDateApp) {
+		const nextWeekThursday = moment(data.availableDates[0].date, SYSTEM_DATE_FORMAT)
+			.add(1, "week")
+			.day("thursday")
+			.format(SYSTEM_DATE_FORMAT)
+		const nextWeekFriday = moment(data.availableDates[0].date, SYSTEM_DATE_FORMAT)
+			.add(1, "week")
+			.day("friday")
+			.format(SYSTEM_DATE_FORMAT)
+		const thursdayDate = data.availableDates.find((ad) => ad.date == nextWeekThursday)
+		const fridayDate = data.availableDates.find((ad) => ad.date == nextWeekFriday)
+		if (thursdayDate) thursdayDate.isSoldOut = true
+		if (fridayDate) fridayDate.isSoldOut = true
+	}
 	return data
 }
 
