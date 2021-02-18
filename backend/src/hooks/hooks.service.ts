@@ -4,7 +4,7 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
+import { APP_NAME, TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
@@ -70,6 +70,10 @@ export class HooksService {
 	}
 
 	static async subscribeHooks(shop: Shop, accessToken: AccessToken): Promise<void> {
+		if (APP_NAME == "DATE_PICKER") {
+			// The Date Picker app doesn't need any hooks.
+			return
+		}
 		console.log(`[subscribeHooks|shop:${shop.domain}] Synchronising hooks...`)
 		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
 		const webhooksToCreate = getSubscribedHooks().filter((webhook) => {
