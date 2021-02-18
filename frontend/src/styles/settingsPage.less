@@ -13,4 +13,17 @@
   .errorMessagePreview {
     margin-top: 20px;
   }
+  .Polaris-ChoiceList__Choices {
+    display: flex;
+    justify-items: stretch;
+  }
+  .Polaris-ChoiceList__Choices li {
+    flex: 1
+  }
+}
+
+@media (max-width: 960px) {
+  #settingsPage .Polaris-ChoiceList__Choices {
+    flex-direction: column;
+  }
 }

@@ -50,16 +50,18 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 				</FormLayout>
 			</Card.Section>
 			<Card.Section>
-				<ChoiceList
-					allowMultiple
-					title="Available days"
-					choices={allWeekDays.map((day) => ({
-						label: capitalize(day),
-						value: day
-					}))}
-					selected={widgetSettings.availableWeekDays}
-					onChange={handleAvailableWeekDaysChange}
-				/>
+				<div className="availableDaysField">
+					<ChoiceList
+						allowMultiple
+						title="Available days"
+						choices={allWeekDays.map((day) => ({
+							label: capitalize(day),
+							value: day
+						}))}
+						selected={widgetSettings.availableWeekDays}
+						onChange={handleAvailableWeekDaysChange}
+					/>
+				</div>
 			</Card.Section>
 		</Card>
 	)
