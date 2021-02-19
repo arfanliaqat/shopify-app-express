@@ -15,6 +15,7 @@ import shopResourceRouter from "./shopResource/shopResource.router"
 import availabilityPeriodsRouter from "./availabilityPeriods/availabilityPeriods.router"
 import widgetRouter from "./widget/widget.router"
 import hooksRouter from "./hooks/hooks.router"
+import gdprRouter from "./gdpr/gdpr.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
 import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabilities.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
@@ -48,7 +49,7 @@ if (isDev) {
 // JSON body parser
 app.use((req, res, next) => {
 	// Hooks need their own body parsing because of the HMAC verification
-	if (!req.url.startsWith("/hooks")) {
+	if (!req.url.startsWith("/hooks") && !req.url.startsWith("/gdpr")) {
 		json()(req, res, next)
 	} else {
 		next()
@@ -91,6 +92,7 @@ app.use(authRouter)
 app.use(shopResourceRouter)
 app.use(availabilityPeriodsRouter)
 app.use(hooksRouter)
+app.use(gdprRouter)
 app.use(scriptTagsRouter)
 app.use(currentAvailabilitiesRouter)
 

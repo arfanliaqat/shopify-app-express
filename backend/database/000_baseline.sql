@@ -86,4 +86,12 @@ create table widget_settings(
 
 create unique index ind_widget_settings_shop_id on widget_settings (shop_id);
 
+create table gdpr_requests(
+    id uuid not null primary key default uuid_generate_v4(),
+    shop_id uuid references shops not null,
+    type text not null,
+    payload jsonb not null,
+    createdDate timestamp with time zone default now() not null
+)
 
+create unique index ind_gdpr_requests_shop_id on widget_settings (shop_id);

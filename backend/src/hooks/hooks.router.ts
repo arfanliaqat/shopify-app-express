@@ -1,4 +1,4 @@
-import { Request, Response, Router, raw, NextFunction } from "express"
+import { Request, Response, Router, raw } from "express"
 import { handleErrors, UnexpectedError } from "../util/error"
 import { loadConnectedShop } from "../shop/shop.middleware"
 import { authenticateHook, loadHookContext, loadConnectedShop as loadConnectedShopFromHook } from "./hooks.middleware"
@@ -41,7 +41,6 @@ router.post(
 	[loadHookContext, authenticateHook, loadConnectedShopFromHook],
 	async (req: Request, res: Response) => {
 		try {
-			console.log(req.body.toString())
 			const eventType = req.params.eventType as OrderEventType
 			const { connectedShop } = getLocals(res)
 			if (!connectedShop) {
