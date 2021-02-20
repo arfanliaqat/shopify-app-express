@@ -1,6 +1,7 @@
 import React from "react"
 import { Card, FormLayout, TextField } from "@shopify/polaris"
 import { WidgetMessages, WidgetSettings } from "../../../widget/src/models/WidgetSettings"
+import { isStockByDateApp } from "../common/constants"
 
 interface Props {
 	widgetSettings: WidgetSettings
@@ -35,12 +36,14 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 						onChange={handleWidgetMessageChange("noAvailableDatesError")}
 						value={widgetSettings.messages.noAvailableDatesError}
 					/>
-					<TextField
-						label="Sold out"
-						maxLength={100}
-						onChange={handleWidgetMessageChange("soldOut")}
-						value={widgetSettings.messages.soldOut}
-					/>
+					{isStockByDateApp && (
+						<TextField
+							label="Sold out"
+							maxLength={100}
+							onChange={handleWidgetMessageChange("soldOut")}
+							value={widgetSettings.messages.soldOut}
+						/>
+					)}
 				</FormLayout>
 			</Card.Section>
 		</Card>
