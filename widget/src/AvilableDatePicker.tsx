@@ -17,8 +17,14 @@ function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	const firstDay = today.clone().add(settings.firstAvailableDateInDays, "days")
 	const lastDay = today.clone().add(settings.lastAvailableDateInWeeks, "weeks").endOf("weeks")
 	const availableWeekDaysSet = new Set(settings.availableWeekDays)
+	const disabledDatesSet = new Set(settings.disabledDates)
 	return getDaysBetween(firstDay, lastDay, "day")
-		.filter((date) => availableWeekDaysSet.has(date.format("dddd").toUpperCase()))
+		.filter((date) => {
+			const matchesPattern = availableWeekDaysSet.has(date.format("dddd").toUpperCase())
+			if (!matchesPattern) return false
+			const matchesDisabledDate = disabledDatesSet.has(date.format(SYSTEM_DATE_FORMAT))
+			return !matchesDisabledDate
+		})
 		.map((date) => ({
 			date: date.format(SYSTEM_DATE_FORMAT),
 			isSoldOut: false

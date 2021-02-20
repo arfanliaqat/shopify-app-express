@@ -2,10 +2,11 @@ export type PickerType = "CALENDAR" | "DROPDOWN"
 
 export interface WidgetSettings {
 	pickerType: PickerType
-	locale: string,
-	firstAvailableDateInDays: number,
-	lastAvailableDateInWeeks: number,
-	availableWeekDays: string[],
+	locale: string
+	firstAvailableDateInDays: number
+	lastAvailableDateInWeeks: number
+	availableWeekDays: string[]
+	disabledDates: string[]
 	styles: WidgetStyles
 	messages: WidgetMessages
 }

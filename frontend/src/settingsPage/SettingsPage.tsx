@@ -72,7 +72,11 @@ export default function SettingsPage({}: Props) {
 	return (
 		<div id="settingsPage">
 			{successMessage && <Toast content={successMessage} onDismiss={() => setSuccessMessage(undefined)} />}
-			<Page breadcrumbs={isStockByDateApp && [{ content: "Products", url: "/app" }]} title="Settings" separator>
+			<Page
+				breadcrumbs={isStockByDateApp && [{ content: "Products", url: "/app" }]}
+				title={isStockByDateApp && "Settings"}
+				separator={isStockByDateApp}
+			>
 				<Layout>
 					<Layout.Section>
 						<AvailabilitySettingsCard

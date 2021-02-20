@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useState } from "react"
 import { Card, FormLayout, TextField, ChoiceList } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { allWeekDays } from "../../../backend/src/util/constants"
 import { capitalize } from "../util/tools"
+import DisabledDates from "./DisabledDates"
 
 interface Props {
 	widgetSettings: WidgetSettings
@@ -20,6 +21,10 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 
 	const handleAvailableWeekDaysChange = (value: string[]) => {
 		onWidgetSettingsChange({ ...widgetSettings, availableWeekDays: value })
+	}
+
+	const handleDisabledDatesChange = (value: string[]) => {
+		onWidgetSettingsChange({ ...widgetSettings, disabledDates: value })
 	}
 
 	return (
@@ -62,6 +67,9 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 						onChange={handleAvailableWeekDaysChange}
 					/>
 				</div>
+			</Card.Section>
+			<Card.Section>
+				<DisabledDates dates={widgetSettings.disabledDates || []} onChange={handleDisabledDatesChange} />
 			</Card.Section>
 		</Card>
 	)
