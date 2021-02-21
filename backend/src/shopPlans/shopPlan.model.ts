@@ -1,5 +1,13 @@
 export type Plan = "BASIC" | "PRO" | "UNLIMITED"
 
+export const allPlans: Plan[] = ["BASIC", "PRO", "UNLIMITED"]
+
+export const planNames = {
+	BASIC: "Basic Plan",
+	PRO: "Pro Plan",
+	UNLIMITED: "Unlimited Plan"
+}
+
 export interface ShopPlanSchema {
 	shop_id: string
 	plan: string

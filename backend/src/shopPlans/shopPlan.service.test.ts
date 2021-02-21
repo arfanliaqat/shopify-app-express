@@ -14,17 +14,16 @@ describe("ShopPlanService", () => {
 	test("Plans can be created and upgraded", async () => {
 		{
 			// Set BASIC plan
-			await ShopPlanService.createPlan(shop!.id!, "BASIC")
+			await ShopPlanService.createAndSavePlan(shop!.id!, "BASIC")
 			const shopPlan = await ShopPlanService.findByShopId(shop!.id!)
 			expect(shopPlan).toBeDefined()
 			expect(shopPlan?.plan).toBe("BASIC")
 			expect(shopPlan?.price).toBe(5)
 			expect(shopPlan?.orderLimit).toBe(100)
 		}
-
 		{
 			// Upgrade to PRO plan
-			await ShopPlanService.createPlan(shop!.id!, "PRO")
+			await ShopPlanService.createAndSavePlan(shop!.id!, "PRO")
 			const shopPlan = await ShopPlanService.findByShopId(shop!.id!)
 			expect(shopPlan).toBeDefined()
 			expect(shopPlan?.plan).toBe("PRO")
@@ -38,7 +37,7 @@ describe("ShopPlanService", () => {
 			const isActive = await ShopPlanService.hasActivePlan(shop!.id!)
 			expect(isActive).toBeFalsy()
 		}
-		await ShopPlanService.createPlan(shop!.id!, "BASIC")
+		await ShopPlanService.createAndSavePlan(shop!.id!, "BASIC")
 		{
 			const isActive = await ShopPlanService.hasActivePlan(shop!.id!)
 			expect(isActive).toBeTruthy()

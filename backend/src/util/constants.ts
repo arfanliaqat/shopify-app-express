@@ -33,3 +33,5 @@ export const plans = {
 		orderLimit: safeParseInt(process.env.UNLIMITED_ORDER_LIMIT) || -1
 	}
 }
+
+export const isPlanTestMode = process.env.PLAN_TEST_MODE == "true"
