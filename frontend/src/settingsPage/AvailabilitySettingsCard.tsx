@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { Card, FormLayout, TextField, ChoiceList } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { allWeekDays } from "../../../backend/src/util/constants"

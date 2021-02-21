@@ -1,3 +1,5 @@
+import { safeParseInt } from "./tools"
+
 export const isDev = process.env.NODE_ENV != "production"
 export const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY || ""
 export const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY || ""
@@ -16,3 +18,18 @@ export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"
 export const APP_NAME = (process.env.APP_NAME as AppName) || "STOCK_BY_DATE"
 
 export const allWeekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
+
+export const plans = {
+	BASIC: {
+		price: safeParseInt(process.env.BASIC_PRICE) || 5,
+		orderLimit: safeParseInt(process.env.ORDER_LIMIT) || 100
+	},
+	PRO: {
+		price: safeParseInt(process.env.PRO_PRICE) || 10,
+		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 1000
+	},
+	UNLIMITED: {
+		price: safeParseInt(process.env.UNLIMITED_PRICE) || 15,
+		orderLimit: safeParseInt(process.env.UNLIMITED_ORDER_LIMIT) || -1
+	}
+}

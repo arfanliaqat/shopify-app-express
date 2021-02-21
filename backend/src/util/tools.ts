@@ -6,3 +6,8 @@ export function generateNonce(length: number): string {
 	}
 	return text
 }
+
+export function safeParseInt(value?: string): number | undefined {
+	if (!value) return undefined
+	return parseInt(value, 10)
+}

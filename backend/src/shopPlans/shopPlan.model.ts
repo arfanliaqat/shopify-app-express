@@ -1,0 +1,36 @@
+export type Plan = "BASIC" | "PRO" | "UNLIMITED"
+
+export interface ShopPlanSchema {
+	shop_id: string
+	plan: string
+	price: string
+	order_limit: number
+	updated_date?: Date
+	created_date?: Date
+}
+
+export class ShopPlan {
+	constructor(
+		public shopId: string,
+		public plan: Plan,
+		public price: number,
+		public orderLimit: number,
+		public updatedDate?: Date,
+		public createdDate?: Date
+	) {}
+
+	static createFromSchema(schema: ShopPlanSchema): ShopPlan {
+		return new ShopPlan(
+			schema.shop_id,
+			schema.plan as Plan,
+			parseFloat(schema.price),
+			schema.order_limit,
+			schema.updated_date,
+			schema.created_date
+		)
+	}
+
+	static createFromSchemas(schemas: ShopPlanSchema[]): ShopPlan[] {
+		return (schemas || []).map(ShopPlan.createFromSchema)
+	}
+}

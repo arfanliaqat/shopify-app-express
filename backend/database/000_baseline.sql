@@ -91,7 +91,18 @@ create table gdpr_requests(
     shop_id uuid references shops not null,
     type text not null,
     payload jsonb not null,
-    createdDate timestamp with time zone default now() not null
-)
+    created_date timestamp with time zone default now() not null
+);
 
-create unique index ind_gdpr_requests_shop_id on widget_settings (shop_id);
+create index ind_gdpr_requests_shop_id on widget_settings (shop_id);
+
+create table shop_plans(
+    shop_id uuid references shops not null,
+    plan text not null,
+    price numeric(18,2) not null,
+    order_limit integer not null,
+    updated_date timestamp with time zone default now() not null,
+    created_date timestamp with time zone default now() not null
+);
+
+create unique index ind_shop_plans_shop_id on shop_plans (shop_id);
