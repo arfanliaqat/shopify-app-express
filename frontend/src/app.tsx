@@ -12,6 +12,7 @@ import NotFoundPage from "./NotFoundPage"
 import "./styles/main.less"
 import SettingsPage from "./settingsPage/SettingsPage"
 import { isStockByDateApp } from "./common/constants"
+import PlansPage from "./plansPage/PlansPage"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -57,6 +58,7 @@ ReactDOM.render(
 						/>
 					)}
 					{isStockByDateApp && <Route exact path="/app/settings" component={SettingsPage} />}
+					<Route path="/app/plans" component={PlansPage} />
 					<Route path="*" component={NotFoundPage} />
 				</Switch>
 			</BrowserRouter>

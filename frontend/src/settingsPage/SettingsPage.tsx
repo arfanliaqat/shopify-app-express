@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Layout, Page, PageActions } from "@shopify/polaris"
+import { Layout, Page, PageActions, Card, Button } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
@@ -77,6 +77,14 @@ export default function SettingsPage({}: Props) {
 				title={isStockByDateApp && "Settings"}
 				separator={isStockByDateApp}
 			>
+				<Layout>
+					<Layout.Section>
+						<Card sectioned>
+							<Button url="/app/plans">Choose your plan</Button>
+						</Card>
+					</Layout.Section>
+				</Layout>
+				<div className="pageSeparator" />
 				<Layout>
 					<Layout.Section>
 						<AvailabilitySettingsCard

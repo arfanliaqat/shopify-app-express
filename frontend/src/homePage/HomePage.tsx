@@ -104,9 +104,7 @@ export default function HomePage({ history }: RouteChildrenProps) {
 				<div className="pageHeader">
 					<div className="pageTitle">Products</div>
 					<div className="pageActions">
-						<Button onClick={() => setOpen(true)} url="/app/settings">
-							Settings
-						</Button>
+						<Button url="/app/settings">Settings</Button>
 						<Button onClick={() => setOpen(true)} primary>
 							Add products
 						</Button>
