@@ -1,12 +1,23 @@
-import React from "react"
+import React, { useState } from "react"
 import { Page, Layout, Card, Button, TextContainer } from "@shopify/polaris"
 import { isStockByDateApp } from "../common/constants"
+import { Plan } from "../../../backend/src/shopPlan/shopPlan.model"
+import ChoosePlanConfirmationModal from "./ChoosePlanConfirmationModal"
 
 interface Props {}
 
 export default function PlansPage({}: Props) {
+	const [selectedPlan, setSelectedPlan] = useState<Plan>()
+
+	const onSelectClick = (plan: Plan) => () => {
+		setSelectedPlan(plan)
+	}
+
 	return (
 		<div id="plansPage">
+			{selectedPlan && (
+				<ChoosePlanConfirmationModal plan={selectedPlan} onClose={() => setSelectedPlan(undefined)} />
+			)}
 			<Page
 				breadcrumbs={[{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]}
 				title="Choose your plan"
@@ -40,7 +51,7 @@ export default function PlansPage({}: Props) {
 									</li>
 									<li>48h support response time</li>
 								</ul>
-								<Button fullWidth primary>
+								<Button fullWidth primary onClick={onSelectClick("BASIC")}>
 									Select
 								</Button>
 							</div>
@@ -62,7 +73,7 @@ export default function PlansPage({}: Props) {
 									</li>
 									<li>24h support response time</li>
 								</ul>
-								<Button fullWidth primary>
+								<Button fullWidth primary onClick={onSelectClick("PRO")}>
 									Select
 								</Button>
 							</div>
@@ -84,7 +95,7 @@ export default function PlansPage({}: Props) {
 									</li>
 									<li>12h support response time</li>
 								</ul>
-								<Button fullWidth primary>
+								<Button fullWidth primary onClick={onSelectClick("UNLIMITED")}>
 									Select
 								</Button>
 							</div>

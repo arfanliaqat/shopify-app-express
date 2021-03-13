@@ -98,6 +98,7 @@ create index ind_gdpr_requests_shop_id on widget_settings (shop_id);
 
 create table shop_plans(
     shop_id uuid references shops not null,
+    charge_id bigint,
     plan text not null,
     price numeric(18,2) not null,
     order_limit integer not null,

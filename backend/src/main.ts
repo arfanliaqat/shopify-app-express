@@ -13,6 +13,7 @@ dotenv.config()
 import authRouter from "./auth/auth.router"
 import shopResourceRouter from "./shopResource/shopResource.router"
 import availabilityPeriodsRouter from "./availabilityPeriods/availabilityPeriods.router"
+import shopPlanRouter from "./shopPlan/shopPlan.router"
 import widgetRouter from "./widget/widget.router"
 import hooksRouter from "./hooks/hooks.router"
 import gdprRouter from "./gdpr/gdpr.router"
@@ -95,6 +96,7 @@ app.use(hooksRouter)
 app.use(gdprRouter)
 app.use(scriptTagsRouter)
 app.use(currentAvailabilitiesRouter)
+app.use(shopPlanRouter)
 
 app.use(cors())
 app.use(

@@ -10,6 +10,7 @@ export const planNames = {
 
 export interface ShopPlanSchema {
 	shop_id: string
+	charge_id?: string
 	plan: string
 	price: string
 	order_limit: number
@@ -20,6 +21,7 @@ export interface ShopPlanSchema {
 export class ShopPlan {
 	constructor(
 		public shopId: string,
+		public chargeId: number | undefined,
 		public plan: Plan,
 		public price: number,
 		public orderLimit: number,
@@ -30,6 +32,7 @@ export class ShopPlan {
 	static createFromSchema(schema: ShopPlanSchema): ShopPlan {
 		return new ShopPlan(
 			schema.shop_id,
+			schema.charge_id ? parseInt(schema.charge_id) : undefined,
 			schema.plan as Plan,
 			parseFloat(schema.price),
 			schema.order_limit,
