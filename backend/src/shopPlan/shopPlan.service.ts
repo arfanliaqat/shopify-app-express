@@ -1,12 +1,13 @@
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { Plan, planNames, ShopPlan, ShopPlanSchema } from "./shopPlan.model"
-import { appUrl, isDev, plans } from "../util/constants"
+import { appUrl, isDev, plans, TRIAL_DAYS } from "../util/constants"
 import { handleAxiosErrors, UnexpectedError } from "../util/error"
 import axios from "axios"
 import { Shop } from "../shop/shop.model"
 import { AccessToken } from "../accessToken/accessToken.model"
 import crypto from "crypto"
+import { ShopService } from "../shop/shop.service"
 
 interface RecurringApplicationChargeResponse {
 	confirmation_url: string
@@ -26,16 +27,27 @@ export class ShopPlanService {
 		accessToken: AccessToken
 	): Promise<RecurringApplicationChargeResponse | undefined> {
 		if (!shop.id) throw new UnexpectedError("Shop id cannot be undefined")
-		const isNewCustomer = !(await this.findByShopId(shop.id))
+		const existingShopPlan = await this.findByShopId(shop.id)
+		const isFreePlan = plans[plan].price === 0
 		const shopPlan = this.createPlan(shop.id, undefined, plan)
-		return await this.postRecurringApplicationCharge(shop, shopPlan, nonce, isNewCustomer, accessToken)
+		if (isFreePlan) {
+			if (existingShopPlan?.chargeId) {
+				await this.deleteRecurringApplicationCharge(shop, existingShopPlan, accessToken)
+			}
+			await this.upsert(shopPlan) // Update the shop plan record straightaway, no confirmation step
+		} else {
+			const response = await this.postRecurringApplicationCharge(shop, shopPlan, nonce, accessToken)
+			if (!shop.trialUsed) {
+				await ShopService.markTrialDaysAsUsed(shop)
+			}
+			return response
+		}
 	}
 
 	static async postRecurringApplicationCharge(
 		shop: Shop,
 		shopPlan: ShopPlan,
 		nonce: string,
-		isNewCustomer: boolean,
 		accessToken: AccessToken
 	): Promise<RecurringApplicationChargeResponse | undefined> {
 		const token = this.makeToken(shopPlan.plan, nonce)
@@ -46,7 +58,7 @@ export class ShopPlanService {
 					recurring_application_charge: {
 						name: planNames[shopPlan.plan],
 						price: shopPlan.price,
-						trial_days: isNewCustomer ? 14 : 0,
+						trial_days: !shop.trialUsed ? TRIAL_DAYS : 0,
 						return_url: `${appUrl}/plan_confirmation?plan=${shopPlan.plan}&token=${token}`,
 						test: isDev
 					}
@@ -59,6 +71,26 @@ export class ShopPlanService {
 				}
 			)
 			return response.data.recurring_application_charge
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
+
+	static async deleteRecurringApplicationCharge(
+		shop: Shop,
+		shopPlan: ShopPlan,
+		accessToken: AccessToken
+	): Promise<void> {
+		try {
+			await axios.delete(
+				`https://${shop.domain}/admin/api/2021-01/recurring_application_charges/${shopPlan.chargeId}.json`,
+				{
+					headers: {
+						"Content-Type": "application/json",
+						"X-Shopify-Access-Token": accessToken.token
+					}
+				}
+			)
 		} catch (error) {
 			handleAxiosErrors(error)
 		}
@@ -107,6 +139,11 @@ export class ShopPlanService {
 			[shopPlan.shopId, shopPlan.chargeId, shopPlan.plan, shopPlan.price, shopPlan.orderLimit]
 		)
 		return ShopPlan.createFromSchemas(result.rows)[0]
+	}
+
+	static async deleteShopPlan(shopPlan: ShopPlan): Promise<void> {
+		const conn: Pool = await getConnection()
+		await conn.query<ShopPlanSchema>(`DELETE FROM shop_plans WHERE shop_id = $1`, [shopPlan.shopId])
 	}
 
 	static async fetchRecurringApplicationCharges(shop: Shop, accessToken: AccessToken) {

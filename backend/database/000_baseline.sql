@@ -2,6 +2,7 @@ create table shops(
 	id uuid default uuid_generate_v4(),
 	domain text not null,
 	email text not null,
+    trial_used timestamp with time zone,
 	raw_data jsonb not null,
 	created_date timestamp with time zone not null default now(),
 	primary key (id)

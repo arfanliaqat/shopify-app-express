@@ -6,26 +6,31 @@ import { UnexpectedError } from "../util/error"
 export class ShopService {
 	static async findByDomain(domain: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
-		const result = await conn.query<ShopSchema>(`SELECT id, domain, email FROM shops WHERE domain = $1`, [domain])
+		const result = await conn.query<ShopSchema>(
+			`SELECT id, domain, email, trial_used FROM shops WHERE domain = $1`,
+			[domain]
+		)
 		return result.rows.map(toShop)[0]
 	}
 
 	static async findById(shopId: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
-		const result = await conn.query<ShopSchema>(`SELECT id, domain, email FROM shops WHERE id = $1`, [shopId])
+		const result = await conn.query<ShopSchema>(`SELECT id, domain, email, trial_used FROM shops WHERE id = $1`, [
+			shopId
+		])
 		return result.rows.map(toShop)[0]
 	}
 
 	static async findAllActiveShops(): Promise<Shop[]> {
 		const conn: Pool = await getConnection()
-		const result = await conn.query<ShopSchema>(`SELECT id, domain, email FROM shops`)
+		const result = await conn.query<ShopSchema>(`SELECT id, domain, email, trial_used FROM shops`)
 		return result.rows.map(toShop)
 	}
 
 	static async createFromApi(shopData: ShopApiData): Promise<Shop | undefined> {
 		if (!shopData.domain) throw new UnexpectedError("shopData.domain cannot be undefined")
 		if (!shopData.email) throw new UnexpectedError("shopData.email cannot be undefined")
-		return await this.insert(new Shop(shopData.domain, shopData.email, shopData))
+		return await this.insert(new Shop(shopData.domain, shopData.email, undefined, shopData))
 	}
 
 	static async insert(shop: Shop): Promise<Shop | undefined> {
@@ -35,5 +40,10 @@ export class ShopService {
 			[shop.domain, shop.email, shop.rawData]
 		)
 		return result.rows.map(toShop)[0]
+	}
+
+	static async markTrialDaysAsUsed(shop: Shop) {
+		const conn: Pool = await getConnection()
+		await conn.query<ShopSchema>(`UPDATE shops SET trial_used = now() WHERE id = $1`, [shop.id])
 	}
 }

@@ -2,16 +2,29 @@ export interface ShopSchema {
 	id: string
 	domain: string
 	email: string
+	trial_used: Date
 	raw_data?: string
 	created_date: Date
 }
 
 export class Shop {
-	constructor(public domain: string, public email: string, public rawData?: ShopApiData, public id?: string) {}
+	constructor(
+		public domain: string,
+		public email: string,
+		public trialUsed: Date | undefined,
+		public rawData?: ShopApiData,
+		public id?: string
+	) {}
 }
 
 export function toShop(schema: ShopSchema): Shop {
-	return new Shop(schema.domain, schema.email, schema.raw_data ? JSON.parse(schema.raw_data) : undefined, schema.id)
+	return new Shop(
+		schema.domain,
+		schema.email,
+		schema.trial_used,
+		schema.raw_data ? JSON.parse(schema.raw_data) : undefined,
+		schema.id
+	)
 }
 
 export interface ShopApiData {

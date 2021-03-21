@@ -1,22 +1,46 @@
-import React, { useState } from "react"
-import { Page, Layout, Card, Button, TextContainer } from "@shopify/polaris"
+import React, { useCallback, useEffect, useState } from "react"
+import { Page, Layout, TextContainer } from "@shopify/polaris"
 import { isStockByDateApp } from "../common/constants"
 import { Plan } from "../../../backend/src/shopPlan/shopPlan.model"
 import ChoosePlanConfirmationModal from "./ChoosePlanConfirmationModal"
+import { useApi } from "../util/useApi"
+import ShopPlan from "../models/ShopPlan"
+import PlanCard from "./PlanCard"
+import { TRIAL_DAYS } from "../../../backend/src/util/constants"
+import PlansPageSkeleton from "./PlansPageSkeleton"
 
 interface Props {}
 
 export default function PlansPage({}: Props) {
 	const [selectedPlan, setSelectedPlan] = useState<Plan>()
+	const [currentShopPlan, setCurrentShopPlan] = useState<ShopPlan>()
+	const [trialAlreadyUsed, setTrialIsAlreadyUsed] = useState<boolean>()
 
-	const onSelectClick = (plan: Plan) => () => {
-		setSelectedPlan(plan)
+	const { setApiRequest: fetchPeriod, isLoading } = useApi<{ plan: ShopPlan; trialAlreadyUsed: boolean }>({
+		onSuccess: useCallback((response) => {
+			setTrialIsAlreadyUsed(response.trialAlreadyUsed)
+			setCurrentShopPlan(response.plan)
+		}, [])
+	})
+
+	useEffect(() => {
+		fetchPeriod({
+			url: `/plans_page`
+		})
+	}, [])
+
+	if (isLoading) {
+		return <PlansPageSkeleton />
 	}
 
 	return (
 		<div id="plansPage">
 			{selectedPlan && (
-				<ChoosePlanConfirmationModal plan={selectedPlan} onClose={() => setSelectedPlan(undefined)} />
+				<ChoosePlanConfirmationModal
+					plan={selectedPlan}
+					onClose={() => setSelectedPlan(undefined)}
+					trialAlreadyUsed={trialAlreadyUsed}
+				/>
 			)}
 			<Page
 				breadcrumbs={[{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]}
@@ -30,76 +54,33 @@ export default function PlansPage({}: Props) {
 								Before we get you set up, please choose your plan. Next you’ll be able to customise and
 								install your date picker.
 							</p>
-							<p>
-								All our plans come with a <strong>14-day trial</strong> period.
-							</p>
+							{trialAlreadyUsed === false && (
+								<p>
+									All our plans come with a <strong>{TRIAL_DAYS}-day trial</strong> period.
+								</p>
+							)}
 						</TextContainer>
 					</Layout.Section>
 					<Layout.Section oneThird>
-						<Card sectioned>
-							<div className="plan">
-								<div className="name">Basic</div>
-								<div className="price">
-									<strong>$5</strong> per month
-								</div>
-								<ul>
-									<li>Customizable date picker</li>
-									<li>Unlimited products</li>
-									<li>Unlimited traffic</li>
-									<li>
-										Up to <strong>100</strong> orders per month
-									</li>
-									<li>48h support response time</li>
-								</ul>
-								<Button fullWidth primary onClick={onSelectClick("BASIC")}>
-									Select
-								</Button>
-							</div>
-						</Card>
+						<PlanCard
+							plan="BASIC"
+							currentShopPlan={currentShopPlan}
+							onSelectClick={(plan: Plan) => setSelectedPlan(plan)}
+						/>
 					</Layout.Section>
 					<Layout.Section oneThird>
-						<Card sectioned>
-							<div className="plan">
-								<div className="name">Pro</div>
-								<div className="price">
-									<strong>$10</strong> per month
-								</div>
-								<ul>
-									<li>Customizable date picker</li>
-									<li>Unlimited products</li>
-									<li>Unlimited traffic</li>
-									<li>
-										Up to <strong>500</strong> orders per month
-									</li>
-									<li>24h support response time</li>
-								</ul>
-								<Button fullWidth primary onClick={onSelectClick("PRO")}>
-									Select
-								</Button>
-							</div>
-						</Card>
+						<PlanCard
+							plan="PRO"
+							currentShopPlan={currentShopPlan}
+							onSelectClick={(plan: Plan) => setSelectedPlan(plan)}
+						/>
 					</Layout.Section>
 					<Layout.Section oneThird>
-						<Card sectioned>
-							<div className="plan">
-								<div className="name">Unlimited</div>
-								<div className="price">
-									<strong>$15</strong> per month
-								</div>
-								<ul>
-									<li>Customizable date picker</li>
-									<li>Unlimited products</li>
-									<li>Unlimited traffic</li>
-									<li>
-										<strong>Unlimited</strong> orders
-									</li>
-									<li>12h support response time</li>
-								</ul>
-								<Button fullWidth primary onClick={onSelectClick("UNLIMITED")}>
-									Select
-								</Button>
-							</div>
-						</Card>
+						<PlanCard
+							plan="UNLIMITED"
+							currentShopPlan={currentShopPlan}
+							onSelectClick={(plan: Plan) => setSelectedPlan(plan)}
+						/>
 					</Layout.Section>
 					<Layout.Section fullWidth>
 						<TextContainer>

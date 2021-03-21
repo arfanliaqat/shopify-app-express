@@ -13,6 +13,8 @@ import PreviewCard from "./PreviewCard"
 import SettingsPageSkeleton from "./SettingsPageSkeleton"
 import DropdownStylesCard from "./DropdownStylesCard"
 import { isStockByDateApp } from "../common/constants"
+import ShopPlan from "../models/ShopPlan"
+import { plans } from "../../../backend/src/util/constants"
 
 interface Props {}
 
@@ -22,11 +24,13 @@ export default function SettingsPage({}: Props) {
 	const [successMessage, setSuccessMessage] = useState<string>()
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
 	const [resetSettingsModalOpen, setResetSettingsModalOpen] = useState(false)
+	const [shopPlan, setShopPlan] = useState<ShopPlan>(undefined)
 
-	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettings>({
-		onSuccess: useCallback((widgetSettings) => {
-			setInitialWidgetSettings({ ...widgetSettings })
-			setWidgetSettings({ ...widgetSettings })
+	const { setApiRequest: fetchPeriod, isLoading } = useApi<{ plan: ShopPlan; settings: WidgetSettings }>({
+		onSuccess: useCallback((response) => {
+			setShopPlan(response.plan)
+			setInitialWidgetSettings({ ...response.settings })
+			setWidgetSettings({ ...response.settings })
 		}, [])
 	})
 
@@ -80,7 +84,14 @@ export default function SettingsPage({}: Props) {
 				<Layout>
 					<Layout.Section>
 						<Card sectioned>
-							<Button url="/app/plans">Choose your plan</Button>
+							<Layout>
+								<Layout.Section>
+									Current plan: <strong>{plans[shopPlan.plan].title}</strong>
+								</Layout.Section>
+								<Layout.Section>
+									<Button url="/app/plans">Choose your plan</Button>
+								</Layout.Section>
+							</Layout>
 						</Card>
 					</Layout.Section>
 				</Layout>

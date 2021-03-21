@@ -8,6 +8,8 @@ import { loadConnectedShop } from "../shop/shop.middleware"
 import { getLocals } from "../util/locals"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 import { WidgetSettings } from "./widget.model"
+import { ShopPlanService } from "../shopPlan/shopPlan.service"
+import { ShopPlan } from "../shopPlan/shopPlan.model"
 
 const router = Router()
 
@@ -59,7 +61,8 @@ router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Re
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
 		const settings = await WidgetService.findOrCreateWidgetSettings(connectedShop.id)
-		res.send(settings)
+		const plan = await ShopPlanService.findByShopId(connectedShop.id)
+		res.send({ plan: ShopPlan.toViewModel(plan), settings })
 	} catch (error) {
 		handleErrors(res, error)
 	}

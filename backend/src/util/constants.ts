@@ -19,17 +19,22 @@ export const APP_NAME = (process.env.APP_NAME as AppName) || "STOCK_BY_DATE"
 
 export const allWeekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
 
+export const TRIAL_DAYS = 7
+
 export const plans = {
 	BASIC: {
-		price: safeParseInt(process.env.BASIC_PRICE) || 5,
-		orderLimit: safeParseInt(process.env.ORDER_LIMIT) || 100
+		title: "Basic",
+		price: safeParseInt(process.env.BASIC_PRICE) || 0,
+		orderLimit: safeParseInt(process.env.ORDER_LIMIT) || 25
 	},
 	PRO: {
-		price: safeParseInt(process.env.PRO_PRICE) || 10,
-		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 1000
+		title: "Pro",
+		price: safeParseInt(process.env.PRO_PRICE) || 5,
+		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 150
 	},
 	UNLIMITED: {
-		price: safeParseInt(process.env.UNLIMITED_PRICE) || 15,
+		title: "Unlimited",
+		price: safeParseInt(process.env.UNLIMITED_PRICE) || 10,
 		orderLimit: safeParseInt(process.env.UNLIMITED_ORDER_LIMIT) || -1
 	}
 }

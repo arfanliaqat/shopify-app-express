@@ -1,3 +1,5 @@
+import ShopPlanViewModel from "../../../frontend/src/models/ShopPlan"
+
 export type Plan = "BASIC" | "PRO" | "UNLIMITED"
 
 export const allPlans: Plan[] = ["BASIC", "PRO", "UNLIMITED"]
@@ -43,5 +45,14 @@ export class ShopPlan {
 
 	static createFromSchemas(schemas: ShopPlanSchema[]): ShopPlan[] {
 		return (schemas || []).map(ShopPlan.createFromSchema)
+	}
+
+	static toViewModel(plan: ShopPlan | undefined): ShopPlanViewModel | undefined {
+		if (!plan) return undefined
+		return {
+			plan: plan.plan,
+			price: plan.price,
+			orderLimit: plan.orderLimit
+		}
 	}
 }

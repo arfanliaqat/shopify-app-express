@@ -6,12 +6,6 @@ import { WidgetSettings } from "./widget.model"
 import { UnexpectedError } from "../util/error"
 
 export class WidgetService {
-	static async findById(shopId: string): Promise<Shop | undefined> {
-		const conn: Pool = await getConnection()
-		const result = await conn.query<ShopSchema>(`SELECT id, domain, email FROM shops WHERE id = $1`, [shopId])
-		return result.rows.map(toShop)[0]
-	}
-
 	static async findWidgetSettingsByShopId(shopId: string): Promise<WidgetSettingsViewModel | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<{ settings: WidgetSettingsViewModel }>(

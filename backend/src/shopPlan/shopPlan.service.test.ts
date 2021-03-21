@@ -1,4 +1,4 @@
-import { DatabaseTestService } from "../util/database"
+import { DatabaseTestService, getConnection } from "../util/database"
 import { ShopBuilder } from "../shop/shop.builder"
 import { Shop } from "../shop/shop.model"
 import { ShopPlanService } from "./shopPlan.service"
@@ -19,8 +19,8 @@ describe("ShopPlanService", () => {
 			expect(shopPlan).toBeDefined()
 			expect(shopPlan?.chargeId).toBe(123)
 			expect(shopPlan?.plan).toBe("BASIC")
-			expect(shopPlan?.price).toBe(5)
-			expect(shopPlan?.orderLimit).toBe(100)
+			expect(shopPlan?.price).toBe(0)
+			expect(shopPlan?.orderLimit).toBe(25)
 		}
 		{
 			// Upgrade to PRO plan
@@ -29,8 +29,8 @@ describe("ShopPlanService", () => {
 			expect(shopPlan).toBeDefined()
 			expect(shopPlan?.chargeId).toBe(123)
 			expect(shopPlan?.plan).toBe("PRO")
-			expect(shopPlan?.price).toBe(10)
-			expect(shopPlan?.orderLimit).toBe(1000)
+			expect(shopPlan?.price).toBe(5)
+			expect(shopPlan?.orderLimit).toBe(150)
 		}
 	})
 
@@ -44,5 +44,9 @@ describe("ShopPlanService", () => {
 			const isActive = await ShopPlanService.hasActivePlan(shop!.id!)
 			expect(isActive).toBeTruthy()
 		}
+	})
+
+	afterAll(async () => {
+		await (await getConnection()).end()
 	})
 })

@@ -3,20 +3,21 @@ import { useApi } from "../util/useApi"
 import ModalBackground from "../util/ModalBackground"
 import { Modal, TextContainer } from "@shopify/polaris"
 import { Plan, planNames } from "../../../backend/src/shopPlan/shopPlan.model"
-import { plans } from "../../../backend/src/util/constants"
+import { plans, TRIAL_DAYS } from "../../../backend/src/util/constants"
 
 interface Props {
 	plan: Plan
 	onClose: () => void
+	trialAlreadyUsed: boolean
 }
 
-export default function ChoosePlanConfirmationModal({ plan, onClose }: Props) {
+export default function ChoosePlanConfirmationModal({ plan, onClose, trialAlreadyUsed }: Props) {
 	const [active, setActive] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
 
 	const { setApiRequest: resetSettings } = useApi<{ url: string }>({
 		onSuccess: (data) => {
-			window.location.href = data.url
+			window.location.href = data.url ?? "/app"
 		}
 	})
 
@@ -35,6 +36,8 @@ export default function ChoosePlanConfirmationModal({ plan, onClose }: Props) {
 		onClose()
 	}
 
+	const isFreePlan = plans[plan].price == 0
+
 	return (
 		<ModalBackground onClose={handleCloseClick}>
 			<Modal
@@ -50,10 +53,25 @@ export default function ChoosePlanConfirmationModal({ plan, onClose }: Props) {
 				<Modal.Section>
 					<TextContainer>
 						<p>You are about to select the {planNames[plan]}.</p>
-						<p>
-							After the 14-day trial period you'll be charge ${plans[plan].price} per month. This will be
-							added on your monthly Shopify bill.
-						</p>
+						{isFreePlan && (
+							<p>
+								This plan is free forever but you will be limited to {plans[plan].orderLimit} orders per
+								months.
+							</p>
+						)}
+						{!trialAlreadyUsed && !isFreePlan && (
+							<p>
+								After the {TRIAL_DAYS}-day trial period you'll be charge ${plans[plan].price} each
+								month. This will be added to your monthly Shopify bill.
+							</p>
+						)}
+
+						{trialAlreadyUsed && !isFreePlan && (
+							<p>
+								You will be charge ${plans[plan].price} each month. This will be added to your monthly
+								Shopify bill.
+							</p>
+						)}
 						<p>Do you wish to proceed?</p>
 					</TextContainer>
 				</Modal.Section>

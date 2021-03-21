@@ -4,12 +4,28 @@ import { getLocals } from "../util/locals"
 import { BadParameter, HandledError, handleErrors, UnexpectedError } from "../util/error"
 import { getSession, updateSession } from "../util/session"
 import { ShopPlanService } from "./shopPlan.service"
-import { allPlans, Plan } from "./shopPlan.model"
+import { allPlans, Plan, ShopPlan } from "./shopPlan.model"
 import { generateNonce } from "../util/tools"
 import { loadAccessToken } from "../accessToken/accessToken.middleware"
 import { devOnly } from "../util/middlewares"
 
 const router = Router()
+
+router.get("/plans_page", [loadConnectedShop], async (req: Request, res: Response) => {
+	try {
+		const { connectedShop } = getLocals(res)
+		if (!connectedShop || !connectedShop.id) {
+			throw new HandledError("Missing connectedShop")
+		}
+		const plan = await ShopPlanService.findByShopId(connectedShop.id)
+		res.send({
+			trialAlreadyUsed: connectedShop.trialUsed != undefined,
+			plan: ShopPlan.toViewModel(plan)
+		})
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
 
 router.post("/choose_plan", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
 	try {
@@ -29,13 +45,8 @@ router.post("/choose_plan", [loadConnectedShop, loadAccessToken], async (req: Re
 		const nonce = generateNonce(16)
 		updateSession(req, res, { planToken: nonce })
 		const response = await ShopPlanService.initiateRecurringCharge(connectedShop, plan, nonce, accessToken)
-		if (!response) {
-			throw new UnexpectedError("Something went wrong when initiating the recurring charge")
-		}
 
-		res.send({
-			url: response.confirmation_url
-		})
+		res.send(response ? { url: response.confirmation_url } : {})
 	} catch (error) {
 		handleErrors(res, error)
 	}
