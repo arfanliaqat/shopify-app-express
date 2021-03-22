@@ -21,21 +21,31 @@ export const allWeekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDA
 
 export const TRIAL_DAYS = 7
 
-export const plans = {
+interface PlanOptions {
+	title: string
+	price: number
+	orderLimit: number
+	supportResponseTime: number
+}
+
+export const plans: { [key: string]: PlanOptions } = {
 	BASIC: {
 		title: "Basic",
 		price: safeParseInt(process.env.BASIC_PRICE) || 0,
-		orderLimit: safeParseInt(process.env.ORDER_LIMIT) || 25
+		orderLimit: safeParseInt(process.env.BASIC_ORDER_LIMIT) || 25,
+		supportResponseTime: safeParseInt(process.env.PRO_SUPPORT_RESPONSE_TIME) || 48
 	},
 	PRO: {
 		title: "Pro",
 		price: safeParseInt(process.env.PRO_PRICE) || 5,
-		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 150
+		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 150,
+		supportResponseTime: safeParseInt(process.env.PRO_SUPPORT_RESPONSE_TIME) || 24
 	},
 	UNLIMITED: {
 		title: "Unlimited",
 		price: safeParseInt(process.env.UNLIMITED_PRICE) || 10,
-		orderLimit: safeParseInt(process.env.UNLIMITED_ORDER_LIMIT) || -1
+		orderLimit: safeParseInt(process.env.UNLIMITED_ORDER_LIMIT) || -1,
+		supportResponseTime: safeParseInt(process.env.PRO_SUPPORT_RESPONSE_TIME) || 12
 	}
 }
 
