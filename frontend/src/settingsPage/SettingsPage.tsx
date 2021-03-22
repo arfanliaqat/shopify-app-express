@@ -18,6 +18,12 @@ import { plans } from "../../../backend/src/util/constants"
 
 interface Props {}
 
+interface WidgetSettingsPageData {
+	currentOrderCount: number
+	plan: ShopPlan
+	settings: WidgetSettings
+}
+
 export default function SettingsPage({}: Props) {
 	const [initialWidgetSettings, setInitialWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
@@ -26,7 +32,7 @@ export default function SettingsPage({}: Props) {
 	const [resetSettingsModalOpen, setResetSettingsModalOpen] = useState(false)
 	const [shopPlan, setShopPlan] = useState<ShopPlan>(undefined)
 
-	const { setApiRequest: fetchPeriod, isLoading } = useApi<{ plan: ShopPlan; settings: WidgetSettings }>({
+	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettingsPageData>({
 		onSuccess: useCallback((response) => {
 			setShopPlan(response.plan)
 			setInitialWidgetSettings({ ...response.settings })

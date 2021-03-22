@@ -9,6 +9,7 @@ export const hooksSecret = process.env.HOOKS_SECRET || ""
 export const databaseName = process.env.DB_DATABASE || "shopify_app"
 
 export const SYSTEM_DATE_FORMAT = "YYYY-MM-DD"
+export const SYSTEM_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss"
 export const SHORT_DISPLAY_FORMAT = "ddd D MMM"
 export const SHORT_DISPLAY_FORMAT_WITH_YEAR = "ddd D MMM YYYY"
 export const TAG_DATE_FORMAT = "DD/MM/YYYY"

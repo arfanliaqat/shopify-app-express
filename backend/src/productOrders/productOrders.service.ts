@@ -1,10 +1,11 @@
 import { OrdersPerDate, ProductOrder, ProductOrderSchema } from "./productOrders.model"
 import { getConnection, WithTransaction } from "../util/database"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { Moment } from "moment"
+import moment, { Moment } from "moment"
 import { Pool } from "pg"
 import { UnexpectedError } from "../util/error"
-import { SYSTEM_DATE_FORMAT } from "../util/constants"
+import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../util/constants"
+import { Shop } from "../shop/shop.model"
 
 export class ProductOrderService {
 	static async findByShopResourceAndDate(
@@ -69,6 +70,26 @@ export class ProductOrderService {
 			serviceWithTransaction.releaseClient()
 		}
 	}
+
+	static async countOrdersInCurrentMonth(shop: Shop): Promise<number> {
+		return await this.countOrdersInMonth(shop, moment())
+	}
+
+	static async countOrdersInMonth(shop: Shop, refDate: Moment): Promise<number> {
+		const startOfMonth = refDate.clone().startOf("month")
+		const endOfMonth = refDate.clone().endOf("month")
+		const conn: Pool = await getConnection()
+		const result = await conn.query<{ count: string }>(
+			`
+			SELECT count(distinct po.order_id) as count
+			FROM product_orders po
+			JOIN shop_resources sr on sr.id = po.shop_resource_id
+			WHERE sr.shop_id = $1
+			AND po.created_date between $2 and $3`,
+			[shop.id, startOfMonth.format(SYSTEM_DATE_FORMAT), endOfMonth.format(SYSTEM_DATE_FORMAT)]
+		)
+		return parseInt(result.rows[0].count)
+	}
 }
 
 export class ProductOrderServiceWithTransaction extends WithTransaction {
@@ -77,18 +98,22 @@ export class ProductOrderServiceWithTransaction extends WithTransaction {
 	}
 
 	async insert(productOrder: ProductOrder): Promise<ProductOrder | undefined> {
+		const args = [
+			productOrder.shopResourceId,
+			productOrder.orderId,
+			productOrder.chosenDate.format(SYSTEM_DATE_FORMAT),
+			productOrder.quantity
+		]
+		if (productOrder.createdDate) {
+			args.push(productOrder.createdDate.format(SYSTEM_DATETIME_FORMAT))
+		}
 		const results = await this.getClient().query<{ id: string }>(
 			`
-			INSERT INTO product_orders (shop_resource_id, order_id, chosen_date, quantity)
-			VALUES ($1, $2, $3, $4)
+			INSERT INTO product_orders (shop_resource_id, order_id, chosen_date, quantity, created_date)
+			VALUES ($1, $2, $3, $4, ${productOrder.createdDate ? "$5" : "now()"})
 			ON CONFLICT DO NOTHING
 			RETURNING id`,
-			[
-				productOrder.shopResourceId,
-				productOrder.orderId,
-				productOrder.chosenDate.format(SYSTEM_DATE_FORMAT),
-				productOrder.quantity
-			]
+			args
 		)
 		if (results.rows.length == 1) {
 			productOrder.id = results.rows[0].id

@@ -10,6 +10,7 @@ import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/m
 import { WidgetSettings } from "./widget.model"
 import { ShopPlanService } from "../shopPlan/shopPlan.service"
 import { ShopPlan } from "../shopPlan/shopPlan.model"
+import { ProductOrderService } from "../productOrders/productOrders.service"
 
 const router = Router()
 
@@ -62,7 +63,8 @@ router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Re
 		}
 		const settings = await WidgetService.findOrCreateWidgetSettings(connectedShop.id)
 		const plan = await ShopPlanService.findByShopId(connectedShop.id)
-		res.send({ plan: ShopPlan.toViewModel(plan), settings })
+		const currentOrderCount = await ProductOrderService.countOrdersInCurrentMonth(connectedShop)
+		res.send({ currentOrderCount, plan: ShopPlan.toViewModel(plan), settings })
 	} catch (error) {
 		handleErrors(res, error)
 	}

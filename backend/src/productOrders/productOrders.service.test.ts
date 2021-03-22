@@ -76,6 +76,35 @@ describe("ProductOrderService", () => {
 		expect(productOrders["2020-12-02"]).toBe(5)
 	})
 
+	test("Count number of orders in a month", async () => {
+		await new ProductOrderBuilder()
+			.forShopResource(shopResource!)
+			.withOrderId(123)
+			.withChosenDate(refDate)
+			.withCreatedDate(refDate)
+			.withQuantity(1)
+			.buildAndSave()
+
+		await new ProductOrderBuilder()
+			.forShopResource(shopResource!)
+			.withOrderId(124)
+			.withChosenDate(availableDate2!)
+			.withCreatedDate(availableDate2!)
+			.withQuantity(3)
+			.buildAndSave()
+
+		await new ProductOrderBuilder()
+			.forShopResource(shopResource!)
+			.withOrderId(125)
+			.withChosenDate(refDate.clone().add(1, "month"))
+			.withCreatedDate(refDate.clone().add(1, "month"))
+			.withQuantity(1)
+			.buildAndSave()
+
+		const numberOfOrders = await ProductOrderService.countOrdersInMonth(shop!, refDate)
+		expect(numberOfOrders).toBe(2)
+	})
+
 	afterAll(async () => {
 		await (await getConnection()).end()
 	})

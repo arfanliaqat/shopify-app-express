@@ -8,6 +8,7 @@ export class ProductOrderBuilder {
 	private orderId?: number
 	private chosenDate?: Moment
 	private quantity?: number
+	private createdDate?: Moment
 
 	forShopResource(shopResource: ShopResource): this {
 		this.shopResource = shopResource
@@ -29,6 +30,11 @@ export class ProductOrderBuilder {
 		return this
 	}
 
+	withCreatedDate(createdDate: Moment): this {
+		this.createdDate = createdDate
+		return this
+	}
+
 	async buildAndSave(): Promise<ProductOrder | undefined> {
 		if (!this.shopResource?.id) throw "this.shop is required"
 
@@ -45,7 +51,14 @@ export class ProductOrderBuilder {
 		}
 
 		return await ProductOrderService.insert(
-			new ProductOrder(undefined, this.shopResource.id, this.orderId, this.chosenDate, this.quantity)
+			new ProductOrder(
+				undefined,
+				this.shopResource.id,
+				this.orderId,
+				this.chosenDate,
+				this.quantity,
+				this.createdDate
+			)
 		)
 	}
 }
