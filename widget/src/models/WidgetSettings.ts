@@ -4,6 +4,7 @@ export interface WidgetSettings {
 	pickerType: PickerType
 	locale: string
 	firstAvailableDateInDays: number
+	cutOffTime: string
 	lastAvailableDateInWeeks: number
 	availableWeekDays: string[]
 	disabledDates: string[]

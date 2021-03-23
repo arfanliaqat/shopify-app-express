@@ -16,6 +16,7 @@ export class WidgetSettings {
 			pickerType: "CALENDAR",
 			locale: "en",
 			firstAvailableDateInDays: 1,
+			cutOffTime: "23:59",
 			lastAvailableDateInWeeks: 12,
 			availableWeekDays: allWeekDays,
 			disabledDates: [],

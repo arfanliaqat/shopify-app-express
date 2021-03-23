@@ -9,12 +9,15 @@ import { WidgetSettings } from "./models/WidgetSettings"
 import { AvailableDate } from "./models/AvailableDate"
 import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
-import { SYSTEM_DATE_FORMAT } from "../../backend/src/util/constants"
+import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../../backend/src/util/constants"
+import moment from "moment"
 
 function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
 	const today = getMoment(settings).startOf("day")
-	const firstDay = today.clone().add(settings.firstAvailableDateInDays, "days")
+	const cutOffTime = moment(moment().format(SYSTEM_DATE_FORMAT) + " " + settings.cutOffTime + ":00", SYSTEM_DATETIME_FORMAT)
+	const cutOffExtraDay = moment().isAfter(cutOffTime, "minute") ? 1 : 0
+	const firstDay = today.clone().add(settings.firstAvailableDateInDays + cutOffExtraDay, "days")
 	const lastDay = today.clone().add(settings.lastAvailableDateInWeeks, "weeks").endOf("weeks")
 	const availableWeekDaysSet = new Set(settings.availableWeekDays)
 	const disabledDatesSet = new Set(settings.disabledDates)
