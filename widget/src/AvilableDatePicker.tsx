@@ -77,6 +77,10 @@ async function fetchWidgetSettings(): Promise<WidgetSettings> {
 			Accept: "application/json"
 		}
 	})
+	if (response.status == 403) {
+		const data = await response.json()
+		throw `[H10 - Date Picker] ${data.reason}`
+	}
 	if (response.status != 200) {
 		throw "[H10 - Date Picker] failed to fetch widget settings"
 	}

@@ -11,17 +11,28 @@ import { WidgetSettings } from "./widget.model"
 import { ShopPlanService } from "../shopPlan/shopPlan.service"
 import { ShopPlan } from "../shopPlan/shopPlan.model"
 import { ProductOrderService } from "../productOrders/productOrders.service"
+import { ShopService } from "../shop/shop.service"
 
 const router = Router()
 
 router.get("/settings", async (req: Request, res: Response) => {
 	try {
-		const shop = req.query.shop?.toString()
-		if (!shop) {
+		const shopDomain = req.query.shop?.toString()
+		if (!shopDomain) {
 			res.status(404).send({ reason: "'shop' param missing" })
 			return
 		}
-		const widgetSettings = await WidgetService.findWidgetSettingsByShopDomain(shop)
+		const shop = await ShopService.findByDomain(shopDomain)
+		if (!shop?.id) {
+			res.status(404).send({ reason: "No matching shop found" })
+			return
+		}
+		const planIsActive = await ShopPlanService.hasActivePlan(shop)
+		if (!planIsActive) {
+			res.status(403).send({ reason: "The plan's limit has been reached. Please upgrade your plan." })
+			return
+		}
+		const widgetSettings = await WidgetService.findWidgetSettingsByShopId(shop.id)
 		if (!widgetSettings) {
 			res.status(404).send({ reason: "Widget settings not found" })
 			return

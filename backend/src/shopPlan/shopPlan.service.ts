@@ -8,6 +8,7 @@ import { Shop } from "../shop/shop.model"
 import { AccessToken } from "../accessToken/accessToken.model"
 import crypto from "crypto"
 import { ShopService } from "../shop/shop.service"
+import { ProductOrderService } from "../productOrders/productOrders.service"
 
 interface RecurringApplicationChargeResponse {
 	confirmation_url: string
@@ -96,10 +97,12 @@ export class ShopPlanService {
 		}
 	}
 
-	static async hasActivePlan(shopId: string): Promise<boolean> {
-		const shopPlan = await this.findByShopId(shopId)
-		// TODO: check that it has not reached the limit
-		return !!shopPlan
+	static async hasActivePlan(shop: Shop): Promise<boolean> {
+		if (!shop.id) throw new UnexpectedError("The shop's id isn't defined")
+		const shopPlan = await this.findByShopId(shop.id)
+		if (!shopPlan) return false
+		const currentOrderCount = await ProductOrderService.countOrdersInCurrentMonth(shop)
+		return currentOrderCount < shopPlan.orderLimit
 	}
 
 	static createPlan(shopId: string, chargeId: number | undefined, plan: Plan): ShopPlan {
