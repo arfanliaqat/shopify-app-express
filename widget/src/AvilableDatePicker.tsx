@@ -97,6 +97,13 @@ export default function AvailableDatePicker() {
 		? (productAvailabilityData?.availableDates || [])
 		: generateAvailableDates(settings), [settings])
 
+	useEffect(() => {
+		const firstAvailableDate = availableDates.find(ad => !ad.isSoldOut)
+		if (firstAvailableDate) {
+			setSelectedAvailableDate(firstAvailableDate.date)
+		}
+	}, [availableDates])
+
 	const widgetStyles = useMemo(() => {
 		if (settings) {
 			return getCssFromWidgetStyles(settings.styles)
@@ -115,7 +122,7 @@ export default function AvailableDatePicker() {
 			const previewDate = getPreviewData()
 			setProductAvailabilityData(previewDate)
 			setFormError(undefined)
-		}, false);
+		}, false)
 	}, [])
 
 	useEffect(() => {
@@ -124,10 +131,6 @@ export default function AvailableDatePicker() {
 				async function fetchStockByDateData() {
 					const data = await fetchAvailabilityForProduct()
 					setProductAvailabilityData(data)
-					const firstAvailableDate = data.availableDates.find(ad => !ad.isSoldOut)
-					if (firstAvailableDate) {
-						setSelectedAvailableDate(firstAvailableDate.date)
-					}
 				}
 				fetchStockByDateData()
 			} else {
@@ -138,6 +141,7 @@ export default function AvailableDatePicker() {
 						availableDates: []
 					})
 				}
+
 				fetchDatePickerData()
 			}
 
@@ -200,7 +204,7 @@ export default function AvailableDatePicker() {
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}
-				settings={settings}
+                settings={settings}
             />}
 		</div>
 	)

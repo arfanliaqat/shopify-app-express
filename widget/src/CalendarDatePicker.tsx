@@ -17,7 +17,7 @@ interface Props {
 }
 
 
-export default function CalendarDatePicker({ availableDates, settings }: Props) {
+export default function CalendarDatePicker({ availableDates, settings, onSelect }: Props) {
 
 	const getMonthStart = () => {
 		return momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
@@ -44,13 +44,18 @@ export default function CalendarDatePicker({ availableDates, settings }: Props) 
 
 	const formattedSelectedDate = useMemo(() => {
 		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT)
-	}, [settings])
+	}, [settings, selectedDate])
 
 	useEffect(() => setMonthStart(getMonthStart()), [settings])
 
 	const moveMonth = (delta) => () => {
 		const newMonthStart = monthStart.clone().add(delta, "months")
 		setMonthStart(newMonthStart)
+	}
+
+	const handleDateSelect = (strDay) => {
+		setSelectedDate(strDay)
+		onSelect(strDay)
 	}
 
 	return <div className="h10cal">
@@ -82,7 +87,7 @@ export default function CalendarDatePicker({ availableDates, settings }: Props) 
 									"h10cal-selected": isCurrentMonth && strDay == selectedDate
 								})}
 								key={"day" + strDay}
-								onClick={dateIsAvailable ? () => setSelectedDate(strDay) : () => {}}>
+								onClick={dateIsAvailable ? () => handleDateSelect(strDay) : () => {}}>
 								<span>{isCurrentMonth ? day.format("D") : ""}</span>
 							</div>
 						})}
