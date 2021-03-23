@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Layout, Page, PageActions, Card, Button } from "@shopify/polaris"
+import { Layout, Page, PageActions } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
@@ -15,6 +15,7 @@ import DropdownStylesCard from "./DropdownStylesCard"
 import { isStockByDateApp } from "../common/constants"
 import ShopPlan from "../models/ShopPlan"
 import { plans } from "../../../backend/src/util/constants"
+import CurrentPlanCard from "./CurrentPlanCard"
 
 interface Props {}
 
@@ -31,9 +32,11 @@ export default function SettingsPage({}: Props) {
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
 	const [resetSettingsModalOpen, setResetSettingsModalOpen] = useState(false)
 	const [shopPlan, setShopPlan] = useState<ShopPlan>(undefined)
+	const [currentOrderCount, setCurrentOrderCount] = useState<number>(undefined)
 
 	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettingsPageData>({
 		onSuccess: useCallback((response) => {
+			setCurrentOrderCount(response.currentOrderCount)
 			setShopPlan(response.plan)
 			setInitialWidgetSettings({ ...response.settings })
 			setWidgetSettings({ ...response.settings })
@@ -89,16 +92,7 @@ export default function SettingsPage({}: Props) {
 			>
 				<Layout>
 					<Layout.Section>
-						<Card sectioned>
-							<Layout>
-								<Layout.Section>
-									Current plan: <strong>{plans[shopPlan.plan].title}</strong>
-								</Layout.Section>
-								<Layout.Section>
-									<Button url="/app/plans">Choose your plan</Button>
-								</Layout.Section>
-							</Layout>
-						</Card>
+						<CurrentPlanCard currentOrderCount={currentOrderCount} planOptions={plans[shopPlan.plan]} />
 					</Layout.Section>
 				</Layout>
 				<div className="pageSeparator" />

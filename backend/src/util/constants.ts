@@ -22,7 +22,7 @@ export const allWeekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDA
 
 export const TRIAL_DAYS = 7
 
-interface PlanOptions {
+export interface PlanOptions {
 	title: string
 	price: number
 	orderLimit: number
