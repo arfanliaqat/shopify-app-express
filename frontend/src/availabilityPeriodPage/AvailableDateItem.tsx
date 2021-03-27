@@ -1,7 +1,7 @@
 import React from "react"
 import { Button } from "@shopify/polaris"
 import moment, { Moment } from "moment"
-import classNames from "classNames"
+import classNames from "classnames"
 
 interface Props {
 	availableDate: Moment

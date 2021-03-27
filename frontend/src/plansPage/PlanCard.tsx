@@ -1,7 +1,7 @@
 import React from "react"
 import { plans } from "../../../backend/src/util/constants"
 import { Button, Card } from "@shopify/polaris"
-import classNames from "classNames"
+import classNames from "classnames"
 import ShopPlan from "../models/ShopPlan"
 import { Plan } from "../../../backend/src/shopPlan/shopPlan.model"
 
