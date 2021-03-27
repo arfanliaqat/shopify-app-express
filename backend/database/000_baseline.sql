@@ -65,7 +65,7 @@ create index ind_product_orders_shop_resource_id on product_orders (shop_resourc
 create index ind_product_orders_order_id on product_orders (order_id);
 create index ind_product_orders_chosen_date on product_orders (chosen_date);
 create index ind_product_orders_created_date on product_orders (created_date);
-create unique index unique_product_order on product_orders (shop_resource_id, order_id, chosen_date)
+create unique index unique_product_order on product_orders (shop_resource_id, order_id, chosen_date);
 
 create table current_availabilities(
 	id uuid not null primary key default uuid_generate_v4(),
