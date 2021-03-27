@@ -1,7 +1,9 @@
 import React from "react"
-import { Card, FormLayout, Select, SelectOption } from "@shopify/polaris"
+import { Card, Checkbox, FormLayout, Select, SelectOption } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { PickerType, WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import { getAppName } from "../../../widget/src/constants"
+import { isStockByDateApp } from "../common/constants"
 
 export const datePickerLanguages: SelectOption[] = [
 	{ value: "nl", label: "Dutch" },
@@ -35,6 +37,10 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 
 	const handleLanguageChange = (locale: string) => {
 		onWidgetSettingsChange({ ...widgetSettings, locale })
+	}
+
+	const handleMandatoryDateSelectChange = (mandatoryDateSelect: boolean) => {
+		onWidgetSettingsChange({ ...widgetSettings, mandatoryDateSelect })
 	}
 
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
@@ -71,6 +77,16 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 						value={widgetSettings.styles.errorFontColor}
 					/>
 				</FormLayout.Group>
+
+				{isStockByDateApp && (
+					<FormLayout.Group>
+						<Checkbox
+							label="A date must be selected to be able to add a product to the cart"
+							checked={widgetSettings.mandatoryDateSelect}
+							onChange={(value) => handleMandatoryDateSelectChange(value)}
+						/>
+					</FormLayout.Group>
+				)}
 			</FormLayout>
 		</Card>
 	)

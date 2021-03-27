@@ -9,6 +9,7 @@ export interface WidgetSettings {
 	availableWeekDays: string[]
 	disabledDates: string[]
 	styles: WidgetStyles
+	mandatoryDateSelect: boolean
 	messages: WidgetMessages
 }
 

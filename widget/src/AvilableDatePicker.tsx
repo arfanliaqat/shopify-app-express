@@ -157,6 +157,7 @@ export default function AvailableDatePicker() {
 			const form = datePickerDiv.closest("form")
 			const onSubmit = (e) => {
 				if (selectedAvailableDate) return
+				if (!settings.mandatoryDateSelect) return
 				let halt = false
 				if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
 					halt = true
