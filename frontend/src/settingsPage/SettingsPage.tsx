@@ -31,7 +31,7 @@ export default function SettingsPage({}: Props) {
 	const [successMessage, setSuccessMessage] = useState<string>()
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
 	const [resetSettingsModalOpen, setResetSettingsModalOpen] = useState(false)
-	const [shopPlan, setShopPlan] = useState<ShopPlan>(undefined)
+	const [shopPlan, setShopPlan] = useState<ShopPlan | undefined>(undefined)
 	const [currentOrderCount, setCurrentOrderCount] = useState<number>(undefined)
 
 	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettingsPageData>({
@@ -56,6 +56,13 @@ export default function SettingsPage({}: Props) {
 		})
 	}, [reloadIncrement])
 
+	useEffect(() => {
+		// Redirect to the plan's page if not plans are yet selected
+		if (widgetSettings && !shopPlan) {
+			window.location.href = "/app/settings"
+		}
+	}, [widgetSettings, shopPlan])
+
 	const handleSaveSettingsClick = () => {
 		saveSettings({
 			method: "POST",
@@ -78,7 +85,7 @@ export default function SettingsPage({}: Props) {
 		return false
 	}, [initialWidgetSettings, widgetSettings])
 
-	if (!widgetSettings || isLoading) {
+	if (!widgetSettings || isLoading || !shopPlan) {
 		return <SettingsPageSkeleton />
 	}
 

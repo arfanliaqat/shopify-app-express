@@ -6,6 +6,8 @@ import { AccessTokenService } from "../accessToken/accessToken.service"
 import { handleAxiosErrors, UnexpectedError } from "../util/error"
 import { appUrl, scopes, shopifyApiPublicKey, shopifyApiSecretKey } from "../util/constants"
 import { AccessToken } from "../accessToken/accessToken.model"
+import { ShopPlan } from "../shopPlan/shopPlan.model"
+import { ShopPlanService } from "../shopPlan/shopPlan.service"
 
 type FullShopApiData = { shop?: ShopApiData }
 
