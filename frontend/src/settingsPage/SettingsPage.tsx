@@ -59,7 +59,7 @@ export default function SettingsPage({}: Props) {
 	useEffect(() => {
 		// Redirect to the plan's page if not plans are yet selected
 		if (widgetSettings && !shopPlan) {
-			window.location.href = "/app/settings"
+			window.location.href = "/app/plans"
 		}
 	}, [widgetSettings, shopPlan])
 
