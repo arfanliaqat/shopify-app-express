@@ -43,7 +43,9 @@ export default function PlansPage({}: Props) {
 				/>
 			)}
 			<Page
-				breadcrumbs={[{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]}
+				breadcrumbs={
+					selectedPlan && [{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]
+				}
 				title="Choose your plan"
 				separator
 			>
