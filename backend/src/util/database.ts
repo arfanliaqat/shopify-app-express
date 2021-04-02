@@ -13,7 +13,8 @@ export const getConnection = async (): Promise<Pool> => {
 			password: process.env.DB_PASSWORD || "postgres",
 			max: 20,
 			connectionTimeoutMillis: 2000,
-			idleTimeoutMillis: 30000
+			idleTimeoutMillis: 30000,
+			ssl: process.env.DB_SSL == "true"
 		})
 	}
 	return dbPool
