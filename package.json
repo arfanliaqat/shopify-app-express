@@ -5,8 +5,7 @@
 	"main": "backend/dist/backend/src/main.js",
 	"scripts": {
 		"heroku-prebuild": "npm install --dev",
-		"heroku-postbuild": "cd frontend && npm install --dev && npm run prod && cd ../widget && npm install --dev && npm run prod",
-		"build": "tsc",
+		"heroku-postbuild": "tsc && cd frontend && npm install --dev && npm run prod && cd ../widget && npm install --dev && npm run prod",
 		"start": "node backend/dist/backend/src/main.js",
 		"watch": "nodemon",
 		"test": "jest --runInBand",
