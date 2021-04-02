@@ -4,9 +4,9 @@
 	"description": "",
 	"main": "backend/dist/backend/src/main.js",
 	"scripts": {
-		"postinstall": "npm install --dev && tsc",
+		"heroku-prebuild": "npm install --dev",
 		"heroku-postbuild": "cd frontend && npm install --dev && npm run prod && cd ../widget && npm install --dev && npm run prod",
-		"tsc": "tsc",
+		"build": "tsc",
 		"start": "node backend/dist/backend/src/main.js",
 		"watch": "nodemon",
 		"test": "jest --runInBand",
