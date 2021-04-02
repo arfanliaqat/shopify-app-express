@@ -64,7 +64,7 @@ app.use((req, res, next) => {
 	next()
 })
 
-app.set("views", path.join(process.cwd(), "src/views"))
+app.set("views", path.join(process.cwd(), "backend/src/views"))
 app.set("view engine", "ejs")
 
 app.get("/app*", loadConnectedShop, async (req, res) => {
@@ -78,7 +78,7 @@ app.get("/app*", loadConnectedShop, async (req, res) => {
 
 app.use(
 	"/public",
-	express.static(path.join(process.cwd(), "../frontend/public"), {
+	express.static(path.join(process.cwd(), "frontend/public"), {
 		setHeaders: (res) => {
 			if (isDev) {
 				res.setHeader("Cache-Control", "no-cache")
@@ -101,7 +101,7 @@ app.use(shopPlanRouter)
 app.use(cors())
 app.use(
 	"/widget",
-	express.static(path.join(process.cwd(), "../widget/public"), {
+	express.static(path.join(process.cwd(), "widget/public"), {
 		setHeaders: (res) => {
 			if (isDev) {
 				res.setHeader("Cache-Control", "no-cache")

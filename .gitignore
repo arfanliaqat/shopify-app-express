@@ -1,10 +1,10 @@
 /.idea
 
-/backend/node_modules
 /backend/dist
-/backend/certs
-/backend/.env
-/backend/coverage
+/node_modules
+/certs
+/coverage
+/.env
 
 /frontend/node_modules
 /frontend/public/build

@@ -2,6 +2,7 @@ import cron from "node-cron"
 import { CurrentAvailabilityService } from "./currentAvailabilities.service"
 import { ShopService } from "../shop/shop.service"
 import moment from "moment"
+import { APP_NAME } from "../util/constants"
 
 export class CurrentAvailabilityJob {
 	static initJobs(): void {
@@ -34,4 +35,6 @@ export class CurrentAvailabilityJob {
 	}
 }
 
-CurrentAvailabilityJob.initJobs()
+if (APP_NAME == "STOCK_BY_DATE") {
+	CurrentAvailabilityJob.initJobs()
+}

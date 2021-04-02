@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+	 "target": "es2019",
+	 "module": "commonjs",
+	 "outDir": "./backend/dist",
+	 "strict": true,
+	 "esModuleInterop": true,
+	 "inlineSourceMap": true
+	},
+	"exclude": [
+		"frontend",
+		"widget"
+	]
+   }
