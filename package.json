@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "backend/dist/backend/src/main.js",
 	"scripts": {
+		"build": "npm install --dev && npm run tsc",
 		"heroku-postbuild": "cd frontend && npm install --dev && npm run prod && cd ../widget && npm install --dev && npm run prod",
 		"tsc": "tsc",
 		"start": "npm run tsc && node backend/dist/backend/src/main.js",
