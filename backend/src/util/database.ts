@@ -14,7 +14,7 @@ export const getConnection = async (): Promise<Pool> => {
 			max: 20,
 			connectionTimeoutMillis: 2000,
 			idleTimeoutMillis: 30000,
-			ssl: process.env.DB_SSL == "true"
+			ssl: process.env.DB_SSL == "true" ? { rejectUnauthorized: false } : undefined
 		})
 	}
 	return dbPool
