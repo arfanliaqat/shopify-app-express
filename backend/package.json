@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "./dist/backend/src/main.js",
 	"scripts": {
+		"heroku-postbuild": "cd ../frontend && npm install && npm run prod && cd ../widget && npm install  && npm run prod",
 		"tsc": "tsc",
 		"start": "npm run tsc && node ./dist/backend/src/main.js",
 		"watch": "nodemon",
