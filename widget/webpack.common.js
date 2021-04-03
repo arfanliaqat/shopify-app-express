@@ -1,4 +1,5 @@
 const path = require("path")
+const webpack = require('webpack')
 
 module.exports = {
 	entry: "./src/app.tsx",
@@ -23,8 +24,13 @@ module.exports = {
 	resolve: {
 		extensions: [".tsx", ".ts", ".js"]
 	},
+	plugins: [
+			new webpack.DefinePlugin({
+				SHOPIFY_APP_URL: JSON.stringify(process.env.SHOPIFY_APP_URL || "https://shopify-app.dev")
+			})
+	],
 	output: {
-		filename: "h10-stock-by-date.js",
+		filename: process.env.WIDGET_SCRIPT_NAME || "h10-ship-by-date.js",
 		path: path.resolve(__dirname, "public/build")
 	}
 }

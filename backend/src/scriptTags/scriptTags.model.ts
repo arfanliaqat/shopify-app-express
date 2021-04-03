@@ -1,4 +1,4 @@
-import { SHOPIFY_APP_URL } from "../../../widget/src/constants"
+import { appUrl, WIDGET_SCRIPT_NAME } from "../util/constants"
 
 export interface ScriptTag {
 	id?: number
@@ -13,7 +13,7 @@ export function getScriptTagsToCreate(): ScriptTag[] {
 	return [
 		{
 			event: "onload",
-			src: `${SHOPIFY_APP_URL}/widget/build/h10-stock-by-date.js`
+			src: `${appUrl}/widget/build/${WIDGET_SCRIPT_NAME}`
 		}
 	]
 }

@@ -1,4 +1,4 @@
-import { SHOPIFY_APP_URL } from "../../../widget/src/constants"
+import { appUrl } from "../util/constants"
 
 export type OrderEventType =
 	| "cancelled"
@@ -37,7 +37,7 @@ export interface Webhook {
 export function getSubscribedHooks(): Webhook[] {
 	const allOrderEventTypes: OrderEventType[] = ["cancelled", "create", "delete", "edited", "paid", "updated"]
 	return allOrderEventTypes.map((eventType) => ({
-		address: `${SHOPIFY_APP_URL}/hooks/orders/${eventType}`,
+		address: `${appUrl}/hooks/orders/${eventType}`,
 		topic: `orders/${eventType}`,
 		format: "json"
 	}))

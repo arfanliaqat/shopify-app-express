@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { useEffect, useMemo, useState } from "preact/hooks"
-import { SHOPIFY_APP_URL, getAnchorElement, getAppName } from "./constants"
+import { getAnchorElement, getAppName } from "./constants"
 import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
 import { getCssFromWidgetStyles } from "./util/widgetStyles"
@@ -11,6 +11,8 @@ import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
 import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../../backend/src/util/constants"
 import moment from "moment"
+
+declare const SHOPIFY_APP_URL: string // Defined with webpack's DefinePlugin
 
 function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
