@@ -2,7 +2,6 @@ import React from "react"
 import { Card, Checkbox, FormLayout, Select, SelectOption } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { PickerType, WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
-import { getAppName } from "../../../widget/src/constants"
 import { isStockByDateApp } from "../common/constants"
 
 export const datePickerLanguages: SelectOption[] = [

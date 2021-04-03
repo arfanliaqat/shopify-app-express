@@ -26,7 +26,8 @@ module.exports = {
 	},
 	plugins: [
 			new webpack.DefinePlugin({
-				SHOPIFY_APP_URL: JSON.stringify(process.env.SHOPIFY_APP_URL || "https://shopify-app.dev")
+				SHOPIFY_APP_URL: JSON.stringify(process.env.SHOPIFY_APP_URL || "https://shopify-app.dev"),
+				APP_NAME: JSON.stringify(process.env.APP_NAME || "DATE_PICKER")
 			})
 	],
 	output: {

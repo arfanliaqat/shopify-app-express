@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { useEffect, useMemo, useState } from "preact/hooks"
-import { getAnchorElement, getAppName } from "./constants"
+import { anchorElement, appName, appUrl } from "./constants"
 import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
 import { getCssFromWidgetStyles } from "./util/widgetStyles"
@@ -11,8 +11,6 @@ import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
 import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../../backend/src/util/constants"
 import moment from "moment"
-
-declare const SHOPIFY_APP_URL: string // Defined with webpack's DefinePlugin
 
 function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
@@ -45,15 +43,15 @@ function getCurrentDomain() {
 }
 
 function getIsPreviewMode() {
-	return getAnchorElement().getAttribute("data-preview") == "true"
+	return anchorElement?.getAttribute("data-preview") == "true"
 }
 
 function getPreviewData(): ProductAvailabilityData {
-	return JSON.parse(getAnchorElement().getAttribute("data-preview-data"))
+	return JSON.parse(anchorElement?.getAttribute("data-preview-data"))
 }
 
 function getProductId() {
-	return getAnchorElement().getAttribute("data-productid")
+	return anchorElement?.getAttribute("data-productid")
 }
 
 async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
@@ -61,7 +59,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	if (!productId) {
 		throw "[H10 - Stock By Date] productId not found"
 	}
-	const response = await fetch(SHOPIFY_APP_URL + "/product_availability/" + productId, {
+	const response = await fetch(appUrl + "/product_availability/" + productId, {
 		headers: {
 			Accept: "application/json"
 		}
@@ -77,7 +75,7 @@ async function fetchWidgetSettings(): Promise<WidgetSettings> {
 	if (!productId) {
 		throw "[H10 - Date Picker] productId not found"
 	}
-	const response = await fetch(SHOPIFY_APP_URL + "/settings?shop=" + getCurrentDomain(), {
+	const response = await fetch(appUrl + "/settings?shop=" + getCurrentDomain(), {
 		headers: {
 			Accept: "application/json"
 		}
@@ -98,7 +96,7 @@ export default function AvailableDatePicker() {
 	const [formError, setFormError] = useState<string>(undefined)
 
 	const settings = productAvailabilityData?.settings
-	const availableDates = useMemo(() => getAppName() == "STOCK_BY_DATE"
+	const availableDates = useMemo(() => appName == "STOCK_BY_DATE"
 		? (productAvailabilityData?.availableDates || [])
 		: generateAvailableDates(settings), [settings])
 
@@ -123,16 +121,18 @@ export default function AvailableDatePicker() {
 	}, [])
 
 	useEffect(() => {
-		getAnchorElement().addEventListener("previewDataUpdated", () => {
-			const previewDate = getPreviewData()
-			setProductAvailabilityData(previewDate)
-			setFormError(undefined)
-		}, false)
+		if (anchorElement) {
+			anchorElement.addEventListener("previewDataUpdated", () => {
+				const previewDate = getPreviewData()
+				setProductAvailabilityData(previewDate)
+				setFormError(undefined)
+			}, false)
+		}
 	}, [])
 
 	useEffect(() => {
 		if (!isPreviewMode) {
-			if (getAppName() == "STOCK_BY_DATE") {
+			if (appName == "STOCK_BY_DATE") {
 				async function fetchStockByDateData() {
 					const data = await fetchAvailabilityForProduct()
 					setProductAvailabilityData(data)
@@ -154,9 +154,8 @@ export default function AvailableDatePicker() {
 	}, [])
 
 	useEffect(() => {
-		if (!isPreviewMode) {
-			const datePickerDiv = getAnchorElement()
-			const form = datePickerDiv.closest("form")
+		if (!isPreviewMode && anchorElement) {
+			const form = anchorElement.closest("form")
 			const onSubmit = (e) => {
 				if (selectedAvailableDate) return
 				if (!settings.mandatoryDateSelect) return

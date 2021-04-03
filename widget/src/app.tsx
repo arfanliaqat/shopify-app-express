@@ -1,6 +1,8 @@
 import { h, render } from "preact"
 import AvailableDatePicker from "./AvilableDatePicker"
-import { getAnchorElement } from "./constants"
 import "./styles/main.less"
+import { anchorElement } from "./constants"
 
-render(<AvailableDatePicker />, getAnchorElement())
+if (anchorElement) {
+	render(<AvailableDatePicker/>, anchorElement)
+}
