@@ -71,8 +71,7 @@ app.get("/app*", loadConnectedShop, async (req, res) => {
 	const { connectedShop } = res.locals
 	res.render("index", {
 		apiKey: process.env.SHOPIFY_API_PUBLIC_KEY,
-		shopOrigin: connectedShop.domain,
-		APP_NAME
+		shopOrigin: connectedShop.domain
 	})
 })
 

@@ -1,9 +1,4 @@
 import React, { useEffect, useMemo } from "react"
-import {
-	STOCK_BY_DATE_ANCHOR_ID,
-	DATE_PICKER_ANCHOR_ID,
-	PREVIEW_DATA_UPDATED_EVENT_NAME,
-} from "../../../widget/src/constants"
 import { getScriptTagsToCreate } from "../../../backend/src/scriptTags/scriptTags.model"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
@@ -11,10 +6,8 @@ import moment from "moment"
 import { ProductAvailabilityData } from "../../../widget/src/models/ProductAvailabilityData"
 import { getDaysBetween } from "../util/tools"
 import _ from "lodash"
-import { isStockByDateApp } from "../common/constants"
+import { anchorId, isStockByDateApp } from "../common/constants"
 import { AvailableDate } from "../../../widget/src/models/AvailableDate"
-
-const ANCHOR_ID = isStockByDateApp ? STOCK_BY_DATE_ANCHOR_ID : DATE_PICKER_ANCHOR_ID
 
 interface Props {
 	widgetSettings: WidgetSettings
@@ -76,13 +69,13 @@ export default function Preview({ widgetSettings }: Props) {
 
 	useEffect(() => {
 		// eslint-disable-next-line no-undef
-		const event = new CustomEvent(PREVIEW_DATA_UPDATED_EVENT_NAME)
-		setTimeout(() => document.getElementById(ANCHOR_ID).dispatchEvent(event), 10)
+		const event = new CustomEvent("previewDataUpdated")
+		setTimeout(() => document.getElementById(anchorId).dispatchEvent(event), 10)
 	}, [jsonWidgetSettings])
 
 	return (
 		<div className="widgetPreview" style={{ background: widgetSettings.styles.previewBackgroundColor }}>
-			<div id={ANCHOR_ID} data-preview="true" data-preview-data={jsonWidgetSettings} />
+			<div id={anchorId} data-preview="true" data-preview-data={jsonWidgetSettings} />
 			<div className="errorMessagePreview" style={{ color: widgetSettings.styles.errorFontColor }}>
 				This is an example error message.
 			</div>

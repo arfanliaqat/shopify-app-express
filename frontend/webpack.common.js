@@ -1,5 +1,6 @@
 const path = require("path")
 const CopyPlugin = require("copy-webpack-plugin")
+const webpack = require("webpack")
 
 module.exports = {
 	entry: "./src/app.tsx",
@@ -31,6 +32,10 @@ module.exports = {
 				{ from: "./node_modules/@shopify/app-bridge/umd/index.js", to: "./libs/app-bridge.js" },
 				{ from: "./node_modules/@shopify/polaris/dist/styles.css", to: "./css/polaris.css" }
 			]
+		}),
+		new webpack.DefinePlugin({
+			APP_NAME: JSON.stringify(process.env.APP_NAME || "DATE_PICKER"),
+			ANCHOR_ID: JSON.stringify(process.env.ANCHOR_ID || "h10-ship-by-date")
 		})
 	]
 }
