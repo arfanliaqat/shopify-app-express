@@ -28,7 +28,8 @@ module.exports = {
 			new webpack.DefinePlugin({
 				SHOPIFY_APP_URL: JSON.stringify(process.env.SHOPIFY_APP_URL || "https://shopify-app.dev"),
 				APP_NAME: JSON.stringify(process.env.APP_NAME || "DATE_PICKER")
-			})
+			}),
+			new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /nl|en|en\-au|en\-ca|en\-gb|fr|fr\-ca|de|id|it|pl|pt|pt\-br|ro|ru|es|sv/),
 	],
 	output: {
 		filename: process.env.WIDGET_SCRIPT_NAME || "h10-ship-by-date.js",
