@@ -30,7 +30,7 @@ export class ShopService {
 	static async createFromApi(shopData: ShopApiData): Promise<Shop | undefined> {
 		if (!shopData.domain) throw new UnexpectedError("shopData.domain cannot be undefined")
 		if (!shopData.email) throw new UnexpectedError("shopData.email cannot be undefined")
-		return await this.insert(new Shop(shopData.domain, shopData.email, undefined, shopData))
+		return await this.insert(new Shop(shopData.myshopify_domain, shopData.email, undefined, shopData))
 	}
 
 	static async insert(shop: Shop): Promise<Shop | undefined> {
