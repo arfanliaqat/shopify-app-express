@@ -16,7 +16,13 @@ export class ShopBuilder {
 	}
 
 	async buildAndSave(): Promise<Shop | undefined> {
-		const newShop = new Shop(this.email || "example.com", this.domain || "my@email.com", undefined, {})
+		const newShop = new Shop(
+			this.email || "example.com",
+			this.domain || "my@email.com",
+			this.domain || "my@email.com",
+			undefined,
+			{}
+		)
 		return await ShopService.insert(newShop)
 	}
 }
