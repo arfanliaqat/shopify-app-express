@@ -70,10 +70,6 @@ export class HooksService {
 	}
 
 	static async subscribeHooks(shop: Shop, accessToken: AccessToken): Promise<void> {
-		if (APP_NAME == "DATE_PICKER") {
-			// The Date Picker app doesn't need any hooks.
-			return
-		}
 		console.log(`[subscribeHooks|shop:${shop.domain}] Synchronising hooks...`)
 		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
 		const webhooksToCreate = getSubscribedHooks().filter((webhook) => {
