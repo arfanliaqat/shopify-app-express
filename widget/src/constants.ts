@@ -11,7 +11,7 @@ export const anchorId = ANCHOR_ID
 export let anchorElement = document.getElementById(anchorId)
 
 if (!anchorElement) {
-	const productForm = document.querySelectorAll("form[action*='/cart']")
+	const productForm = document.querySelectorAll("form[action*='/cart/add']")
 	if (productForm?.length > 0) {
 		anchorElement = document.createElement("div")
 		anchorElement.id = anchorId
