@@ -6,6 +6,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import path from "path"
 import morgan from "morgan"
+import compression from "compression"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -20,7 +21,7 @@ import gdprRouter from "./gdpr/gdpr.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
 import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabilities.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
-import { appUrl, isDev, APP_NAME } from "./util/constants"
+import { appUrl, isDev } from "./util/constants"
 import { noApiCallCache } from "./util/middlewares"
 
 import "./currentAvailabilities/currentAvailabilities.job"
@@ -58,6 +59,7 @@ app.use((req, res, next) => {
 })
 
 app.set("etag", false)
+app.use(compression())
 
 app.use((req, res, next) => {
 	res.removeHeader("X-Powered-By")
