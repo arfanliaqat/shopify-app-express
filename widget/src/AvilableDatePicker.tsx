@@ -71,10 +71,6 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 }
 
 async function fetchWidgetSettings(): Promise<WidgetSettings> {
-	const productId = getProductId()
-	if (!productId) {
-		throw "[H10 - Date Picker] productId not found"
-	}
 	const response = await fetch(appUrl + "/settings?shop=" + getCurrentDomain(), {
 		headers: {
 			Accept: "application/json"
