@@ -16,7 +16,7 @@ export class ShopService {
 	static async findByPublicDomain(domain: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(
-			`SELECT id, domain, public_domain, email, trial_used FROM shops WHERE domain = $1`,
+			`SELECT id, domain, public_domain, email, trial_used FROM shops WHERE public_domain = $1`,
 			[domain]
 		)
 		return result.rows.map(toShop)[0]
