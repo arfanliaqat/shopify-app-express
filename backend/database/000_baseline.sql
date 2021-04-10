@@ -38,6 +38,7 @@ create table availability_periods(
 	id uuid default uuid_generate_v4(),
 	shop_resource_id uuid not null references shop_resources(id),
 	quantity integer,
+	quantity_is_shared boolean not null,
 	start_date timestamp with time zone not null,
 	end_date timestamp with time zone not null,
 	available_dates jsonb not null default '[]'::jsonb,
