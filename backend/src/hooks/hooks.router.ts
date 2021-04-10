@@ -7,6 +7,7 @@ import { HooksService } from "./hooks.service"
 import { getLocals } from "../util/locals"
 import { loadAccessToken } from "../accessToken/accessToken.middleware"
 import { devOnly } from "../util/middlewares"
+import { APP_NAME } from "../util/constants"
 
 const router = Router()
 
@@ -47,7 +48,7 @@ router.post(
 				throw new UnexpectedError("`connectedShop` shouldn't be null")
 			}
 			const orderEvent = JSON.parse(req.body) as OrderEventData
-			await HooksService.ingestOrderEvent(eventType, connectedShop, orderEvent)
+			await HooksService.ingestOrderEvent(eventType, connectedShop, orderEvent, APP_NAME == "STOCK_BY_DATE")
 
 			res.end()
 		} catch (error) {

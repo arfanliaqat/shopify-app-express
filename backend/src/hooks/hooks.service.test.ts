@@ -17,21 +17,26 @@ describe("HooksService", () => {
 	let shopResource: ShopResource | undefined
 
 	async function ingestOrderEvent() {
-		await HooksService.ingestOrderEvent("create", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 1,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"create",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 	}
 
 	beforeEach(async () => {
@@ -39,10 +44,10 @@ describe("HooksService", () => {
 		availableDate = moment("01/12/2020", "DD/MM/YYYY")
 		shop = await new ShopBuilder().buildAndSave()
 		await new WidgetSettingsBuilder(shop!.id!).withFirstAvailableDateInDays(0).buildAndSave()
-		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 	})
 
 	test("Orders get properly ingested", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		const productOrders = await ProductOrderService.findByShopResourceAndDate(
 			shopResource!.id!,
@@ -56,6 +61,7 @@ describe("HooksService", () => {
 	})
 
 	test("If the order changes with another product, it doesn't retain the previously ingested product order", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		{
 			// So it creates a product orders record for it
@@ -67,21 +73,26 @@ describe("HooksService", () => {
 			expect(productOrders).toHaveLength(1)
 		}
 
-		await HooksService.ingestOrderEvent("updated", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 1,
-					product_id: 6666,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate.format("DD/MM/YYYY")
-						}
-					]
-				}
-			] // This product doesn't exist
-		})
+		await HooksService.ingestOrderEvent(
+			"updated",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 6666,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				] // This product doesn't exist
+			},
+			true
+		)
 
 		{
 			// So we shouldn't have any records for this product
@@ -91,6 +102,7 @@ describe("HooksService", () => {
 	})
 
 	test("If the quantity of a product changes in an order, the product order quantity for that date gets updated", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
@@ -102,21 +114,26 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("updated", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 3,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"updated",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 3,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 
 		{
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
@@ -126,6 +143,7 @@ describe("HooksService", () => {
 	})
 
 	test("When the event is of type cancellation it removes the product orders", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
@@ -137,21 +155,26 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("cancelled", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 1,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"cancelled",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 
 		{
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
@@ -160,6 +183,7 @@ describe("HooksService", () => {
 	})
 
 	test("When the event is of type deletion it removes the product orders", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
@@ -171,21 +195,26 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("delete", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 1,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"delete",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 
 		{
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
@@ -194,6 +223,7 @@ describe("HooksService", () => {
 	})
 
 	test("When the event cancelled_at property is not null it removes the product orders", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		{
 			const productOrders = await ProductOrderService.findByShopResourceAndDate(
@@ -205,22 +235,27 @@ describe("HooksService", () => {
 			expect(productOrders[0].quantity).toBe(1)
 		}
 
-		await HooksService.ingestOrderEvent("updated", shop!, {
-			id: 1234,
-			cancelled_at: "2020-12-03T16:10:47-05:00",
-			line_items: [
-				{
-					quantity: 1,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"updated",
+			shop!,
+			{
+				id: 1234,
+				cancelled_at: "2020-12-03T16:10:47-05:00",
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 
 		{
 			const productOrders = await ProductOrderService.findByShopResource(shopResource!)
@@ -229,6 +264,7 @@ describe("HooksService", () => {
 	})
 
 	test("It handles multiple chosen dates in the same order", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		await ingestOrderEvent()
 		const shopResource2 = await new ShopResourceBuilder()
 			.forShop(shop!)
@@ -238,31 +274,36 @@ describe("HooksService", () => {
 		const availableDate1 = availableDate.clone().add(1, "day")
 		const availableDate2 = availableDate.clone().add(2, "day")
 
-		await HooksService.ingestOrderEvent("updated", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 1,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate1.format("DD/MM/YYYY")
-						}
-					]
-				},
-				{
-					quantity: 5,
-					product_id: 5555,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate2.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"updated",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate1.format("DD/MM/YYYY")
+							}
+						]
+					},
+					{
+						quantity: 5,
+						product_id: 5555,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate2.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 
 		const productOrders1 = await ProductOrderService.findByShopResourceAndDate(
 			shopResource!.id!,
@@ -284,6 +325,7 @@ describe("HooksService", () => {
 	})
 
 	test("Date is parsed correctly", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		const availableDate = getChosenDate({
 			product_id: 123,
 			quantity: 2,
@@ -299,6 +341,7 @@ describe("HooksService", () => {
 	})
 
 	test("When an order gets ingested it refreshes the current availabilities cache", async () => {
+		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
 		const availableDate1 = moment().startOf("week").add(1, "week")
 		const availableDate2 = availableDate1.clone().add(1, "day")
 		const availableDate3 = availableDate1.clone().add(3, "day")
@@ -309,21 +352,26 @@ describe("HooksService", () => {
 			.withQuantity(2)
 			.buildAndSave()
 
-		await HooksService.ingestOrderEvent("create", shop!, {
-			id: 1234,
-			line_items: [
-				{
-					quantity: 2,
-					product_id: 4321,
-					properties: [
-						{
-							name: TAG_LABEL,
-							value: availableDate1.format("DD/MM/YYYY")
-						}
-					]
-				}
-			]
-		})
+		await HooksService.ingestOrderEvent(
+			"create",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 2,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate1.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			true
+		)
 
 		const { results } = await ShopResourceService.searchShopResources(shop!, {})
 		const product = results[0]
@@ -335,6 +383,72 @@ describe("HooksService", () => {
 		)
 		expect(product.availableDates).toBe(2)
 		expect(product.soldOutDates).toBe(1)
+	})
+
+	test("Works for the date picker app too (where products aren't created upfront)", async () => {
+		await HooksService.ingestOrderEvent(
+			"create",
+			shop!,
+			{
+				id: 1234,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			false
+		)
+
+		const shopResource = await ShopResourceService.findShopResourceByProductId(4321)
+		expect(shopResource).toBeDefined()
+
+		{
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!.id!,
+				availableDate,
+				availableDate
+			)
+			expect(productOrders).toHaveLength(1)
+		}
+
+		// Ingest another order on the same product
+		await HooksService.ingestOrderEvent(
+			"create",
+			shop!,
+			{
+				id: 3333,
+				line_items: [
+					{
+						quantity: 1,
+						product_id: 4321,
+						properties: [
+							{
+								name: TAG_LABEL,
+								value: availableDate.format("DD/MM/YYYY")
+							}
+						]
+					}
+				]
+			},
+			false
+		)
+
+		{
+			const productOrders = await ProductOrderService.findByShopResourceAndDate(
+				shopResource!.id!,
+				availableDate,
+				availableDate
+			)
+			expect(productOrders).toHaveLength(2)
+		}
 	})
 
 	afterAll(async () => {

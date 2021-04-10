@@ -7,6 +7,7 @@ import { BadParameter, handleAxiosErrors, UnexpectedError } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import Axios from "axios"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
+import { APP_NAME } from "../util/constants"
 
 export interface ShopifyResource {
 	id: string
@@ -77,6 +78,30 @@ export class ShopResourceService {
 			AND resource_id in (${productIds.join(",")})`
 		)
 		return result.rows.map(ShopResource.createFromSchema)
+	}
+
+	static async findOrCreateByProductIds(
+		productIds: number[],
+		shop: Shop,
+		client: PoolClient
+	): Promise<ShopResource[]> {
+		if (!shop.id) throw new UnexpectedError("shop.id cannot be undefined")
+		const products = await this.findByProductIds(productIds, client)
+		const allProducts = []
+		for (const productId of productIds) {
+			const existingProduct = products.find((product) => product.resourceId == productId)
+			if (!existingProduct) {
+				const newProduct = await this.insert(
+					new ShopResource(undefined, shop.id, "Product", productId, "Product: " + productId)
+				)
+				if (newProduct) {
+					allProducts.push(newProduct)
+				}
+			} else {
+				allProducts.push(existingProduct)
+			}
+		}
+		return allProducts
 	}
 
 	static groupByResourceId(shopResources: ShopResource[]): ShopResourceById {
@@ -182,7 +207,7 @@ export class ShopResourceService {
 		const row = result.rows[0]
 		if (!row) return undefined
 		const newShopResource = ShopResource.createFromSchema(row)
-		if (newShopResource.id) {
+		if (newShopResource.id && APP_NAME == "STOCK_BY_DATE") {
 			await CurrentAvailabilityService.createInitial(newShopResource.id)
 		}
 		return newShopResource

@@ -4,7 +4,7 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { APP_NAME, TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
+import { TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
@@ -85,7 +85,8 @@ export class HooksService {
 	static async ingestOrderEvent(
 		eventType: OrderEventType,
 		connectedShop: Shop,
-		orderEvent: OrderEventData
+		orderEvent: OrderEventData,
+		isStockByDateApp: boolean
 	): Promise<void> {
 		let eventShopResourcesArray
 		const service = new ProductOrderServiceWithTransaction()
@@ -100,7 +101,15 @@ export class HooksService {
 			}
 
 			const productIds = Array.from(new Set<number>(orderEvent.line_items.map((item) => item.product_id)))
-			eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
+			if (isStockByDateApp) {
+				eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
+			} else {
+				eventShopResourcesArray = await ShopResourceService.findOrCreateByProductIds(
+					productIds,
+					connectedShop,
+					service.getClient()
+				)
+			}
 			const eventShopResources = ShopResourceService.groupByResourceId(eventShopResourcesArray)
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
