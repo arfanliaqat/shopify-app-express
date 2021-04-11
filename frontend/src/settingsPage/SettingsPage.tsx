@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Layout, Page, PageActions } from "@shopify/polaris"
+import { Layout, Page, PageActions, SettingToggle, TextStyle } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
 import { Toast } from "@shopify/app-bridge-react"
@@ -16,6 +16,7 @@ import { isStockByDateApp } from "../common/constants"
 import ShopPlan from "../models/ShopPlan"
 import { plans } from "../../../backend/src/util/constants"
 import CurrentPlanCard from "./CurrentPlanCard"
+import VisibilityToggle from "./VisibilityToggle"
 
 interface Props {}
 
@@ -97,6 +98,16 @@ export default function SettingsPage({}: Props) {
 				title={isStockByDateApp && "Settings"}
 				separator={isStockByDateApp}
 			>
+				<Layout>
+					<Layout.Section>
+						<VisibilityToggle
+							initialWidgetSettings={initialWidgetSettings}
+							widgetSettings={widgetSettings}
+							onWidgetSettingsChange={setWidgetSettings}
+						/>
+					</Layout.Section>
+				</Layout>
+				<div className="pageSeparator" />
 				<Layout>
 					<Layout.Section>
 						<CurrentPlanCard currentOrderCount={currentOrderCount} planOptions={plans[shopPlan.plan]} />

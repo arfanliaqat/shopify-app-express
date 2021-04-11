@@ -11,6 +11,7 @@ export interface WidgetSettings {
 	styles: WidgetStyles
 	mandatoryDateSelect: boolean
 	messages: WidgetMessages
+	isVisible: boolean
 }
 
 export interface WidgetStyles {

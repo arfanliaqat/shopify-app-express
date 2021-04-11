@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { useEffect, useMemo, useState } from "preact/hooks"
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks"
 import { anchorElement, appName, appUrl } from "./constants"
 import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
@@ -149,8 +149,10 @@ export default function AvailableDatePicker() {
 		}
 	}, [])
 
+	const isVisible = useCallback(() => isPreviewMode || settings?.isVisible, [isPreviewMode, settings])
+
 	useEffect(() => {
-		if (!isPreviewMode && anchorElement) {
+		if (!isPreviewMode && anchorElement && isVisible()) {
 			const form = anchorElement.closest("form")
 			const onSubmit = (e) => {
 				if (selectedAvailableDate) return
@@ -177,7 +179,7 @@ export default function AvailableDatePicker() {
 				form.removeEventListener("click", onSubmit)
 			}
 		}
-	}, [selectedAvailableDate, settings])
+	}, [selectedAvailableDate, settings, isVisible])
 
 	useEffect(() => {
 		if (productAvailabilityData && availableDates.length == 0) {
@@ -189,7 +191,8 @@ export default function AvailableDatePicker() {
 		setSelectedAvailableDate(value)
 	}
 
-	if (!productAvailabilityData || !settings) return undefined
+	if (!productAvailabilityData || !isVisible()) return undefined
+
 	return (
 		<div className="h10-date-dropdown-picker">
 			{widgetStyles && <style>{widgetStyles}</style>}
