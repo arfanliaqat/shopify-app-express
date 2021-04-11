@@ -12,7 +12,7 @@ export const SYSTEM_DATE_FORMAT = "YYYY-MM-DD"
 export const SYSTEM_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss"
 export const SHORT_DISPLAY_FORMAT = "ddd D MMM"
 export const SHORT_DISPLAY_FORMAT_WITH_YEAR = "ddd D MMM YYYY"
-export const TAG_DATE_FORMAT = "DD/MM/YYYY"
+export const TAG_DATE_FORMAT = "LL"
 export const TAG_LABEL = "Delivery Date"
 
 export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"
@@ -52,3 +52,23 @@ export const plans: { [key: string]: PlanOptions } = {
 }
 
 export const isPlanTestMode = process.env.PLAN_TEST_MODE == "true"
+
+export const datePickerLanguages: { value: string; label: string }[] = [
+	{ value: "nl", label: "Dutch" },
+	{ value: "en", label: "English (United States)" },
+	{ value: "en-au", label: "English (Australia)" },
+	{ value: "en-ca", label: "English (Canada)" },
+	{ value: "en-gb", label: "English (United Kingdom)" },
+	{ value: "fr", label: "French" },
+	{ value: "fr-ca", label: "French (Canada)" },
+	{ value: "de", label: "German" },
+	{ value: "id", label: "Indonesian" },
+	{ value: "it", label: "Italian" },
+	{ value: "pl", label: "Polish" },
+	{ value: "pt", label: "Portuguese" },
+	{ value: "pt-br", label: "Portuguese (Brazil)" },
+	{ value: "ro", label: "Romanian" },
+	{ value: "ru", label: "Russian" },
+	{ value: "es", label: "Spanish" },
+	{ value: "sv", label: "Swedish" }
+]

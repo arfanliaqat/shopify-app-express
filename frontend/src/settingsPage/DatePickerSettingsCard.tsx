@@ -1,28 +1,9 @@
 import React from "react"
-import { Card, Checkbox, FormLayout, Select, SelectOption } from "@shopify/polaris"
+import { Card, Checkbox, FormLayout, Select } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { PickerType, WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
 import { isStockByDateApp } from "../common/constants"
-
-export const datePickerLanguages: SelectOption[] = [
-	{ value: "nl", label: "Dutch" },
-	{ value: "en", label: "English (United States)" },
-	{ value: "en-au", label: "English (Australia)" },
-	{ value: "en-ca", label: "English (Canada)" },
-	{ value: "en-gb", label: "English (United Kingdom)" },
-	{ value: "fr", label: "French" },
-	{ value: "fr-ca", label: "French (Canada)" },
-	{ value: "de", label: "German" },
-	{ value: "id", label: "Indonesian" },
-	{ value: "it", label: "Italian" },
-	{ value: "pl", label: "Polish" },
-	{ value: "pt", label: "Portuguese" },
-	{ value: "pt-br", label: "Portuguese (Brazil)" },
-	{ value: "ro", label: "Romanian" },
-	{ value: "ru", label: "Russian" },
-	{ value: "es", label: "Spanish" },
-	{ value: "sv", label: "Swedish" }
-]
+import { datePickerLanguages } from "../../../backend/src/util/constants"
 
 interface Props {
 	widgetSettings: WidgetSettings

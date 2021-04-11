@@ -6,15 +6,18 @@ import { ProductOrderService } from "../productOrders/productOrders.service"
 import { DatabaseTestService, getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { SYSTEM_DATE_FORMAT, TAG_LABEL } from "../util/constants"
+import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
 import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPeriods.builder"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { WidgetSettingsBuilder } from "../widget/widget.builder"
+import { WidgetSettings } from "../widget/widget.model"
+import { WidgetService } from "../widget/widget.service"
 
 describe("HooksService", () => {
 	let availableDate: Moment
 	let shop: Shop | undefined
 	let shopResource: ShopResource | undefined
+	let widgetSettings: WidgetSettings
 
 	async function ingestOrderEvent() {
 		await HooksService.ingestOrderEvent(
@@ -29,7 +32,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -43,7 +46,7 @@ describe("HooksService", () => {
 		await DatabaseTestService.clearDatabase()
 		availableDate = moment("01/12/2020", "DD/MM/YYYY")
 		shop = await new ShopBuilder().buildAndSave()
-		await new WidgetSettingsBuilder(shop!.id!).withFirstAvailableDateInDays(0).buildAndSave()
+		widgetSettings = await new WidgetSettingsBuilder(shop!.id!).withFirstAvailableDateInDays(0).buildAndSave()
 	})
 
 	test("Orders get properly ingested", async () => {
@@ -85,7 +88,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -126,7 +129,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -167,7 +170,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -207,7 +210,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -248,7 +251,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -286,7 +289,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate1.format("DD/MM/YYYY")
+								value: availableDate1.format(TAG_DATE_FORMAT)
 							}
 						]
 					},
@@ -296,7 +299,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate2.format("DD/MM/YYYY")
+								value: availableDate2.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -325,19 +328,38 @@ describe("HooksService", () => {
 	})
 
 	test("Date is parsed correctly", async () => {
-		shopResource = await new ShopResourceBuilder().forShop(shop!).withResourceId("Product", 4321).buildAndSave()
-		const availableDate = getChosenDate({
-			product_id: 123,
-			quantity: 2,
-			properties: [
-				{
-					name: TAG_LABEL,
-					value: "20/12/2020"
-				}
-			]
-		})
+		{
+			const availableDate = getChosenDate(widgetSettings.settings, {
+				product_id: 123,
+				quantity: 2,
+				properties: [
+					{
+						name: TAG_LABEL,
+						value: "December 20, 2020"
+					}
+				]
+			})
 
-		expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
+			expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
+		}
+
+		// Try another locale
+		{
+			widgetSettings.settings.locale = "fr"
+
+			const availableDate = getChosenDate(widgetSettings.settings, {
+				product_id: 123,
+				quantity: 2,
+				properties: [
+					{
+						name: TAG_LABEL,
+						value: "20 décembre 2020"
+					}
+				]
+			})
+
+			expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
+		}
 	})
 
 	test("When an order gets ingested it refreshes the current availabilities cache", async () => {
@@ -364,7 +386,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate1.format("DD/MM/YYYY")
+								value: availableDate1.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -398,7 +420,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}
@@ -432,7 +454,7 @@ describe("HooksService", () => {
 						properties: [
 							{
 								name: TAG_LABEL,
-								value: availableDate.format("DD/MM/YYYY")
+								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
 					}

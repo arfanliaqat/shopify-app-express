@@ -7,7 +7,7 @@
 		"heroku-prebuild": "npm install --dev",
 		"heroku-postbuild": "tsc && cd frontend && npm install --dev && npm run prod && cd ../widget && npm install --dev && npm run prod",
 		"start": "node backend/dist/backend/src/main.js",
-		"watch": "nodemon",
+		"watch": "nodemon --watch ./backend",
 		"test": "jest --runInBand",
 		"coverage": "jest --coverage --runInBand",
 		"lint": "eslint .",

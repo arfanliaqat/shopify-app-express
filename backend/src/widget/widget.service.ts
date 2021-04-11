@@ -1,4 +1,4 @@
-import { Shop, ShopSchema, toShop } from "../shop/shop.model"
+import { Shop } from "../shop/shop.model"
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"

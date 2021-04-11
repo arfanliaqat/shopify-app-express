@@ -10,13 +10,14 @@ import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
 import { WidgetService } from "../widget/widget.service"
+import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 
-export function getChosenDate(lineItem: LineItem): Moment | undefined {
+export function getChosenDate(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): Moment | undefined {
 	const chosenDateProperty = lineItem.properties.find((property: Property) => {
 		return property.name?.toLowerCase() == TAG_LABEL.toLowerCase()
 	})
 	if (!chosenDateProperty?.value) return undefined
-	return moment(chosenDateProperty.value, TAG_DATE_FORMAT)
+	return moment(chosenDateProperty.value, TAG_DATE_FORMAT, widgetSetting.locale)
 }
 
 export class HooksService {
@@ -111,27 +112,27 @@ export class HooksService {
 				)
 			}
 			const eventShopResources = ShopResourceService.groupByResourceId(eventShopResourcesArray)
+			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 
 			orderEvent.line_items.forEach((item) => {
-				const chosenDate = getChosenDate(item)
-				if (!chosenDate) return
 				const shopResource = eventShopResources[item.product_id]
-				if (shopResource && shopResource.id) {
-					const key = shopResource.id + ":" + chosenDate
-					const newProductOrder = newProductOrdersById[key]
-					if (!newProductOrder) {
-						newProductOrdersById[key] = new ProductOrder(
-							undefined,
-							shopResource.id,
-							orderEvent.id,
-							chosenDate,
-							item.quantity
-						)
-					} else {
-						newProductOrder.quantity += item.quantity
-					}
+				if (!shopResource || !shopResource.id) return
+				const chosenDate = getChosenDate(widgetSettings, item)
+				if (!chosenDate) return
+				const key = shopResource.id + ":" + chosenDate
+				const newProductOrder = newProductOrdersById[key]
+				if (!newProductOrder) {
+					newProductOrdersById[key] = new ProductOrder(
+						undefined,
+						shopResource.id,
+						orderEvent.id,
+						chosenDate,
+						item.quantity
+					)
+				} else {
+					newProductOrder.quantity += item.quantity
 				}
 			})
 
