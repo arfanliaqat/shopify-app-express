@@ -4,7 +4,13 @@ import { ArrowLeftCircle, ArrowRightCircle } from "./Icons"
 import { getDaysBetween } from "../../frontend/src/util/tools"
 import { Moment } from "moment"
 import { useEffect, useMemo, useState } from "preact/hooks"
-import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../../backend/src/util/constants"
+import {
+	DAY_OF_WEEK_TAG_DATE_FORMAT,
+	DAY_OF_WEEK_TAG_LABEL,
+	SYSTEM_DATE_FORMAT,
+	TAG_DATE_FORMAT,
+	TAG_LABEL
+} from "../../backend/src/util/constants"
 import classNames from "classnames"
 import { WidgetSettings } from "./models/WidgetSettings"
 import { getMoment, parseMoment } from "./util/dates"
@@ -46,6 +52,10 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT)
 	}, [settings, selectedDate])
 
+	const formattedSelectedDay = useMemo(() => {
+		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(DAY_OF_WEEK_TAG_DATE_FORMAT)
+	}, [settings, selectedDate])
+
 	useEffect(() => setMonthStart(getMonthStart()), [settings])
 
 	const moveMonth = (delta) => () => {
@@ -60,6 +70,7 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 
 	return <div className="h10cal">
 		<input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate} />
+		<input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay} />
 		<div className="h10cal-header-wrapper">
 			<div className="h10cal-header">
 				<div className="h10cal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
