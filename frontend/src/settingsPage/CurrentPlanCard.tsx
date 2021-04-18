@@ -1,5 +1,5 @@
 import React from "react"
-import { Banner, Button, Card, Layout, ProgressBar } from "@shopify/polaris"
+import { Banner, Button, Card, Layout, ProgressBar, TextContainer } from "@shopify/polaris"
 import ShopPlan from "../models/ShopPlan"
 import { plans } from "../../../backend/src/util/constants"
 
@@ -10,23 +10,31 @@ interface Props {
 
 export default function CurrentPlanCard({ currentOrderCount, shopPlan }: Props) {
 	const progressPercent = (currentOrderCount * 100) / shopPlan.orderLimit
-	const approachingLimit = progressPercent >= 80
-	const reachedLimit = currentOrderCount >= shopPlan.orderLimit
+	const approachingLimit = shopPlan.orderLimit > 0 && progressPercent >= 80
+	const reachedLimit = shopPlan.orderLimit > 0 && currentOrderCount >= shopPlan.orderLimit
 	const planOptions = plans[shopPlan.plan]
 	return (
 		<Card sectioned>
 			<Layout>
 				<Layout.Section>
 					<div className="ordersCount">
-						<p>
-							Current plan: <strong>{planOptions.title}</strong>
-						</p>
-						<p>
-							Orders made this month: <strong>{currentOrderCount}</strong> out of{" "}
-							<strong>{shopPlan.orderLimit}</strong>
-						</p>
+						<TextContainer>
+							<p>
+								Current plan: <strong>{planOptions.title}</strong>
+							</p>
+							{shopPlan.orderLimit > 0 ? (
+								<p>
+									You had <strong>{currentOrderCount}</strong> orders tagged out of{" "}
+									<strong>{shopPlan.orderLimit}</strong> so far this month.
+								</p>
+							) : (
+								<p>
+									You had <strong>{currentOrderCount}</strong> orders tagged so far this month.
+								</p>
+							)}
+						</TextContainer>
 					</div>
-					<ProgressBar progress={progressPercent} size="large" />
+					{shopPlan.orderLimit > 0 && <ProgressBar progress={progressPercent} size="large" />}
 				</Layout.Section>
 				<Layout.Section>
 					{!approachingLimit && !reachedLimit && <Button url="/app/plans">Change your plan</Button>}
