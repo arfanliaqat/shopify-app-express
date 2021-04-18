@@ -18,21 +18,28 @@ router.get("/auth", (req: Request, res: Response) => {
 		}
 		const nonce = generateNonce(16)
 		const installShopUrl = AuthService.buildInstallUrl(shop.toString(), nonce, AuthService.buildRedirectUri())
-		updateSession(req, res, { state: nonce })
-		res.redirect(installShopUrl)
+		res.send(`<script>
+			document.cookie = "state=${nonce}; secure; SameSite=None"
+			if (document.cookie) {
+				window.location.href = "${installShopUrl}"
+			} else {
+			  document.write("Blah")
+			}
+		</script>`)
 	} catch (error) {
 		handleErrors(res, error)
 	}
 })
 
 router.get("/auth/callback", async (req: Request, res: Response) => {
+	console.log("CALLBACK!")
 	try {
 		const { shop, code, state } = req.query
 		if (!shop) return res.status(400).send("Missing 'shop' in the query params")
 		if (!state) return res.status(400).send("Missing 'state' in the query params")
 		if (!code) return res.status(400).send("Missing 'code' in the query params")
 
-		const sessionState = getSession(req).state
+		const sessionState = req.cookies.state
 		if (!sessionState) return res.status(400).send("Missing 'state' in the session")
 		if (state.toString() != sessionState) return res.status(403).send("Cannot be verified")
 
