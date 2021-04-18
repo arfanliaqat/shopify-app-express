@@ -172,7 +172,7 @@ export class ShopPlanService {
 		const shopPlan = await this.findByShopId(shop.id)
 		const monthStart = moment().startOf("month")
 		const monthEnd = moment().endOf("month")
-		if (shopPlan) {
+		if (shopPlan && shopPlan.orderLimit > 0) {
 			const currentOrderCount = await ProductOrderService.countOrdersInMonth(shop, moment())
 			const progressPercent = (currentOrderCount * 100) / shopPlan.orderLimit
 			const approachingLimit = progressPercent >= 80
