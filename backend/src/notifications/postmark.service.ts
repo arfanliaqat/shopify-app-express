@@ -1,5 +1,5 @@
 import postmark, { ServerClient } from "postmark"
-import { NotificationType } from "../notifications/notifications.model"
+import { NotificationType } from "./notifications.model"
 import { TemplatedMessage } from "postmark/dist/client/models"
 import { APP_NAME, isDev } from "../util/constants"
 
