@@ -55,6 +55,7 @@
 		"@types/lodash": "^4.14.165",
 		"@types/morgan": "^1.9.2",
 		"@types/node-cron": "^2.0.3",
+		"@types/postmark": "^2.0.3",
 		"axios": "^0.21.0",
 		"compression": "^1.7.4",
 		"cookie-parser": "^1.4.5",

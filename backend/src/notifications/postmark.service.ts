@@ -1,4 +1,4 @@
-import postmark, { ServerClient } from "postmark"
+import * as postmark from "postmark"
 import { NotificationType } from "./notifications.model"
 import { TemplatedMessage } from "postmark/dist/client/models"
 import { APP_NAME, isDev } from "../util/constants"
@@ -10,7 +10,7 @@ const globalTemplateModel = {
 	company_name: "H10 Studio"
 }
 
-export function getEmailClient(): ServerClient | undefined {
+export function getEmailClient(): postmark.ServerClient | undefined {
 	if (process.env.POSTMARK_API_TOKEN) {
 		return new postmark.ServerClient(process.env.POSTMARK_API_TOKEN)
 	}

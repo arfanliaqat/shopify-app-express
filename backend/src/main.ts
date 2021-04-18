@@ -21,11 +21,10 @@ import gdprRouter from "./gdpr/gdpr.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
 import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabilities.router"
 import { loadConnectedShop } from "./shop/shop.middleware"
-import { appUrl, datePickerLanguages, isDev } from "./util/constants"
+import { appUrl, isDev } from "./util/constants"
 import { noApiCallCache } from "./util/middlewares"
 
 import "./currentAvailabilities/currentAvailabilities.job"
-import moment from "moment"
 
 const app: Application = express()
 
