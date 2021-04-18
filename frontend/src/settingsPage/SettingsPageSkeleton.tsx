@@ -1,12 +1,17 @@
 import React from "react"
 import { Card, Layout, SkeletonBodyText, SkeletonPage } from "@shopify/polaris"
+import { isStockByDateApp } from "../common/constants"
 
 interface Props {}
 
 export default function SettingsPageSkeleton({}: Props) {
 	return (
 		<div id="settingsPage">
-			<SkeletonPage title="Settings" primaryAction breadcrumbs>
+			<SkeletonPage
+				title={isStockByDateApp && "Settings"}
+				primaryAction={isStockByDateApp}
+				breadcrumbs={isStockByDateApp}
+			>
 				<Card>
 					<Card.Section>
 						<SkeletonBodyText lines={5} />
