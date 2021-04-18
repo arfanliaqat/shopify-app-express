@@ -7,7 +7,6 @@ export const scopes = "read_products,read_orders,write_script_tags"
 export const appUrl = process.env.SHOPIFY_APP_URL || ""
 export const hooksSecret = process.env.HOOKS_SECRET || ""
 export const databaseName = process.env.DB_DATABASE || "shopify_app"
-
 export const SYSTEM_DATE_FORMAT = "YYYY-MM-DD"
 export const SYSTEM_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss"
 export const SHORT_DISPLAY_FORMAT = "ddd D MMM"

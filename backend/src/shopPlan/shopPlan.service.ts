@@ -9,6 +9,8 @@ import { AccessToken } from "../accessToken/accessToken.model"
 import crypto from "crypto"
 import { ShopService } from "../shop/shop.service"
 import { ProductOrderService } from "../productOrders/productOrders.service"
+import moment from "moment"
+import NotificationService from "../notifications/notifications.service"
 
 interface RecurringApplicationChargeResponse {
 	confirmation_url: string
@@ -162,6 +164,40 @@ export class ShopPlanService {
 			return response.data
 		} catch (error) {
 			handleAxiosErrors(error)
+		}
+	}
+
+	static async sendPlanLimitNotifications(shop: Shop): Promise<void> {
+		if (!shop.id) throw new UnexpectedError("The shop's id isn't defined")
+		const shopPlan = await this.findByShopId(shop.id)
+		const monthStart = moment().startOf("month")
+		const monthEnd = moment().endOf("month")
+		if (shopPlan) {
+			const currentOrderCount = await ProductOrderService.countOrdersInMonth(shop, moment())
+			const progressPercent = (currentOrderCount * 100) / shopPlan.orderLimit
+			const approachingLimit = progressPercent >= 80
+			const reachedLimit = currentOrderCount >= shopPlan.orderLimit
+			if (reachedLimit) {
+				const notifications = await NotificationService.findNotifications(
+					shop,
+					"REACHED_PLAN_LIMIT",
+					monthStart,
+					monthEnd
+				)
+				if (notifications.length == 0) {
+					await NotificationService.reachedPlanLimit(shop, shopPlan)
+				}
+			} else if (approachingLimit) {
+				const notifications = await NotificationService.findNotifications(
+					shop,
+					"APPROACHING_PLAN_LIMIT",
+					monthStart,
+					monthEnd
+				)
+				if (notifications.length == 0) {
+					await NotificationService.approachingPlanLimit(shop, shopPlan)
+				}
+			}
 		}
 	}
 }

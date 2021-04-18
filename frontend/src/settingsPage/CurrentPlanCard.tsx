@@ -1,16 +1,18 @@
 import React from "react"
 import { Banner, Button, Card, Layout, ProgressBar } from "@shopify/polaris"
-import { PlanOptions } from "../../../backend/src/util/constants"
+import ShopPlan from "../models/ShopPlan"
+import { plans } from "../../../backend/src/util/constants"
 
 interface Props {
-	planOptions: PlanOptions
+	shopPlan: ShopPlan
 	currentOrderCount: number
 }
 
-export default function CurrentPlanCard({ currentOrderCount, planOptions }: Props) {
-	const progressPercent = (currentOrderCount * 100) / planOptions.orderLimit
+export default function CurrentPlanCard({ currentOrderCount, shopPlan }: Props) {
+	const progressPercent = (currentOrderCount * 100) / shopPlan.orderLimit
 	const approachingLimit = progressPercent >= 80
-	const reachedLimit = currentOrderCount >= planOptions.orderLimit
+	const reachedLimit = currentOrderCount >= shopPlan.orderLimit
+	const planOptions = plans[shopPlan.plan]
 	return (
 		<Card sectioned>
 			<Layout>

@@ -11,6 +11,7 @@ import { AccessToken } from "../accessToken/accessToken.model"
 import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvailabilities.service"
 import { WidgetService } from "../widget/widget.service"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
+import { ShopPlanService } from "../shopPlan/shopPlan.service"
 
 export function getChosenDate(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): Moment | undefined {
 	const chosenDateProperty = lineItem.properties.find((property: Property) => {
@@ -148,9 +149,13 @@ export class HooksService {
 			service.releaseClient()
 		}
 
-		const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
-		if (widgetSettings) {
-			await CurrentAvailabilityService.refreshCurrentAvailabilities(eventShopResourcesArray, widgetSettings)
+		if (isStockByDateApp) {
+			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
+			if (widgetSettings) {
+				await CurrentAvailabilityService.refreshCurrentAvailabilities(eventShopResourcesArray, widgetSettings)
+			}
 		}
+
+		await ShopPlanService.sendPlanLimitNotifications(connectedShop)
 	}
 }

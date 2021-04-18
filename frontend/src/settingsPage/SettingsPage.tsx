@@ -110,7 +110,7 @@ export default function SettingsPage({}: Props) {
 				<div className="pageSeparator" />
 				<Layout>
 					<Layout.Section>
-						<CurrentPlanCard currentOrderCount={currentOrderCount} planOptions={plans[shopPlan.plan]} />
+						<CurrentPlanCard currentOrderCount={currentOrderCount} shopPlan={shopPlan} />
 					</Layout.Section>
 				</Layout>
 				<div className="pageSeparator" />

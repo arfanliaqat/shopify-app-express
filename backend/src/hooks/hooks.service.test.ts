@@ -11,7 +11,6 @@ import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPe
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { WidgetSettingsBuilder } from "../widget/widget.builder"
 import { WidgetSettings } from "../widget/widget.model"
-import { WidgetService } from "../widget/widget.service"
 
 describe("HooksService", () => {
 	let availableDate: Moment
