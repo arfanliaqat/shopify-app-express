@@ -23,7 +23,7 @@ export default function CurrentPlanCard({ currentOrderCount, shopPlan }: Props) 
 						</p>
 						<p>
 							Orders made this month: <strong>{currentOrderCount}</strong> out of{" "}
-							<strong>{planOptions.orderLimit}</strong>
+							<strong>{shopPlan.orderLimit}</strong>
 						</p>
 					</div>
 					<ProgressBar progress={progressPercent} size="large" />
@@ -36,9 +36,9 @@ export default function CurrentPlanCard({ currentOrderCount, shopPlan }: Props) 
 							action={{ content: "Change your plan", url: "/app/plans" }}
 							status="warning"
 						>
-							You're currently allowed a maximum of {planOptions.orderLimit} orders per month. Once the
-							limit is reached, the calendar will stop showing on your shop. Please consider upgrading
-							your plan right now to avoid any interruption.
+							You're currently allowed a maximum of {shopPlan.orderLimit} orders per month. Once the limit
+							is reached, the calendar will stop showing on your shop. Please consider upgrading your plan
+							right now to avoid any interruption.
 						</Banner>
 					)}
 					{reachedLimit && (
@@ -47,9 +47,9 @@ export default function CurrentPlanCard({ currentOrderCount, shopPlan }: Props) 
 							action={{ content: "Change your plan", url: "/app/plans" }}
 							status="critical"
 						>
-							You're currently allowed a maximum of {planOptions.orderLimit} orders per month.
-							Unfortunately since the limit was reached the calendar has stopped showing on your shop.
-							Please consider upgrading your plan to instantly resume our service.
+							You're currently allowed a maximum of {shopPlan.orderLimit} orders per month. Unfortunately
+							since the limit was reached the calendar has stopped showing on your shop. Please consider
+							upgrading your plan to instantly resume our service.
 						</Banner>
 					)}
 				</Layout.Section>
