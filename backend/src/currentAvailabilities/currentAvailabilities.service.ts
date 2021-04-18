@@ -7,6 +7,7 @@ import { ShopResourceService } from "../shopResource/shopResource.service"
 import { Shop } from "../shop/shop.model"
 import { WidgetService } from "../widget/widget.service"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 export class CurrentAvailabilityService {
 	static async refreshAllByShop(shop: Shop): Promise<void> {
@@ -92,8 +93,8 @@ export class CurrentAvailabilityService {
 			RETURNING id`,
 			[
 				currentAvailability.shopResourceId,
-				currentAvailability.nextAvailabilityDate,
-				currentAvailability.lastAvailabilityDate,
+				currentAvailability.nextAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
+				currentAvailability.lastAvailabilityDate?.format(SYSTEM_DATE_FORMAT),
 				currentAvailability.soldOutDates,
 				currentAvailability.availableDates
 			]
