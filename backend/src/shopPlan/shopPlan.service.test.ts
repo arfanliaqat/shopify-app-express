@@ -6,7 +6,7 @@ import { ShopPlanBuilder } from "./shopPlan.builder"
 import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
 import moment from "moment"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { emailTestStore } from "../notifications/postmark.server"
+import { emailTestStore } from "../notifications/postmark.service"
 
 describe("ShopPlanService", () => {
 	let shop: Shop | undefined

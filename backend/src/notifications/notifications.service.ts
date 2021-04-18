@@ -4,7 +4,7 @@ import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { UnexpectedError } from "../util/error"
-import { PostmarkService } from "./postmark.server"
+import { PostmarkService } from "./postmark.service"
 import { ShopPlan } from "../shopPlan/shopPlan.model"
 
 export default class NotificationService {
