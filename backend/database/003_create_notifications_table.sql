@@ -6,6 +6,6 @@ create table notifications(
     primary key (id)
 );
 
-create unique index ind_notifications_shop_id on notifications(shop_id);
-create unique index ind_notifications_type on notifications(type);
-create unique index ind_notifications_created_date on notifications(created_date);
+create index ind_notifications_shop_id on notifications(shop_id);
+create index ind_notifications_type on notifications(type);
+create index ind_notifications_created_date on notifications(created_date);
