@@ -4,6 +4,10 @@ import ModalBackground from "../util/ModalBackground"
 import { Modal, TextContainer } from "@shopify/polaris"
 import { Plan, planNames } from "../../../backend/src/shopPlan/shopPlan.model"
 import { plans, TRIAL_DAYS } from "../../../backend/src/util/constants"
+import { useAppBridge } from "@shopify/app-bridge-react"
+import { Redirect } from "@shopify/app-bridge/actions"
+import { useHistory } from "react-router-dom"
+import { shopifyConfig } from "../models/ShopifyConfig"
 
 interface Props {
 	plan: Plan
@@ -12,14 +16,25 @@ interface Props {
 }
 
 export default function ChoosePlanConfirmationModal({ plan, onClose, trialAlreadyUsed }: Props) {
+	const app = useAppBridge()
+	const history = useHistory()
+
 	const [active, setActive] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
 
-	const { setApiRequest: resetSettings } = useApi<{ url: string }>({
-		onSuccess: (data) => {
-			window.location.href = data.url ?? "/app"
-		}
-	})
+	const { setApiRequest: resetSettings } = useApi<{ url: string }>(
+		{
+			onSuccess: (data) => {
+				if (data.url) {
+					const redirect = Redirect.create(app)
+					redirect.dispatch(Redirect.Action.REMOTE, data.url)
+				} else {
+					history.push("/app?shopOrigin=" + shopifyConfig.shopOrigin)
+				}
+			}
+		},
+		app
+	)
 
 	const handleChosePlanClick = () => {
 		setIsLoading(true)

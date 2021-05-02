@@ -1,7 +1,7 @@
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { Plan, planNames, ShopPlan, ShopPlanSchema } from "./shopPlan.model"
-import { appUrl, isDev, plans, TRIAL_DAYS } from "../util/constants"
+import { appUrl, isDev, plans, shopifyApiSecretKey, TRIAL_DAYS } from "../util/constants"
 import { handleAxiosErrors, UnexpectedError } from "../util/error"
 import axios from "axios"
 import { Shop } from "../shop/shop.model"
@@ -11,22 +11,17 @@ import { ShopService } from "../shop/shop.service"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import moment from "moment"
 import NotificationService from "../notifications/notifications.service"
+import { generateNonce } from "../util/tools"
 
 interface RecurringApplicationChargeResponse {
 	confirmation_url: string
+	price: string
 }
 
 export class ShopPlanService {
-	static makeToken(plan: Plan, nonce: string): string {
-		const hash = crypto.createHash("sha1")
-		hash.update(plan + "_" + nonce)
-		return hash.digest("hex")
-	}
-
 	static async initiateRecurringCharge(
 		shop: Shop,
 		plan: Plan,
-		nonce: string,
 		accessToken: AccessToken
 	): Promise<RecurringApplicationChargeResponse | undefined> {
 		if (!shop.id) throw new UnexpectedError("Shop id cannot be undefined")
@@ -39,7 +34,7 @@ export class ShopPlanService {
 			}
 			await this.upsert(shopPlan) // Update the shop plan record straightaway, no confirmation step
 		} else {
-			const response = await this.postRecurringApplicationCharge(shop, shopPlan, nonce, accessToken)
+			const response = await this.postRecurringApplicationCharge(shop, shopPlan, accessToken)
 			if (!shop.trialUsed) {
 				await ShopService.markTrialDaysAsUsed(shop)
 			}
@@ -47,14 +42,23 @@ export class ShopPlanService {
 		}
 	}
 
+	static getSignature(shopDomain: string, plan: Plan, token: string): string {
+		const hash = crypto.createHash("sha256")
+		hash.update(plan + "_" + shopDomain + "_" + token + "_" + shopifyApiSecretKey)
+		return hash.digest("hex")
+	}
+
 	static async postRecurringApplicationCharge(
 		shop: Shop,
 		shopPlan: ShopPlan,
-		nonce: string,
 		accessToken: AccessToken
 	): Promise<RecurringApplicationChargeResponse | undefined> {
-		const token = this.makeToken(shopPlan.plan, nonce)
 		try {
+			const token = generateNonce(16)
+			const signature = this.getSignature(shop.domain, shopPlan.plan, token)
+			const returnUrlQuery = `plan=${shopPlan.plan}&shopDomain=${shop.domain}&token=${token}&signature=${signature}`
+			const returnUrl = `${appUrl}/plan_confirmation?${returnUrlQuery}`
+			console.log({ returnUrl })
 			const response = await axios.post<{ recurring_application_charge: RecurringApplicationChargeResponse }>(
 				`https://${shop.domain}/admin/api/2021-01/recurring_application_charges.json`,
 				{
@@ -62,7 +66,7 @@ export class ShopPlanService {
 						name: planNames[shopPlan.plan],
 						price: shopPlan.price,
 						trial_days: !shop.trialUsed ? TRIAL_DAYS : 0,
-						return_url: `${appUrl}/plan_confirmation?plan=${shopPlan.plan}&token=${token}`,
+						return_url: returnUrl,
 						test: isDev
 					}
 				},
@@ -94,6 +98,22 @@ export class ShopPlanService {
 					}
 				}
 			)
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
+
+	static async fetchRecurringApplicationCharges(shop: Shop, accessToken: AccessToken) {
+		try {
+			const response = await axios.get<RecurringApplicationChargeResponse>(
+				`https://${shop.domain}/admin/api/2021-01/recurring_application_charges.json`,
+				{
+					headers: {
+						"X-Shopify-Access-Token": accessToken.token
+					}
+				}
+			)
+			return response.data
 		} catch (error) {
 			handleAxiosErrors(error)
 		}
@@ -149,22 +169,6 @@ export class ShopPlanService {
 	static async deleteShopPlan(shopPlan: ShopPlan): Promise<void> {
 		const conn: Pool = await getConnection()
 		await conn.query<ShopPlanSchema>(`DELETE FROM shop_plans WHERE shop_id = $1`, [shopPlan.shopId])
-	}
-
-	static async fetchRecurringApplicationCharges(shop: Shop, accessToken: AccessToken) {
-		try {
-			const response = await axios.get<RecurringApplicationChargeResponse>(
-				`https://${shop.domain}/admin/api/2021-01/recurring_application_charges.json`,
-				{
-					headers: {
-						"X-Shopify-Access-Token": accessToken.token
-					}
-				}
-			)
-			return response.data
-		} catch (error) {
-			handleAxiosErrors(error)
-		}
 	}
 
 	static async sendPlanLimitNotifications(shop: Shop): Promise<void> {

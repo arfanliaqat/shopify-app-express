@@ -20,7 +20,6 @@ import hooksRouter from "./hooks/hooks.router"
 import gdprRouter from "./gdpr/gdpr.router"
 import scriptTagsRouter from "./scriptTags/scriptTags.router"
 import currentAvailabilitiesRouter from "./currentAvailabilities/currentAvailabilities.router"
-import { loadConnectedShop } from "./shop/shop.middleware"
 import { appUrl, isDev } from "./util/constants"
 import { noApiCallCache } from "./util/middlewares"
 
@@ -69,12 +68,8 @@ app.use((req, res, next) => {
 app.set("views", path.join(process.cwd(), "backend/src/views"))
 app.set("view engine", "ejs")
 
-app.get("/app*", loadConnectedShop, async (req, res) => {
-	const { connectedShop } = res.locals
-	res.render("index", {
-		apiKey: process.env.SHOPIFY_API_PUBLIC_KEY,
-		shopOrigin: connectedShop.domain
-	})
+app.get("/app*", async (req, res) => {
+	res.render("index")
 })
 
 app.use(

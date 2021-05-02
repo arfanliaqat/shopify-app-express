@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Layout, Page, PageActions, SettingToggle, TextStyle } from "@shopify/polaris"
+import { Layout, Page, PageActions } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
-import { Toast } from "@shopify/app-bridge-react"
 import _ from "lodash"
 import ResetSettingsModal from "./ResetSettingsModal"
 import AvailabilitySettingsCard from "./AvailabilitySettingsCard"
@@ -14,9 +13,10 @@ import SettingsPageSkeleton from "./SettingsPageSkeleton"
 import DropdownStylesCard from "./DropdownStylesCard"
 import { isStockByDateApp } from "../common/constants"
 import ShopPlan from "../models/ShopPlan"
-import { plans } from "../../../backend/src/util/constants"
 import CurrentPlanCard from "./CurrentPlanCard"
 import VisibilityToggle from "./VisibilityToggle"
+
+import { Toast, useAppBridge } from "@shopify/app-bridge-react"
 
 interface Props {}
 
@@ -27,6 +27,8 @@ interface WidgetSettingsPageData {
 }
 
 export default function SettingsPage({}: Props) {
+	const app = useAppBridge()
+
 	const [initialWidgetSettings, setInitialWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [successMessage, setSuccessMessage] = useState<string>()
@@ -35,21 +37,27 @@ export default function SettingsPage({}: Props) {
 	const [shopPlan, setShopPlan] = useState<ShopPlan | undefined>(undefined)
 	const [currentOrderCount, setCurrentOrderCount] = useState<number>(undefined)
 
-	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettingsPageData>({
-		onSuccess: useCallback((response) => {
-			setCurrentOrderCount(response.currentOrderCount)
-			setShopPlan(response.plan)
-			setInitialWidgetSettings({ ...response.settings })
-			setWidgetSettings({ ...response.settings })
-		}, [])
-	})
+	const { setApiRequest: fetchPeriod, isLoading } = useApi<WidgetSettingsPageData>(
+		{
+			onSuccess: useCallback((response) => {
+				setCurrentOrderCount(response.currentOrderCount)
+				setShopPlan(response.plan)
+				setInitialWidgetSettings({ ...response.settings })
+				setWidgetSettings({ ...response.settings })
+			}, [])
+		},
+		app
+	)
 
-	const { setApiRequest: saveSettings, isLoading: isSaving } = useApi({
-		onSuccess: useCallback(() => {
-			setSuccessMessage("Settings saved!")
-			setReloadIncrement(reloadIncrement + 1)
-		}, [reloadIncrement])
-	})
+	const { setApiRequest: saveSettings, isLoading: isSaving } = useApi(
+		{
+			onSuccess: useCallback(() => {
+				setSuccessMessage("Settings saved!")
+				setReloadIncrement(reloadIncrement + 1)
+			}, [reloadIncrement])
+		},
+		app
+	)
 
 	useEffect(() => {
 		fetchPeriod({

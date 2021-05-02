@@ -3,6 +3,7 @@ import { Modal, TextContainer } from "@shopify/polaris"
 import ModalBackground from "../util/ModalBackground"
 import { useApi } from "../util/useApi"
 import { WidgetSettings } from "../../../backend/src/widget/widget.model"
+import { useAppBridge } from "@shopify/app-bridge-react"
 
 interface Props {
 	onSuccess: (widgetSettings: WidgetSettings) => void
@@ -10,13 +11,18 @@ interface Props {
 }
 
 export default function ResetSettingsModal({ onSuccess, onClose }: Props) {
+	const app = useAppBridge()
+
 	const [active, setActive] = useState(true)
 
-	const { setApiRequest: resetSettings, isLoading } = useApi({
-		onSuccess: (widgetSettings: WidgetSettings) => {
-			onSuccess(widgetSettings)
-		}
-	})
+	const { setApiRequest: resetSettings, isLoading } = useApi(
+		{
+			onSuccess: (widgetSettings: WidgetSettings) => {
+				onSuccess(widgetSettings)
+			}
+		},
+		app
+	)
 
 	const handleResetSettingsClick = () => {
 		resetSettings({

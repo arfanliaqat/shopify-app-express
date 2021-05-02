@@ -6,7 +6,7 @@ import { AvailabilityPeriod } from "../models/AvailabilityPeriod"
 import moment, { Moment } from "moment"
 import { ShopResource } from "../models/ShopResource"
 import _ from "lodash"
-import { Toast } from "@shopify/app-bridge-react"
+import { Toast, useAppBridge } from "@shopify/app-bridge-react"
 import AvailableDatePickerModal from "./AvailableDatePickerModal"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
@@ -80,6 +80,8 @@ const sectionMessages: SectionMessages = {
 }
 
 export default function AvailabilityPeriodPage({ match, history }: RouteChildrenProps<UrlParams>) {
+	const app = useAppBridge()
+
 	const { availabilityPeriodId } = match.params
 
 	const [availabilityPeriod, setAvailabilityPeriod] = useState<AvailabilityPeriod>()
@@ -92,27 +94,36 @@ export default function AvailabilityPeriodPage({ match, history }: RouteChildren
 	const [addPeriodModalOpen, setAddPeriodModalOpen] = useState<boolean>()
 
 	const [reloadIncrement, setReloadIncrement] = useState<number>(0)
-	const { setApiRequest: fetchPeriod, data: pageData, isLoading } = useApi<AvailabilityPeriodPageData>({
-		onSuccess: useCallback((pageData) => {
-			const period = AvailabilityPeriod.newInstance(pageData.availabilityPeriod)
-			setAvailabilityPeriod(period)
-			setNewDates([])
-			setDeletedDates([])
-			setPausedDates(period.getPausedDates())
-		}, [])
-	})
+	const { setApiRequest: fetchPeriod, data: pageData, isLoading } = useApi<AvailabilityPeriodPageData>(
+		{
+			onSuccess: useCallback((pageData) => {
+				const period = AvailabilityPeriod.newInstance(pageData.availabilityPeriod)
+				setAvailabilityPeriod(period)
+				setNewDates([])
+				setDeletedDates([])
+				setPausedDates(period.getPausedDates())
+			}, [])
+		},
+		app
+	)
 
-	const { setApiRequest: savePeriod, isLoading: isSavingPeriod } = useApi({
-		onSuccess: useCallback(() => {
-			setSuccessMessage("Availability period saved!")
-			setReloadIncrement(reloadIncrement + 1)
-		}, [reloadIncrement])
-	})
-	const { setApiRequest: deletePeriod, isLoading: isDeletingPeriod } = useApi({
-		onSuccess: useCallback(() => {
-			history.push(getBackUrl(pageData.shopResource))
-		}, [pageData, history])
-	})
+	const { setApiRequest: savePeriod, isLoading: isSavingPeriod } = useApi(
+		{
+			onSuccess: useCallback(() => {
+				setSuccessMessage("Availability period saved!")
+				setReloadIncrement(reloadIncrement + 1)
+			}, [reloadIncrement])
+		},
+		app
+	)
+	const { setApiRequest: deletePeriod, isLoading: isDeletingPeriod } = useApi(
+		{
+			onSuccess: useCallback(() => {
+				history.push(getBackUrl(pageData.shopResource))
+			}, [pageData, history])
+		},
+		app
+	)
 
 	useEffect(() => {
 		fetchPeriod({

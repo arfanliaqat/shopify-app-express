@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import Axios, { Method } from "axios"
+import { getSessionToken } from "@shopify/app-bridge-utils"
+import { ClientApplication } from "@shopify/app-bridge"
 
 type Error = any // TODO
 
@@ -22,7 +24,7 @@ export interface UseApiParams<T> {
 	onError?: (error: Error, apiRequest: ApiRequest) => void
 }
 
-export function useApi<T>({ onSuccess, onError }: UseApiParams<T>): UseApiState<T> {
+export function useApi<T>({ onSuccess, onError }: UseApiParams<T>, app: ClientApplication<any>): UseApiState<T> {
 	const [apiRequest, setApiRequest] = useState<ApiRequest | undefined>()
 	const [isLoading, setIsLoading] = useState<boolean>()
 	const [data, setData] = useState<T>()
@@ -31,10 +33,14 @@ export function useApi<T>({ onSuccess, onError }: UseApiParams<T>): UseApiState<
 		const fetchData = async () => {
 			setIsLoading(true)
 			try {
+				const sessionToken = await getSessionToken(app)
 				const response = await Axios(apiRequest.url, {
 					method: apiRequest.method || "GET",
 					data: apiRequest.postData,
-					params: apiRequest.queryParams
+					params: apiRequest.queryParams,
+					headers: {
+						Authorization: `Bearer ${sessionToken}`
+					}
 				})
 				setData(response.data)
 				if (onSuccess) {

@@ -8,6 +8,7 @@ import { RouteChildrenProps } from "react-router"
 import ProductItem from "./ProductItem"
 import HomePageSkeleton from "./HomePageSkeleton"
 import { TabDescriptor } from "@shopify/polaris/dist/types/latest/src/components/Tabs/types"
+import { useAppBridge } from "@shopify/app-bridge-react"
 
 const tabs: TabDescriptor[] = [
 	{
@@ -34,22 +35,27 @@ interface ShopResourcesPageResult {
 }
 
 export default function HomePage({ history }: RouteChildrenProps) {
+	const app = useAppBridge()
+
 	const [open, setOpen] = useState(false)
 	const [page, setPage] = useState(0)
 	const [filterTabIndex, setFilterTabIndex] = useState(0)
 	const [queryValue, setQueryValue] = useState<string>()
 	const [search, setSearch] = useState<string>()
 	const [shopResources, setShopResources] = useState<ShopResource[]>([])
-	const { setApiRequest, data: pageResult, isLoading } = useApi<ShopResourcesPageResult>({
-		onSuccess: (pageResult) => {
-			const newShopResources = pageResult.results?.map(ShopResource.create)
-			if (page > 0) {
-				setShopResources(shopResources.concat(newShopResources))
-			} else {
-				setShopResources(newShopResources)
+	const { setApiRequest, data: pageResult, isLoading } = useApi<ShopResourcesPageResult>(
+		{
+			onSuccess: (pageResult) => {
+				const newShopResources = pageResult.results?.map(ShopResource.create)
+				if (page > 0) {
+					setShopResources(shopResources.concat(newShopResources))
+				} else {
+					setShopResources(newShopResources)
+				}
 			}
-		}
-	})
+		},
+		app
+	)
 
 	useEffect(() => {
 		const timer = setTimeout(() => {

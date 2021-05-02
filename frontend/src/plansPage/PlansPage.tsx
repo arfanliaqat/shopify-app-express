@@ -8,20 +8,26 @@ import ShopPlan from "../models/ShopPlan"
 import PlanCard from "./PlanCard"
 import { TRIAL_DAYS } from "../../../backend/src/util/constants"
 import PlansPageSkeleton from "./PlansPageSkeleton"
+import { useAppBridge } from "@shopify/app-bridge-react"
 
 interface Props {}
 
 export default function PlansPage({}: Props) {
+	const app = useAppBridge()
+
 	const [selectedPlan, setSelectedPlan] = useState<Plan>()
 	const [currentShopPlan, setCurrentShopPlan] = useState<ShopPlan>()
 	const [trialAlreadyUsed, setTrialIsAlreadyUsed] = useState<boolean>()
 
-	const { setApiRequest: fetchPeriod, isLoading } = useApi<{ plan: ShopPlan; trialAlreadyUsed: boolean }>({
-		onSuccess: useCallback((response) => {
-			setTrialIsAlreadyUsed(response.trialAlreadyUsed)
-			setCurrentShopPlan(response.plan)
-		}, [])
-	})
+	const { setApiRequest: fetchPeriod, isLoading } = useApi<{ plan: ShopPlan; trialAlreadyUsed: boolean }>(
+		{
+			onSuccess: useCallback((response) => {
+				setTrialIsAlreadyUsed(response.trialAlreadyUsed)
+				setCurrentShopPlan(response.plan)
+			}, [])
+		},
+		app
+	)
 
 	useEffect(() => {
 		fetchPeriod({

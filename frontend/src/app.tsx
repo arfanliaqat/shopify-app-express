@@ -13,6 +13,7 @@ import "./styles/main.less"
 import SettingsPage from "./settingsPage/SettingsPage"
 import { isStockByDateApp } from "./common/constants"
 import PlansPage from "./plansPage/PlansPage"
+import { shopifyConfig } from "./models/ShopifyConfig"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -39,7 +40,7 @@ function Link({ children, url = "", external, ref, ...rest }: any) {
 
 ReactDOM.render(
 	<AppProvider i18n={translations} linkComponent={Link}>
-		<Provider config={window.shopifyConfig}>
+		<Provider config={shopifyConfig}>
 			<BrowserRouter>
 				<Switch>
 					<Route exact path="/app" component={isStockByDateApp ? HomePage : SettingsPage} />

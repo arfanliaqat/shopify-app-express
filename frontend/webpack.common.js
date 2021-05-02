@@ -35,7 +35,8 @@ module.exports = {
 		}),
 		new webpack.DefinePlugin({
 			APP_NAME: JSON.stringify(process.env.APP_NAME || "DATE_PICKER"),
-			ANCHOR_ID: JSON.stringify(process.env.ANCHOR_ID || "h10-ship-by-date")
+			ANCHOR_ID: JSON.stringify(process.env.ANCHOR_ID || "h10-ship-by-date"),
+			SHOPIFY_API_PUBLIC_KEY: JSON.stringify(process.env.SHOPIFY_API_PUBLIC_KEY || "")
 		})
 	]
 }

@@ -2,12 +2,14 @@ import { Request, Response, Router } from "express"
 import { loadConnectedShop } from "../shop/shop.middleware"
 import { getLocals } from "../util/locals"
 import { BadParameter, HandledError, handleErrors, UnexpectedError } from "../util/error"
-import { getSession, updateSession } from "../util/session"
 import { ShopPlanService } from "./shopPlan.service"
 import { allPlans, Plan, ShopPlan } from "./shopPlan.model"
-import { generateNonce } from "../util/tools"
 import { loadAccessToken } from "../accessToken/accessToken.middleware"
 import { devOnly } from "../util/middlewares"
+import { ShopService } from "../shop/shop.service"
+import { AccessTokenService } from "../accessToken/accessToken.service"
+import { shopifyConfig } from "../../../frontend/src/models/ShopifyConfig"
+import { shopifyApiPublicKey, shopifyApiSecretKey } from "../util/constants"
 
 const router = Router()
 
@@ -42,9 +44,7 @@ router.post("/choose_plan", [loadConnectedShop, loadAccessToken], async (req: Re
 			throw new BadParameter(`Wrong 'plan' value: ${plan}`)
 		}
 
-		const nonce = generateNonce(16)
-		updateSession(req, res, { planToken: nonce })
-		const response = await ShopPlanService.initiateRecurringCharge(connectedShop, plan, nonce, accessToken)
+		const response = await ShopPlanService.initiateRecurringCharge(connectedShop, plan, accessToken)
 
 		res.send(response ? { url: response.confirmation_url } : {})
 	} catch (error) {
@@ -52,44 +52,37 @@ router.post("/choose_plan", [loadConnectedShop, loadAccessToken], async (req: Re
 	}
 })
 
-router.get("/plan_confirmation", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
+router.get("/plan_confirmation", async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
-		if (!connectedShop || !connectedShop.id) {
-			throw new HandledError("Missing connectedShop")
-		}
-
-		const urlToken = req.query.token
-		if (!urlToken) {
-			throw new BadParameter("Missing 'token' parameter")
-		}
+		const shopDomain = req.query.shopDomain?.toString()
+		if (!shopDomain) throw new BadParameter("Missing 'shopDomain' param")
 
 		const plan = req.query.plan as Plan
-		if (!plan) {
-			throw new BadParameter("Missing 'plan' parameter")
-		}
-		if (!allPlans.includes(plan)) {
-			throw new BadParameter(`Wrong 'plan' value: ${plan}`)
+		if (!plan) throw new BadParameter("Missing 'plan' parameter")
+		if (!allPlans.includes(plan)) throw new BadParameter(`Wrong 'plan' value: ${plan}`)
+
+		const token = req.query.token?.toString()
+		if (!token) throw new BadParameter("Missing 'token' param")
+
+		const signature = req.query.signature?.toString()
+		if (!signature) throw new BadParameter("Missing 'signature' param")
+
+		if (ShopPlanService.getSignature(shopDomain, plan, token) != signature) {
+			throw new BadParameter("Signature mismatch")
 		}
 
-		const { planToken: sessionToken } = getSession(req)
-		if (!sessionToken) {
-			throw new BadParameter("Missing 'planToken' in the session")
-		}
-		if (urlToken != ShopPlanService.makeToken(plan, sessionToken)) {
-			throw new BadParameter("'token' mismatch")
-		}
+		const shop = await ShopService.findByDomain(shopDomain)
+		if (!shop || !shop.id) throw new BadParameter("Shop not found")
+
+		const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+		if (!accessToken) throw new BadParameter("Access token not found")
 
 		const chargeId = req.query.charge_id ? parseInt(req.query.charge_id.toString()) : undefined
-		if (!chargeId) {
-			throw new BadParameter("Missing 'charge_id' parameter")
-		}
+		if (!chargeId) throw new BadParameter("Missing 'charge_id' parameter")
 
-		updateSession(req, res, { planToken: undefined })
+		await ShopPlanService.createAndSavePlan(shop.id, chargeId, plan as Plan)
 
-		await ShopPlanService.createAndSavePlan(connectedShop.id, chargeId, plan as Plan)
-
-		res.redirect("/app")
+		res.redirect(`https://${shop.domain}/admin/apps/${shopifyApiPublicKey}/app?shopOrigin=${shop.domain}`)
 	} catch (error) {
 		handleErrors(res, error)
 	}

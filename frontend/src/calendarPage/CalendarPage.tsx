@@ -11,6 +11,7 @@ import { OrdersPerDate } from "../../../backend/src/productOrders/productOrders.
 import ProductThumbnail from "../util/ProductThumbnail"
 import { capitalize } from "../util/tools"
 import CalendarPageSkeleton from "./CalendarPageSkeleton"
+import { useAppBridge } from "@shopify/app-bridge-react"
 
 interface Params {
 	shopResourceId: string
@@ -42,13 +43,15 @@ interface CalendarPageData {
 export const currentStartOfMonth = moment().startOf("month")
 
 export default function CalendarPage({ match, history }: RouteChildrenProps<Params>) {
+	const app = useAppBridge()
+
 	const params = match.params
 	const shopResourceId = params.shopResourceId
 	const calendarDates = useMemo(() => getCalendarDatesFromParams(params), [params])
 
 	const [addPeriodDate, setAddPeriodDate] = useState<Moment>()
 	const [requestIncrement, setRequestIncrement] = useState<number>(0)
-	const { setApiRequest: fetchCalendarPage, data: calendarPageData } = useApi<CalendarPageData>({})
+	const { setApiRequest: fetchCalendarPage, data: calendarPageData } = useApi<CalendarPageData>({}, app)
 
 	useEffect(() => {
 		fetchCalendarPage({

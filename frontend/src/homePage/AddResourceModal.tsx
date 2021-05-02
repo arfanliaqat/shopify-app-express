@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react"
-import { ResourcePicker } from "@shopify/app-bridge-react"
+import { ResourcePicker, useAppBridge } from "@shopify/app-bridge-react"
 import { ActionVerb } from "@shopify/app-bridge/actions/ResourcePicker"
 import { SelectPayload } from "@shopify/app-bridge-react/components/ResourcePicker/ResourcePicker"
 import { ResourcePicker as AppBridgeResourcePicker } from "@shopify/app-bridge/actions"
@@ -12,12 +12,17 @@ interface Props {
 }
 
 export default function AddResourceModal({ open, onSuccess, onClose }: Props) {
+	const app = useAppBridge()
+
 	const [resourceSelection, setResourceSelection] = useState<AppBridgeResourcePicker.ResourceSelection[]>()
-	const { setApiRequest: createShopResources } = useApi({
-		onSuccess: useCallback(() => {
-			onSuccess()
-		}, [])
-	})
+	const { setApiRequest: createShopResources } = useApi(
+		{
+			onSuccess: useCallback(() => {
+				onSuccess()
+			}, [])
+		},
+		app
+	)
 
 	useEffect(() => {
 		if (resourceSelection) {

@@ -5,6 +5,7 @@ import { useApi } from "../util/useApi"
 import _ from "lodash"
 import AvailableDatePicker from "../common/AvailableDatePicker"
 import QuantityIsSharedCheckbox from "../common/QuantityIsSharedCheckbox"
+import { useAppBridge } from "@shopify/app-bridge-react"
 
 interface Props {
 	shopResourceId: string
@@ -14,16 +15,21 @@ interface Props {
 }
 
 export default function AddPeriodModal({ shopResourceId, date, onSuccess, onClose }: Props) {
+	const app = useAppBridge()
+
 	const [active, setActive] = useState(true)
 	const [selectedDates, setSelectedDates] = useState<Moment[]>([date])
 	const [quantity, setQuantity] = useState<number>(10)
 	const [quantityIsShared, setQuantityIsShared] = useState<boolean>(true)
 
-	const { setApiRequest: submitForm, isLoading: isSubmitting } = useApi({
-		onSuccess: useCallback(() => {
-			onSuccess()
-		}, [onSuccess])
-	})
+	const { setApiRequest: submitForm, isLoading: isSubmitting } = useApi(
+		{
+			onSuccess: useCallback(() => {
+				onSuccess()
+			}, [onSuccess])
+		},
+		app
+	)
 
 	const handleAddPeriodClick = useCallback(() => {
 		submitForm({
