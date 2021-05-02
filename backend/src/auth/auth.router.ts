@@ -2,7 +2,6 @@ import { Router } from "express"
 import { Request, Response } from "express"
 import querystring from "querystring"
 import { handleErrors } from "../util/error"
-import { generateNonce } from "../util/tools"
 import { AuthService } from "./auth.service"
 import { HooksService } from "../hooks/hooks.service"
 import { ScriptTagService } from "../scriptTags/scriptTags.service"
@@ -15,6 +14,7 @@ router.get("/auth", (req: Request, res: Response) => {
 		if (!shop) {
 			return res.status(400).send("Shop is missing")
 		}
+
 		const installShopUrl = AuthService.buildInstallUrl(shop.toString(), AuthService.buildRedirectUri())
 
 		// Stupid hack to make it work on Safari
