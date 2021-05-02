@@ -14,9 +14,9 @@ export class AuthService {
 		return `${appUrl}/auth/callback`
 	}
 
-	static buildInstallUrl(shop: string, state: string, redirectUri: string): string {
+	static buildInstallUrl(shop: string, redirectUri: string): string {
 		const baseUrl = `https://${shop}/admin/oauth/authorize`
-		const params = `client_id=${shopifyApiPublicKey}&scope=${scopes}&state=${state}&redirect_uri=${redirectUri}`
+		const params = `client_id=${shopifyApiPublicKey}&scope=${scopes}&redirect_uri=${redirectUri}`
 		return `${baseUrl}?${params}`
 	}
 

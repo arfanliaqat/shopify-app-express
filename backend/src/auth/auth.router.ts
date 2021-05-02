@@ -15,9 +15,10 @@ router.get("/auth", (req: Request, res: Response) => {
 		if (!shop) {
 			return res.status(400).send("Shop is missing")
 		}
-		const nonce = generateNonce(16)
-		const installShopUrl = AuthService.buildInstallUrl(shop.toString(), nonce, AuthService.buildRedirectUri())
-		res.redirect(installShopUrl)
+		const installShopUrl = AuthService.buildInstallUrl(shop.toString(), AuthService.buildRedirectUri())
+
+		// Stupid hack to make it work on Safari
+		res.send(`<script>window.location.href = "${installShopUrl}"</script>`)
 	} catch (error) {
 		handleErrors(res, error)
 	}

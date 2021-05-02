@@ -3,7 +3,6 @@ import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
 import cors from "cors"
-import cookieParser from "cookie-parser"
 import path from "path"
 import morgan from "morgan"
 import compression from "compression"
@@ -42,7 +41,6 @@ if (isDev && appUrl.indexOf("ngrok") == -1) {
 const sessionSecretKey = process.env.SESSION_SECRET_KEY || ""
 if (sessionSecretKey.length == 0) throw "Missing SESSION_SECRET_KEY"
 if (sessionSecretKey.length < 64) throw "SESSION_SECRET_KEY should be at least 64 chars"
-app.use(cookieParser(sessionSecretKey))
 if (isDev) {
 	app.use(morgan("[:date[clf]] :method :url :status :response-time ms"))
 }
