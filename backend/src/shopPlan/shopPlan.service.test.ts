@@ -7,6 +7,7 @@ import { ProductOrderBuilder } from "../productOrders/productOrder.builder"
 import moment from "moment"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
 import { emailTestStore } from "../notifications/postmark.service"
+import { TRIAL_DAYS } from "../util/constants"
 
 describe("ShopPlanService", () => {
 	let shop: Shop | undefined
@@ -157,6 +158,14 @@ describe("ShopPlanService", () => {
 		await ShopPlanService.sendPlanLimitNotifications(shop!)
 
 		expect(emailTestStore).toHaveLength(1)
+	})
+
+	test("getTrialDays", () => {
+		expect(ShopPlanService.getTrialDays(shop!)).toBe(TRIAL_DAYS)
+		shop!.trialUsed = moment().startOf("day").subtract(3, "days").toDate()
+		expect(ShopPlanService.getTrialDays(shop!)).toBe(TRIAL_DAYS - 3)
+		shop!.trialUsed = moment().startOf("day").subtract(100, "days").toDate()
+		expect(ShopPlanService.getTrialDays(shop!)).toBe(0)
 	})
 
 	afterAll(async () => {

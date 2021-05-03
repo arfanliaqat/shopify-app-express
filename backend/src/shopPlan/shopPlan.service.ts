@@ -48,6 +48,17 @@ export class ShopPlanService {
 		return hash.digest("hex")
 	}
 
+	static getTrialDays(shop: Shop): number {
+		let daysSinceTrialStarted = 0
+		if (shop.trialUsed) {
+			// When reinstalling the app we want to resume the trial where it was left off
+			const trialStartDate = moment(shop.trialUsed).startOf("day")
+			const today = moment().startOf("day")
+			daysSinceTrialStarted = Math.abs(today.diff(trialStartDate, "days"))
+		}
+		return Math.max(TRIAL_DAYS - daysSinceTrialStarted, 0)
+	}
+
 	static async postRecurringApplicationCharge(
 		shop: Shop,
 		shopPlan: ShopPlan,
@@ -58,14 +69,13 @@ export class ShopPlanService {
 			const signature = this.getSignature(shop.domain, shopPlan.plan, token)
 			const returnUrlQuery = `plan=${shopPlan.plan}&shopDomain=${shop.domain}&token=${token}&signature=${signature}`
 			const returnUrl = `${appUrl}/plan_confirmation?${returnUrlQuery}`
-			console.log({ returnUrl })
 			const response = await axios.post<{ recurring_application_charge: RecurringApplicationChargeResponse }>(
 				`https://${shop.domain}/admin/api/2021-01/recurring_application_charges.json`,
 				{
 					recurring_application_charge: {
 						name: planNames[shopPlan.plan],
 						price: shopPlan.price,
-						trial_days: !shop.trialUsed ? TRIAL_DAYS : 0,
+						trial_days: this.getTrialDays(shop),
 						return_url: returnUrl,
 						test: isChargeTestMode
 					}
