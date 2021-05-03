@@ -27,6 +27,10 @@ router.get("/settings", async (req: Request, res: Response) => {
 			res.status(404).send({ reason: "No matching shop found" })
 			return
 		}
+		if (shop.uninstalled) {
+			res.status(403).send({ reason: "The app is not currently installed." })
+			return
+		}
 		const planIsActive = await ShopPlanService.hasActivePlan(shop)
 		if (!planIsActive) {
 			res.status(403).send({ reason: "The plan's limit has been reached. Please upgrade your plan." })
@@ -49,6 +53,16 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 		const shopResource = await ShopResourceService.findShopResourceByProductId(productId)
 		if (!shopResource || !shopResource.id) {
 			res.status(404).send({ reason: "Resource not found" })
+			return
+		}
+		const shop = await ShopService.findById(shopResource.shopId)
+		if (shop.uninstalled) {
+			res.status(403).send({ reason: "The app is not currently installed." })
+			return
+		}
+		const planIsActive = await ShopPlanService.hasActivePlan(shop)
+		if (!planIsActive) {
+			res.status(403).send({ reason: "The plan's limit has been reached. Please upgrade your plan." })
 			return
 		}
 		let widgetSettings = await WidgetService.findWidgetSettingsByShopId(shopResource.shopId)
