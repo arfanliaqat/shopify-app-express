@@ -38,9 +38,6 @@ if (isDev && appUrl.indexOf("ngrok") == -1) {
 	server = http.createServer(app)
 }
 
-const sessionSecretKey = process.env.SESSION_SECRET_KEY || ""
-if (sessionSecretKey.length == 0) throw "Missing SESSION_SECRET_KEY"
-if (sessionSecretKey.length < 64) throw "SESSION_SECRET_KEY should be at least 64 chars"
 if (isDev) {
 	app.use(morgan("[:date[clf]] :method :url :status :response-time ms"))
 }
