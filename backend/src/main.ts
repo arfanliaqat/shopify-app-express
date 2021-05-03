@@ -79,7 +79,6 @@ app.use(
 )
 
 app.use(noApiCallCache)
-
 app.use(authRouter)
 app.use(shopResourceRouter)
 app.use(availabilityPeriodsRouter)
