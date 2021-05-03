@@ -67,6 +67,10 @@ app.get("/app*", async (req, res) => {
 	res.render("index")
 })
 
+app.get("/privacy", async (req, res) => {
+	res.render("privacy")
+})
+
 app.use(
 	"/public",
 	express.static(path.join(process.cwd(), "frontend/public"), {
