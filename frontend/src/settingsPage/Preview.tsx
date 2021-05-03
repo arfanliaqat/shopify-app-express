@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo } from "react"
-import { getScriptTagsToCreate } from "../../../backend/src/scriptTags/scriptTags.model"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import moment from "moment"
 import { ProductAvailabilityData } from "../../../widget/src/models/ProductAvailabilityData"
 import { getDaysBetween } from "../util/tools"
 import _ from "lodash"
-import { anchorId, isStockByDateApp } from "../common/constants"
+import { anchorId, isStockByDateApp, widgetScriptName } from "../common/constants"
 import { AvailableDate } from "../../../widget/src/models/AvailableDate"
 
 interface Props {
@@ -56,11 +55,9 @@ function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvaila
 
 export default function Preview({ widgetSettings }: Props) {
 	useEffect(() => {
-		getScriptTagsToCreate().forEach((scriptTag) => {
-			const script = document.createElement("script")
-			script.src = scriptTag.src
-			document.head.appendChild(script)
-		})
+		const script = document.createElement("script")
+		script.src = `/widget/build/${widgetScriptName}`
+		document.head.appendChild(script)
 	}, [])
 
 	const jsonWidgetSettings = useMemo(() => JSON.stringify(getMockProductAvailabilityData(widgetSettings)), [
