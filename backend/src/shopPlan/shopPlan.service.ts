@@ -1,7 +1,7 @@
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { Plan, planNames, ShopPlan, ShopPlanSchema } from "./shopPlan.model"
-import { appUrl, isDev, plans, shopifyApiSecretKey, TRIAL_DAYS } from "../util/constants"
+import { appUrl, isDev, isChargeTestMode, plans, shopifyApiSecretKey, TRIAL_DAYS } from "../util/constants"
 import { handleAxiosErrors, UnexpectedError } from "../util/error"
 import axios from "axios"
 import { Shop } from "../shop/shop.model"
@@ -67,7 +67,7 @@ export class ShopPlanService {
 						price: shopPlan.price,
 						trial_days: !shop.trialUsed ? TRIAL_DAYS : 0,
 						return_url: returnUrl,
-						test: isDev
+						test: isChargeTestMode
 					}
 				},
 				{

@@ -1,6 +1,7 @@
 import { safeParseInt } from "./tools"
 
 export const isDev = process.env.NODE_ENV != "production"
+export const isChargeTestMode = isDev || (process.env.CHARGE_TEST_MODE || "") === "true"
 export const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY || ""
 export const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY || ""
 export const scopes = "read_products,read_orders,write_script_tags"
