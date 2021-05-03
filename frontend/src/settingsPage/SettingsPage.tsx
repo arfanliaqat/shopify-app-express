@@ -17,6 +17,7 @@ import CurrentPlanCard from "./CurrentPlanCard"
 import VisibilityToggle from "./VisibilityToggle"
 
 import { Toast, useAppBridge } from "@shopify/app-bridge-react"
+import { useHistory } from "react-router"
 
 interface Props {}
 
@@ -28,6 +29,7 @@ interface WidgetSettingsPageData {
 
 export default function SettingsPage({}: Props) {
 	const app = useAppBridge()
+	const history = useHistory()
 
 	const [initialWidgetSettings, setInitialWidgetSettings] = useState<WidgetSettings>(undefined)
 	const [widgetSettings, setWidgetSettings] = useState<WidgetSettings>(undefined)
@@ -68,9 +70,9 @@ export default function SettingsPage({}: Props) {
 	useEffect(() => {
 		// Redirect to the plan's page if not plans are yet selected
 		if (widgetSettings && !shopPlan) {
-			window.location.href = "/app/plans"
+			history.push("/app/plans")
 		}
-	}, [widgetSettings, shopPlan])
+	}, [widgetSettings, shopPlan, history])
 
 	const handleSaveSettingsClick = () => {
 		saveSettings({

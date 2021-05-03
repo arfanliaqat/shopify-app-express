@@ -56,6 +56,10 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			return
 		}
 		const shop = await ShopService.findById(shopResource.shopId)
+		if (!shop?.id) {
+			res.status(404).send({ reason: "No matching shop found" })
+			return
+		}
 		if (shop.uninstalled) {
 			res.status(403).send({ reason: "The app is not currently installed." })
 			return

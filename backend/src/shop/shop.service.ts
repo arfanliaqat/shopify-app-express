@@ -39,19 +39,28 @@ export class ShopService {
 		return result.rows.map(toShop)
 	}
 
+	static createShopObjectFromApi(shopData: ShopApiData): Shop {
+		return new Shop(
+			shopData.myshopify_domain || shopData.domain || "",
+			shopData.domain || shopData.myshopify_domain || "",
+			shopData.email || "",
+			undefined,
+			undefined,
+			shopData
+		)
+	}
+
 	static async createFromApi(shopData: ShopApiData): Promise<Shop | undefined> {
 		if (!shopData.domain) throw new UnexpectedError("shopData.domain cannot be undefined")
 		if (!shopData.email) throw new UnexpectedError("shopData.email cannot be undefined")
-		return await this.insert(
-			new Shop(
-				shopData.myshopify_domain || shopData.domain || "",
-				shopData.domain || shopData.myshopify_domain || "",
-				shopData.email,
-				undefined,
-				undefined,
-				shopData
-			)
-		)
+		const newShop = this.createShopObjectFromApi(shopData)
+		return await this.insert(newShop)
+	}
+
+	static async updateFromApi(shop: Shop, shopData: ShopApiData): Promise<Shop | undefined> {
+		const updatedShop = this.createShopObjectFromApi(shopData)
+		updatedShop.id = shop.id
+		return await this.update(updatedShop)
 	}
 
 	static async insert(shop: Shop): Promise<Shop | undefined> {
@@ -63,6 +72,18 @@ export class ShopService {
 			[shop.domain, shop.publicDomain, shop.email, shop.rawData]
 		)
 		return result.rows.map(toShop)[0]
+	}
+
+	static async update(shop: Shop): Promise<Shop | undefined> {
+		const conn: Pool = await getConnection()
+		await conn.query<ShopSchema>(
+			`
+			UPDATE shops
+			SET domain = $2, public_domain = $3, email = $4, trial_used = $5, uninstalled = $6, raw_data = $7
+			WHERE id = $1`,
+			[shop.id, shop.domain, shop.publicDomain, shop.email, shop.trialUsed, shop.uninstalled, shop.rawData]
+		)
+		return shop
 	}
 
 	static async markTrialDaysAsUsed(shop: Shop) {

@@ -38,14 +38,16 @@ export class AuthService {
 		return crypto.createHmac("sha256", shopifyApiSecretKey).update(params).digest("hex")
 	}
 
-	static async installApp(shopDomain: string, code: string): Promise<[Shop, AccessToken]> {
+	static async installOrReinstallApp(shopDomain: string, code: string, shop?: Shop): Promise<[Shop, AccessToken]> {
 		const accessTokenData = await AccessTokenService.fetchAccessToken(shopDomain, code)
 		if (accessTokenData) {
 			const shopData = await this.fetchShopData(shopDomain, accessTokenData.access_token)
 			if (shopData) {
 				let dbShop
 				if (shopData.shop) {
-					dbShop = await ShopService.createFromApi(shopData.shop)
+					dbShop = shop
+						? await ShopService.updateFromApi(shop, shopData.shop) // Reinstall
+						: await ShopService.createFromApi(shopData.shop) // First install
 				}
 				if (dbShop && dbShop.id) {
 					const accessToken = await AccessTokenService.storeAccessToken({
@@ -63,7 +65,7 @@ export class AuthService {
 
 	static async findShopOrInstallApp(shopDomain: string, code: string): Promise<[Shop, AccessToken]> {
 		const dbShop = await ShopService.findByDomain(shopDomain)
-		if (dbShop && dbShop.id) {
+		if (dbShop && dbShop.id && !dbShop.uninstalled) {
 			const accessTokenData = await AccessTokenService.fetchAccessToken(shopDomain, code)
 			if (!accessTokenData) {
 				throw new UnexpectedError(`Token couldn't be fetched for shop: ${shopDomain}`)
@@ -75,7 +77,7 @@ export class AuthService {
 			})
 			return [dbShop, accessToken]
 		} else {
-			return await this.installApp(shopDomain, code)
+			return await this.installOrReinstallApp(shopDomain, code, dbShop)
 		}
 	}
 }
