@@ -11,6 +11,9 @@ import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPe
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { WidgetSettingsBuilder } from "../widget/widget.builder"
 import { WidgetSettings } from "../widget/widget.model"
+import { ShopService } from "../shop/shop.service"
+import { ShopPlanService } from "../shopPlan/shopPlan.service"
+import { ShopPlanBuilder } from "../shopPlan/shopPlan.builder"
 
 describe("HooksService", () => {
 	let availableDate: Moment
@@ -469,6 +472,26 @@ describe("HooksService", () => {
 				availableDate
 			)
 			expect(productOrders).toHaveLength(2)
+		}
+	})
+
+	test("App uninstall hook", async () => {
+		await new ShopPlanBuilder().forShop(shop!).buildAndSave()
+
+		{
+			const updatedShop = await ShopService.findById(shop!.id!)
+			expect(updatedShop!.uninstalled).toBeNull()
+			const shopPlan = await ShopPlanService.findByShopId(shop!.id!)
+			expect(shopPlan).toBeDefined()
+		}
+
+		await HooksService.ingestAppUninstalledEvent(shop!)
+
+		{
+			const updatedShop = await ShopService.findById(shop!.id!)
+			expect(updatedShop!.uninstalled).toBeDefined()
+			const shopPlan = await ShopPlanService.findByShopId(shop!.id!)
+			expect(shopPlan).toBeUndefined()
 		}
 	})
 

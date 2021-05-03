@@ -21,6 +21,7 @@ export class ShopBuilder {
 			this.domain || "my@email.com",
 			this.email || "myshop.myshopify.com",
 			undefined,
+			undefined,
 			{}
 		)
 		return await ShopService.insert(newShop)

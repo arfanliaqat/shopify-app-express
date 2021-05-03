@@ -17,7 +17,7 @@ router.get("/auth", (req: Request, res: Response) => {
 
 		const installShopUrl = AuthService.buildInstallUrl(shop.toString(), AuthService.buildRedirectUri())
 
-		// Stupid hack to make it work on Safari
+		// Stupid hack to make it works on Safari
 		res.send(`<script>window.location.href = "${installShopUrl}"</script>`)
 	} catch (error) {
 		handleErrors(res, error)

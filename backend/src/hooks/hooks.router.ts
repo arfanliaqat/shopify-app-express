@@ -57,4 +57,21 @@ router.post(
 	}
 )
 
+router.post(
+	"/hooks/app/uninstalled",
+	[loadHookContext, authenticateHook, loadConnectedShopFromHook],
+	async (req: Request, res: Response) => {
+		try {
+			const { connectedShop } = getLocals(res)
+			if (!connectedShop) {
+				throw new UnexpectedError("`connectedShop` shouldn't be null")
+			}
+			await HooksService.ingestAppUninstalledEvent(connectedShop)
+			res.end()
+		} catch (error) {
+			handleErrors(res, error)
+		}
+	}
+)
+
 export default router

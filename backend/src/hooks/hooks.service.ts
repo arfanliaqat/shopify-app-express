@@ -12,6 +12,7 @@ import { CurrentAvailabilityService } from "../currentAvailabilities/currentAvai
 import { WidgetService } from "../widget/widget.service"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 import { ShopPlanService } from "../shopPlan/shopPlan.service"
+import { ShopService } from "../shop/shop.service"
 
 export function getChosenDate(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): Moment | undefined {
 	const chosenDateProperty = lineItem.properties.find((property: Property) => {
@@ -157,5 +158,12 @@ export class HooksService {
 		}
 
 		await ShopPlanService.sendPlanLimitNotifications(connectedShop)
+	}
+
+	static async ingestAppUninstalledEvent(shop: Shop): Promise<void> {
+		console.log(`[ingestAppUninstalledEvent|shop:${shop.domain}] Uninstalling app...`)
+		await ShopService.markAsUninstalled(shop)
+		await ShopPlanService.deleteShopPlan(shop)
+		console.log(`[ingestAppUninstalledEvent|shop:${shop.domain}] Uninstall successful`)
 	}
 }

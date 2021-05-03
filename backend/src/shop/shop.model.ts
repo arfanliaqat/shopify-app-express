@@ -4,6 +4,7 @@ export interface ShopSchema {
 	public_domain: string
 	email: string
 	trial_used: Date
+	uninstalled: Date
 	raw_data?: string
 	created_date: Date
 }
@@ -14,6 +15,7 @@ export class Shop {
 		public publicDomain: string,
 		public email: string,
 		public trialUsed: Date | undefined,
+		public uninstalled: Date | undefined,
 		public rawData?: ShopApiData,
 		public id?: string
 	) {}
@@ -25,6 +27,7 @@ export function toShop(schema: ShopSchema): Shop {
 		schema.public_domain,
 		schema.email,
 		schema.trial_used,
+		schema.uninstalled,
 		schema.raw_data ? JSON.parse(schema.raw_data) : undefined,
 		schema.id
 	)

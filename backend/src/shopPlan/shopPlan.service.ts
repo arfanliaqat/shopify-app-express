@@ -1,7 +1,7 @@
 import { Pool } from "pg"
 import { getConnection } from "../util/database"
 import { Plan, planNames, ShopPlan, ShopPlanSchema } from "./shopPlan.model"
-import { appUrl, isDev, isChargeTestMode, plans, shopifyApiSecretKey, TRIAL_DAYS } from "../util/constants"
+import { appUrl, isChargeTestMode, plans, shopifyApiSecretKey, TRIAL_DAYS } from "../util/constants"
 import { handleAxiosErrors, UnexpectedError } from "../util/error"
 import axios from "axios"
 import { Shop } from "../shop/shop.model"
@@ -166,9 +166,10 @@ export class ShopPlanService {
 		return ShopPlan.createFromSchemas(result.rows)[0]
 	}
 
-	static async deleteShopPlan(shopPlan: ShopPlan): Promise<void> {
+	static async deleteShopPlan(shop: Shop): Promise<void> {
+		if (!shop.id) throw new UnexpectedError("The shop's id isn't defined")
 		const conn: Pool = await getConnection()
-		await conn.query<ShopPlanSchema>(`DELETE FROM shop_plans WHERE shop_id = $1`, [shopPlan.shopId])
+		await conn.query<ShopPlanSchema>(`DELETE FROM shop_plans WHERE shop_id = $1`, [shop.id])
 	}
 
 	static async sendPlanLimitNotifications(shop: Shop): Promise<void> {

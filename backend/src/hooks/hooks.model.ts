@@ -36,9 +36,15 @@ export interface Webhook {
 
 export function getSubscribedHooks(): Webhook[] {
 	const allOrderEventTypes: OrderEventType[] = ["cancelled", "create", "delete", "edited", "paid", "updated"]
-	return allOrderEventTypes.map((eventType) => ({
+	const hooks: Webhook[] = allOrderEventTypes.map((eventType) => ({
 		address: `${appUrl}/hooks/orders/${eventType}`,
 		topic: `orders/${eventType}`,
 		format: "json"
 	}))
+	hooks.push({
+		address: `${appUrl}/hooks/app/uninstalled`,
+		topic: "app/uninstalled",
+		format: "json"
+	})
+	return hooks
 }

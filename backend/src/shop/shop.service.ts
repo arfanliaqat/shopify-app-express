@@ -7,7 +7,7 @@ export class ShopService {
 	static async findByDomain(domain: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(
-			`SELECT id, domain, public_domain, email, trial_used FROM shops WHERE domain = $1`,
+			`SELECT id, domain, public_domain, email, trial_used, uninstalled FROM shops WHERE domain = $1`,
 			[domain]
 		)
 		return result.rows.map(toShop)[0]
@@ -16,7 +16,7 @@ export class ShopService {
 	static async findByPublicDomain(domain: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(
-			`SELECT id, domain, public_domain, email, trial_used FROM shops WHERE public_domain = $1`,
+			`SELECT id, domain, public_domain, email, trial_used, uninstalled FROM shops WHERE public_domain = $1`,
 			[domain]
 		)
 		return result.rows.map(toShop)[0]
@@ -25,7 +25,7 @@ export class ShopService {
 	static async findById(shopId: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(
-			`SELECT id, domain, public_domain, email, trial_used FROM shops WHERE id = $1`,
+			`SELECT id, domain, public_domain, email, trial_used, uninstalled FROM shops WHERE id = $1`,
 			[shopId]
 		)
 		return result.rows.map(toShop)[0]
@@ -33,7 +33,9 @@ export class ShopService {
 
 	static async findAllActiveShops(): Promise<Shop[]> {
 		const conn: Pool = await getConnection()
-		const result = await conn.query<ShopSchema>(`SELECT id, domain, public_domain, email, trial_used FROM shops`)
+		const result = await conn.query<ShopSchema>(
+			`SELECT id, domain, public_domain, email, trial_used, uninstalled FROM shops`
+		)
 		return result.rows.map(toShop)
 	}
 
@@ -45,6 +47,7 @@ export class ShopService {
 				shopData.myshopify_domain || shopData.domain || "",
 				shopData.domain || shopData.myshopify_domain || "",
 				shopData.email,
+				undefined,
 				undefined,
 				shopData
 			)
@@ -65,5 +68,10 @@ export class ShopService {
 	static async markTrialDaysAsUsed(shop: Shop) {
 		const conn: Pool = await getConnection()
 		await conn.query<ShopSchema>(`UPDATE shops SET trial_used = now() WHERE id = $1`, [shop.id])
+	}
+
+	static async markAsUninstalled(shop: Shop) {
+		const conn: Pool = await getConnection()
+		await conn.query<ShopSchema>(`UPDATE shops SET uninstalled = now() WHERE id = $1`, [shop.id])
 	}
 }
