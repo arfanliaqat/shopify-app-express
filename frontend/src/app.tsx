@@ -14,6 +14,7 @@ import SettingsPage from "./settingsPage/SettingsPage"
 import { isStockByDateApp } from "./common/constants"
 import PlansPage from "./plansPage/PlansPage"
 import { shopifyConfig } from "./models/ShopifyConfig"
+import GuidePage from "./helpPage/HelpPage"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -60,6 +61,7 @@ ReactDOM.render(
 					)}
 					{isStockByDateApp && <Route exact path="/app/settings" component={SettingsPage} />}
 					<Route path="/app/plans" component={PlansPage} />
+					<Route path="/app/guide" component={GuidePage} />
 					<Route path="*" component={NotFoundPage} />
 				</Switch>
 			</BrowserRouter>

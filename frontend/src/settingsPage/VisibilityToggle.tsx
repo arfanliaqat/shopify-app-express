@@ -27,11 +27,8 @@ export default function VisibilityToggle({ initialWidgetSettings, widgetSettings
 				{initialWidgetSettings.isVisible && (
 					<Layout.Section>
 						<Banner status="info">
-							Is the date picker still not visible? Please send us an email at{" "}
-							<Link url="mailto:support@h10.studio?subject=Date%20picker%20not%20visible">
-								support@h10.studio
-							</Link>
-							.
+							Is the date picker still not visible? Please make sure to check{" "}
+							<Link url="/app/guide">our guide</Link>.
 						</Banner>
 					</Layout.Section>
 				)}
