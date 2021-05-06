@@ -14,7 +14,7 @@ import SettingsPage from "./settingsPage/SettingsPage"
 import { isStockByDateApp } from "./common/constants"
 import PlansPage from "./plansPage/PlansPage"
 import { shopifyConfig } from "./models/ShopifyConfig"
-import GuidePage from "./helpPage/HelpPage"
+import GuidePage from "./helpPage/GuidePage"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 

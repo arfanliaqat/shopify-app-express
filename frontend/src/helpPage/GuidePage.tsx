@@ -1,12 +1,12 @@
 import React from "react"
-import { Page, Layout, Heading, TextContainer, TextStyle } from "@shopify/polaris"
-import { isStockByDateApp } from "../common/constants"
+import { Link, Page, Layout, Heading, TextContainer, TextStyle } from "@shopify/polaris"
+import { isStockByDateApp, widgetScriptName } from "../common/constants"
 
 interface Props {}
 
-export default function HelpPage({}: Props) {
+export default function GuidePage({}: Props) {
 	return (
-		<div id="plansPage">
+		<div id="guidePage">
 			<Page
 				title="Guide"
 				breadcrumbs={[{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]}
@@ -95,6 +95,79 @@ export default function HelpPage({}: Props) {
 									alt="Date picker settings"
 									style={{ maxWidth: "607px", width: "100%" }}
 								/>
+							</p>
+							<p>
+								<TextStyle variation="strong">11. Calendar styles</TextStyle>
+							</p>
+							<p>Adjust CSS settings to match your store design.</p>
+							<p>
+								<TextStyle variation="strong">12. Preview</TextStyle>
+							</p>
+							<p>See your CSS changes in real time.</p>
+							<p>
+								<img
+									src="/public/images/guide_calendar_styles.png"
+									alt="Calendar style settings"
+									style={{ maxWidth: "908px", width: "100%" }}
+								/>
+							</p>
+							<p>
+								<TextStyle variation="strong">13. Dropdown styles</TextStyle>
+							</p>
+							<p>Adjust CSS settings to match your store design.</p>
+							<p>
+								<TextStyle variation="strong">14. Preview</TextStyle>
+							</p>
+							<p>See your CSS changes in real time.</p>
+							<p>
+								<img
+									src="/public/images/guide_dropdown_styles.png"
+									alt="Dropdown style settings"
+									style={{ maxWidth: "908px", width: "100%" }}
+								/>
+							</p>
+						</TextContainer>
+						<div className="pageSeparator" />
+						<TextContainer>
+							<Heading>Manually placing the date picker</Heading>
+							<p>
+								To manually adjust the position of the date picker a{" "}
+								<TextStyle variation="code">{"<div>"}</TextStyle> can tag can be placed in the source
+								code of your template.
+							</p>
+							<p>
+								To do this Select Online Store &gt; Themes in the side bar. Then select “Edit code” in
+								the “Actions” dropdown.
+							</p>
+							<p>
+								<img
+									src="/public/images/guide_edit_code.png"
+									alt="Edit your theme's code"
+									style={{ maxWidth: "906px", width: "100%" }}
+								/>
+							</p>
+							<p>
+								In "Sections" find "product-template.liquid". Within the{" "}
+								<TextStyle variation="code">{"<form></form>"}</TextStyle> tags, add the following to
+								place the picker.
+							</p>
+							<p>
+								<TextStyle variation="code">{`<div id="${widgetScriptName}"></div>`}</TextStyle>
+							</p>
+							<p>
+								<img
+									src="/public/images/guide_place_div.png"
+									alt="Place the date picker"
+									style={{ maxWidth: "902px", width: "100%" }}
+								/>
+							</p>
+						</TextContainer>
+						<div className="pageSeparator" />
+						<TextContainer>
+							<Heading>Still having some troubles installing Shop By Date?</Heading>
+							<p>
+								Don't hesitate to contact our support team! You can contact us via email at{" "}
+								<Link url="mailto:support@h10.studio">support@h10.studio</Link>.
 							</p>
 						</TextContainer>
 					</Layout.Section>
