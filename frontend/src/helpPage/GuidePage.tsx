@@ -1,6 +1,6 @@
 import React from "react"
 import { Link, Page, Layout, Heading, TextContainer, TextStyle } from "@shopify/polaris"
-import { isStockByDateApp, widgetScriptName } from "../common/constants"
+import { anchorId, isStockByDateApp, widgetScriptName } from "../common/constants"
 
 interface Props {}
 
@@ -27,7 +27,7 @@ export default function GuidePage({}: Props) {
 								<TextStyle variation="strong">2. Plan</TextStyle>
 							</p>
 							<p>
-								Upgrade your plan here ate any moment. The calendar will stop showing on your shop once
+								Upgrade your plan here at any moment. The calendar will stop showing on your shop once
 								the limit is reached so you might want to upgrade before that happens.
 							</p>
 							<p>
@@ -152,7 +152,7 @@ export default function GuidePage({}: Props) {
 								place the picker.
 							</p>
 							<p>
-								<TextStyle variation="code">{`<div id="${widgetScriptName}"></div>`}</TextStyle>
+								<TextStyle variation="code">{`<div id="${anchorId}"></div>`}</TextStyle>
 							</p>
 							<p>
 								<img
