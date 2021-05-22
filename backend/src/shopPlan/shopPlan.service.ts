@@ -133,6 +133,7 @@ export class ShopPlanService {
 		if (!shop.id) throw new UnexpectedError("The shop's id isn't defined")
 		const shopPlan = await this.findByShopId(shop.id)
 		if (!shopPlan) return false
+		if (shopPlan.orderLimit == -1) return true
 		const currentOrderCount = await ProductOrderService.countOrdersInCurrentMonth(shop)
 		return currentOrderCount < shopPlan.orderLimit
 	}

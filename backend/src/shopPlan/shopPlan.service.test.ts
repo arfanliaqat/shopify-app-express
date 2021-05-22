@@ -82,6 +82,20 @@ describe("ShopPlanService", () => {
 		}
 	})
 
+	test("Check that Unlimited plan works", async () => {
+		{
+			const isActive = await ShopPlanService.hasActivePlan(shop!)
+			expect(isActive).toBeFalsy()
+		}
+
+		await new ShopPlanBuilder().forShop(shop!).withOrderLimit(-1).buildAndSave()
+
+		{
+			const isActive = await ShopPlanService.hasActivePlan(shop!)
+			expect(isActive).toBeTruthy()
+		}
+	})
+
 	test("A notification is sent when approaching the plan limit", async () => {
 		await new ShopPlanBuilder().forShop(shop!).withOrderLimit(5).buildAndSave()
 
