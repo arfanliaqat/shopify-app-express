@@ -21,7 +21,7 @@ export class WidgetSettings {
 			availableWeekDays: allWeekDays,
 			disabledDates: [],
 			mandatoryDateSelect: true,
-			isVisible: true,
+			isVisible: false,
 			styles: {
 				errorFontColor: "#8b0000",
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",

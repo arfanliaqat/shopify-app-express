@@ -20,8 +20,9 @@ export default function GuidePage({}: Props) {
 								<TextStyle variation="strong">1. Visibility</TextStyle>
 							</p>
 							<p>
-								Enable or disable Shop-By-Date. This is enabled by default. When enabled the date picker
-								will appear in your shop on product pages and featured product sections of the homepage.
+								Enable or disable Shop-By-Date. This is disabled by default. When enabled the date
+								picker will appear in your shop on product pages and featured product sections of the
+								homepage.
 							</p>
 							<p>
 								<TextStyle variation="strong">2. Plan</TextStyle>
