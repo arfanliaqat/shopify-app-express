@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { Page, Layout, TextContainer } from "@shopify/polaris"
 import { isStockByDateApp } from "../common/constants"
-import { Plan } from "../../../backend/src/shopPlan/shopPlan.model"
-import ChoosePlanConfirmationModal from "./ChoosePlanConfirmationModal"
 import { useApi } from "../util/useApi"
 import ShopPlan from "../models/ShopPlan"
 import PlanCard from "./PlanCard"
@@ -15,7 +13,6 @@ interface Props {}
 export default function PlansPage({}: Props) {
 	const app = useAppBridge()
 
-	const [selectedPlan, setSelectedPlan] = useState<Plan>()
 	const [currentShopPlan, setCurrentShopPlan] = useState<ShopPlan>()
 	const [trialAlreadyUsed, setTrialIsAlreadyUsed] = useState<boolean>()
 
@@ -41,13 +38,6 @@ export default function PlansPage({}: Props) {
 
 	return (
 		<div id="plansPage">
-			{selectedPlan && (
-				<ChoosePlanConfirmationModal
-					plan={selectedPlan}
-					onClose={() => setSelectedPlan(undefined)}
-					trialAlreadyUsed={trialAlreadyUsed}
-				/>
-			)}
 			<Page
 				breadcrumbs={
 					currentShopPlan && [{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]
@@ -70,25 +60,13 @@ export default function PlansPage({}: Props) {
 						</TextContainer>
 					</Layout.Section>
 					<Layout.Section oneThird>
-						<PlanCard
-							plan="BASIC"
-							currentShopPlan={currentShopPlan}
-							onSelectClick={(plan: Plan) => setSelectedPlan(plan)}
-						/>
+						<PlanCard plan="BASIC" currentShopPlan={currentShopPlan} />
 					</Layout.Section>
 					<Layout.Section oneThird>
-						<PlanCard
-							plan="PRO"
-							currentShopPlan={currentShopPlan}
-							onSelectClick={(plan: Plan) => setSelectedPlan(plan)}
-						/>
+						<PlanCard plan="PRO" currentShopPlan={currentShopPlan} />
 					</Layout.Section>
 					<Layout.Section oneThird>
-						<PlanCard
-							plan="UNLIMITED"
-							currentShopPlan={currentShopPlan}
-							onSelectClick={(plan: Plan) => setSelectedPlan(plan)}
-						/>
+						<PlanCard plan="UNLIMITED" currentShopPlan={currentShopPlan} />
 					</Layout.Section>
 					<Layout.Section fullWidth>
 						<TextContainer>

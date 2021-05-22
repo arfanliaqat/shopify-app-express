@@ -1,18 +1,53 @@
-import React from "react"
+import React, { useState } from "react"
 import { plans } from "../../../backend/src/util/constants"
 import { Button, Card } from "@shopify/polaris"
 import classNames from "classnames"
 import ShopPlan from "../models/ShopPlan"
 import { Plan } from "../../../backend/src/shopPlan/shopPlan.model"
+import { useApi } from "../util/useApi"
+import { Redirect } from "@shopify/app-bridge/actions"
+import { shopifyConfig } from "../models/ShopifyConfig"
+import { useAppBridge } from "@shopify/app-bridge-react"
+import { useHistory } from "react-router"
 
 interface Props {
 	plan: Plan
 	currentShopPlan: ShopPlan
-	onSelectClick: (plan: Plan) => void
 }
 
-export default function PlanCard({ currentShopPlan, plan, onSelectClick }: Props) {
+export default function PlanCard({ currentShopPlan, plan }: Props) {
+	const app = useAppBridge()
+	const history = useHistory()
+
+	const [isLoading, setIsLoading] = useState(false)
+
+	const { setApiRequest: callChoosePlan } = useApi<{ url: string }>(
+		{
+			onSuccess: (data) => {
+				if (data.url) {
+					const redirect = Redirect.create(app)
+					redirect.dispatch(Redirect.Action.REMOTE, data.url)
+				} else {
+					history.push("/app?shopOrigin=" + shopifyConfig.shopOrigin)
+				}
+			}
+		},
+		app
+	)
+
+	const handleChosePlanClick = () => {
+		setIsLoading(true)
+		callChoosePlan({
+			method: "post",
+			url: "/choose_plan",
+			postData: {
+				plan
+			}
+		})
+	}
+
 	const isFreePlan = plans[plan].price === 0
+
 	return (
 		<div className={classNames("planCard", { selected: currentShopPlan?.plan == plan })}>
 			<Card sectioned>
@@ -40,12 +75,7 @@ export default function PlanCard({ currentShopPlan, plan, onSelectClick }: Props
 							<strong>{plans[plan].supportResponseTime}h</strong> support response time
 						</li>
 					</ul>
-					<Button
-						fullWidth
-						primary
-						onClick={() => onSelectClick(plan)}
-						disabled={currentShopPlan?.plan == plan}
-					>
+					<Button fullWidth primary onClick={handleChosePlanClick} disabled={currentShopPlan?.plan == plan}>
 						{currentShopPlan?.plan == plan ? "Current plan" : "Select"}
 					</Button>
 				</div>
