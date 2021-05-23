@@ -1,6 +1,6 @@
 import React from "react"
 import { Link, Page, Layout, Heading, TextContainer, TextStyle } from "@shopify/polaris"
-import { anchorId, isStockByDateApp, widgetScriptName } from "../common/constants"
+import { anchorId, isStockByDateApp } from "../common/constants"
 
 interface Props {}
 
@@ -10,7 +10,6 @@ export default function GuidePage({}: Props) {
 			<Page
 				title="Guide"
 				breadcrumbs={[{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]}
-				separator
 			>
 				<Layout>
 					<Layout.Section fullWidth>
@@ -20,7 +19,7 @@ export default function GuidePage({}: Props) {
 								<TextStyle variation="strong">1. Visibility</TextStyle>
 							</p>
 							<p>
-								Enable or disable Shop-By-Date. This is disabled by default. When enabled the date
+								Enable or disable Shop By Date. This is disabled by default. When enabled the date
 								picker will appear in your shop on product pages and featured product sections of the
 								homepage.
 							</p>

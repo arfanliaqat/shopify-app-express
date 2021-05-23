@@ -43,7 +43,6 @@ export default function PlansPage({}: Props) {
 					currentShopPlan && [{ content: "Settings", url: isStockByDateApp ? "/app/settings" : "/app" }]
 				}
 				title="Choose your plan"
-				separator
 			>
 				<Layout>
 					<Layout.Section fullWidth>

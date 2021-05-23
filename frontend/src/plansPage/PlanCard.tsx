@@ -28,7 +28,7 @@ export default function PlanCard({ currentShopPlan, plan }: Props) {
 					const redirect = Redirect.create(app)
 					redirect.dispatch(Redirect.Action.REMOTE, data.url)
 				} else {
-					history.push("/app?shopOrigin=" + shopifyConfig.shopOrigin)
+					history.push("/app?shopOrigin=" + shopifyConfig.host)
 				}
 			}
 		},

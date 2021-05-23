@@ -1,6 +1,6 @@
 import React from "react"
 import { Icon } from "@shopify/polaris"
-import { ImageMajorTwotone } from "@shopify/polaris-icons"
+import { ImageMajor } from "@shopify/polaris-icons"
 
 interface Props {
 	src?: string
@@ -12,7 +12,7 @@ export default function ProductThumbnail({ src }: Props) {
 			{src && <div className="image" style={{ backgroundImage: `url(${src}` }} />}
 			{!src && (
 				<div className="image placeholder">
-					<Icon source={ImageMajorTwotone} color="inkLightest" />
+					<Icon source={ImageMajor} color="base" />
 				</div>
 			)}
 		</div>

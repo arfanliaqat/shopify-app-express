@@ -106,7 +106,6 @@ export default function SettingsPage({}: Props) {
 			<Page
 				breadcrumbs={isStockByDateApp && [{ content: "Products", url: "/app" }]}
 				title={isStockByDateApp && "Settings"}
-				separator={isStockByDateApp}
 			>
 				<Layout>
 					<Layout.Section>

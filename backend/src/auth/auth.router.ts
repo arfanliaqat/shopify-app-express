@@ -27,8 +27,9 @@ router.get("/auth", (req: Request, res: Response) => {
 
 router.get("/auth/callback", async (req: Request, res: Response) => {
 	try {
-		const { shop, code } = req.query
+		const { shop, code, host } = req.query
 		if (!shop) return res.status(400).send("Missing 'shop' in the query params")
+		if (!host) return res.status(400).send("Missing 'host' in the query params")
 		if (!code) return res.status(400).send("Missing 'code' in the query params")
 
 		const { hmac, ...params } = req.query
@@ -45,7 +46,7 @@ router.get("/auth/callback", async (req: Request, res: Response) => {
 		}
 		await HooksService.subscribeHooks(dbShop, accessToken)
 		await ScriptTagService.createScriptTags(dbShop, accessToken)
-		res.redirect("/app?shopOrigin=" + dbShop.domain)
+		res.redirect("/app?host=" + host)
 	} catch (error) {
 		handleErrors(res, error)
 	}
