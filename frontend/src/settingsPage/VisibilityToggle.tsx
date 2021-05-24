@@ -20,7 +20,8 @@ export default function VisibilityToggle({ initialWidgetSettings, widgetSettings
 					<Layout.Section>
 						<Banner status="warning">
 							The date picker is currently hidden from your shop. To make it visible make sure to tick the
-							following box and save
+							following box and save. <br />
+							Read <Link url="/app/guide">our guide</Link> for more information.
 						</Banner>
 					</Layout.Section>
 				)}
