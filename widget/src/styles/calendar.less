@@ -1,15 +1,15 @@
-.h10cal {
+.buuntoCal {
   user-select: none;
   margin-top: 20px;
   color: #333;
   padding: 5px 10px;
   min-width: 200px;
   max-width: 400px;
-  .h10cal-header-wrapper {
+  .buuntoCal-header-wrapper {
     position: relative;
     padding-bottom: 14.28%;
   }
-  .h10cal-header {
+  .buuntoCal-header {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -20,7 +20,7 @@
       justify-content: center;
       align-items: center;
     }
-    .h10cal-previous, .h10cal-next {
+    .buuntoCal-previous, .buuntoCal-next {
       width: 14.28%;
       cursor: pointer;
       > svg {
@@ -31,36 +31,36 @@
         opacity: 0.7;
       }
     }
-    .h10cal-month {
+    .buuntoCal-month {
       font-weight: bold;
       flex: 1;
       text-transform: capitalize;
     }
   }
-  .h10cal-day-names {
+  .buuntoCal-day-names {
     display: flex;
     width: 100%;
     justify-content: stretch;
-    .h10cal-day-name {
+    .buuntoCal-day-name {
       flex: 1;
       text-align: center;
       text-transform: capitalize;
     }
   }
-  .h10cal-body {
+  .buuntoCal-body {
     width: 100%;
     flex: 1;
-    .h10cal-week-wrapper {
+    .buuntoCal-week-wrapper {
       padding-bottom: 14.28%;
       position: relative;
     }
-    .h10cal-week {
+    .buuntoCal-week {
       position: absolute;
       display: flex;
       align-items: stretch;
       height: 100%;
       width: 100%;
-      .h10cal-day {
+      .buuntoCal-day {
         flex: 1;
         position: relative;
         > span {
@@ -74,7 +74,7 @@
           align-items: center;
           border-radius: 50%;
         }
-        &.h10cal-available {
+        &.buuntoCal-available {
           font-weight: bold;
           cursor: pointer;
         }

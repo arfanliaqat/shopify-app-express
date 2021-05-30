@@ -72,7 +72,7 @@ export default function PlansPage({}: Props) {
 							<p>You’ll be able to change you plan or cancel at any point.</p>
 							<p>
 								If you have any question please send us an email at{" "}
-								<a href="mailto:hi@h10.studio">hi@h10.studio</a>.
+								<a href="mailto:hi@buunto.com">hi@buunto.com</a>.
 							</p>
 						</TextContainer>
 					</Layout.Section>

@@ -6,8 +6,8 @@ import { APP_NAME, isDev } from "../util/constants"
 export const emailTestStore: TemplatedMessage[] = []
 
 const globalTemplateModel = {
-	product_name: APP_NAME == "STOCK_BY_DATE" ? "Stock By Date" : "Shop By Date",
-	company_name: "H10 Studio"
+	product_name: APP_NAME == "STOCK_BY_DATE" ? "Buunto Date Picker" : "Buunto Stock By Date",
+	company_name: "Buunto"
 }
 
 export function getEmailClient(): postmark.ServerClient | undefined {
@@ -29,7 +29,7 @@ export class PostmarkService {
 		const emailClient = getEmailClient()
 		const templateMessage: TemplatedMessage = {
 			TemplateAlias: toPostmarkTemplateAlias(notificationType),
-			From: "support@h10.studio",
+			From: "support@buunto.com",
 			To: to,
 			TemplateModel: {
 				...globalTemplateModel,

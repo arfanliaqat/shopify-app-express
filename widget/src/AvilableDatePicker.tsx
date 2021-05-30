@@ -57,7 +57,7 @@ function getProductId() {
 async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	const productId = getProductId()
 	if (!productId) {
-		throw "[H10 - Stock By Date] productId not found"
+		throw "[Buunto] productId not found"
 	}
 	const response = await fetch(appUrl + "/product_availability/" + productId, {
 		headers: {
@@ -65,7 +65,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 		}
 	})
 	if (response.status != 200) {
-		throw "[H10 - Stock By Date] failed to fetch product availability"
+		throw "[Buunto] failed to fetch product availability"
 	}
 	return (await response.json()) as ProductAvailabilityData
 }
@@ -78,10 +78,10 @@ async function fetchWidgetSettings(): Promise<WidgetSettings> {
 	})
 	if (response.status == 403) {
 		const data = await response.json()
-		throw `[H10 - Date Picker] ${data.reason}`
+		throw `[Buunto] ${data.reason}`
 	}
 	if (response.status != 200) {
-		throw "[H10 - Date Picker] failed to fetch widget settings"
+		throw "[Buunto] failed to fetch widget settings"
 	}
 	return (await response.json()) as WidgetSettings
 }
@@ -194,10 +194,10 @@ export default function AvailableDatePicker() {
 	if (!productAvailabilityData || !isVisible()) return undefined
 
 	return (
-		<div className="h10-date-dropdown-picker">
+		<div className="buunto-date-dropdown-picker">
 			{widgetStyles && <style>{widgetStyles}</style>}
-			<div className="h10-date-picker-label">{settings.messages.datePickerLabel}</div>
-			{formError && <div className="h10-date-picker-error">{formError}</div>}
+			<div className="buunto-date-picker-label">{settings.messages.datePickerLabel}</div>
+			{formError && <div className="buunto-date-picker-error">{formError}</div>}
 			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}

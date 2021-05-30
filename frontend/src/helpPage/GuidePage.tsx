@@ -167,7 +167,7 @@ export default function GuidePage({}: Props) {
 							<Heading>Still having some troubles installing Shop By Date?</Heading>
 							<p>
 								Don't hesitate to contact our support team! You can contact us via email at{" "}
-								<Link url="mailto:support@h10.studio">support@h10.studio</Link>.
+								<Link url="mailto:support@buunto.com">support@buunto.com</Link>.
 							</p>
 						</TextContainer>
 					</Layout.Section>

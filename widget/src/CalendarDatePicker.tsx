@@ -68,34 +68,34 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 		onSelect(strDay)
 	}
 
-	return <div className="h10cal">
+	return <div className="buuntoCal">
 		<input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate} />
 		<input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay} />
-		<div className="h10cal-header-wrapper">
-			<div className="h10cal-header">
-				<div className="h10cal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
-				<div className="h10cal-month">{monthStart.format("MMMM YYYY")}</div>
-				<div className="h10cal-next" onClick={moveMonth(1)}><ArrowRightCircle/></div>
+		<div className="buuntoCal-header-wrapper">
+			<div className="buuntoCal-header">
+				<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
+				<div className="buuntoCal-month">{monthStart.format("MMMM YYYY")}</div>
+				<div className="buuntoCal-next" onClick={moveMonth(1)}><ArrowRightCircle/></div>
 			</div>
 		</div>
-		<div className="h10cal-day-names">
+		<div className="buuntoCal-day-names">
 			{getDaysBetween(calendarStart, calendarStart.clone().endOf("week"), "day").map((day) => (
-				<div className="h10cal-day-name" key={"day" + day.format("YYYY-MM-DD")}>{day.format("dd")}</div>
+				<div className="buuntoCal-day-name" key={"day" + day.format("YYYY-MM-DD")}>{day.format("dd")}</div>
 			))}
 		</div>
-		<div className="h10cal-body">
+		<div className="buuntoCal-body">
 			{getDaysBetween(calendarStart, calendarEnd, "week").map((weekStart) => (
-				<div className="h10cal-week-wrapper" key={"week" + weekStart.format(SYSTEM_DATE_FORMAT)}>
-					<div className="h10cal-week">
+				<div className="buuntoCal-week-wrapper" key={"week" + weekStart.format(SYSTEM_DATE_FORMAT)}>
+					<div className="buuntoCal-week">
 						{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
 							const strDay = day.format(SYSTEM_DATE_FORMAT)
 							const dateIsAvailable = availableDatesSet.has(strDay)
 							const isCurrentMonth = day.month() == currentMonth
 							return <div
-								className={classNames("h10cal-day", {
-									"h10cal-unavailable": isCurrentMonth && !dateIsAvailable,
-									"h10cal-available": isCurrentMonth && dateIsAvailable,
-									"h10cal-selected": isCurrentMonth && strDay == selectedDate
+								className={classNames("buuntoCal-day", {
+									"buuntoCal-unavailable": isCurrentMonth && !dateIsAvailable,
+									"buuntoCal-available": isCurrentMonth && dateIsAvailable,
+									"buuntoCal-selected": isCurrentMonth && strDay == selectedDate
 								})}
 								key={"day" + strDay}
 								onClick={dateIsAvailable ? () => handleDateSelect(strDay) : () => {}}>

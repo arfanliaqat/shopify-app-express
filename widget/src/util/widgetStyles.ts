@@ -1,25 +1,25 @@
 import { WidgetStyles } from "../models/WidgetSettings"
 
 const queries: WidgetStyles = {
-	errorFontColor: ".h10-date-picker-error { color: $$ }",
-	calendarBoxShadow: ".h10cal { box-shadow: $$ }",
-	calendarBorderRadius: ".h10cal { border-radius: $$ }",
-	calendarBackgroundColor: ".h10cal { background-color: $$ }",
-	headerFontColor: ".h10cal .h10cal-month { color: $$ }",
-	arrowIconColor: ".h10cal .h10cal-header .h10cal-previous, .h10cal .h10cal-header .h10cal-next { color: $$ }",
-	headerDaysFontColor: ".h10cal .h10cal-day-names .h10cal-day-name { color: $$ }",
-	headerDaysFontWeight: ".h10cal .h10cal-day-names .h10cal-day-name { font-weight: $$ }",
-	dayUnavailableFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-unavailable > span { color: $$ }",
-	dayAvailableFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available > span { color: $$ }",
-	dayHoveringBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover:not(.h10cal-selected) > span { background-color: $$ }",
-	dayHoveringFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-available:hover:not(.h10cal-selected) > span { color: $$ }",
-	daySelectedBackgroundColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-selected > span { background-color: $$ }",
-	daySelectedFontColor: ".h10cal .h10cal-body .h10cal-week .h10cal-day.h10cal-selected > span { color: $$ }",
+	errorFontColor: ".buunto-date-picker-error { color: $$ }",
+	calendarBoxShadow: ".buuntoCal { box-shadow: $$ }",
+	calendarBorderRadius: ".buuntoCal { border-radius: $$ }",
+	calendarBackgroundColor: ".buuntoCal { background-color: $$ }",
+	headerFontColor: ".buuntoCal .buuntoCal-month { color: $$ }",
+	arrowIconColor: ".buuntoCal .buuntoCal-header .buuntoCal-previous, .buuntoCal .buuntoCal-header .buuntoCal-next { color: $$ }",
+	headerDaysFontColor: ".buuntoCal .buuntoCal-day-names .buuntoCal-day-name { color: $$ }",
+	headerDaysFontWeight: ".buuntoCal .buuntoCal-day-names .buuntoCal-day-name { font-weight: $$ }",
+	dayUnavailableFontColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-unavailable > span { color: $$ }",
+	dayAvailableFontColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-available > span { color: $$ }",
+	dayHoveringBackgroundColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-available:hover:not(.buuntoCal-selected) > span { background-color: $$ }",
+	dayHoveringFontColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-available:hover:not(.buuntoCal-selected) > span { color: $$ }",
+	daySelectedBackgroundColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-selected > span { background-color: $$ }",
+	daySelectedFontColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-selected > span { color: $$ }",
 	previewBackgroundColor: "",
-	dropdownBorderColor: ".h10-dropdown { border-color: $$ }",
-	dropdownBorderWidth: ".h10-dropdown { border-width: $$ }",
-	dropdownBackgroundColor: ".h10-dropdown { background-color: $$ }",
-	dropdownTextColor: ".h10-dropdown { color: $$ }"
+	dropdownBorderColor: ".buunto-dropdown { border-color: $$ }",
+	dropdownBorderWidth: ".buunto-dropdown { border-width: $$ }",
+	dropdownBackgroundColor: ".buunto-dropdown { background-color: $$ }",
+	dropdownTextColor: ".buunto-dropdown { color: $$ }"
 }
 
 export function getCssFromWidgetStyles(widgetStyles: WidgetStyles): string {

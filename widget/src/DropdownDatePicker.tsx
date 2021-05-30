@@ -33,7 +33,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 
 	return (
 		<Fragment>
-			<select className="h10-dropdown" name={`properties[${TAG_LABEL}]`} onChange={handleSelect}>
+			<select className="buunto-dropdown" name={`properties[${TAG_LABEL}]`} onChange={handleSelect}>
 				{availableDates.map((availableDate) => {
 					const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
 					const valueDate = momentDate.format(TAG_DATE_FORMAT)
