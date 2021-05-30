@@ -53,6 +53,7 @@ app.use((req, res, next) => {
 })
 
 app.set("etag", false)
+
 app.use(compression())
 
 app.use((req, res, next) => {
