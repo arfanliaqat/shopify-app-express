@@ -86,7 +86,7 @@ export class ProductOrderService {
 			JOIN shop_resources sr on sr.id = po.shop_resource_id
 			WHERE sr.shop_id = $1
 			AND po.created_date between $2 and $3`,
-			[shop.id, startOfMonth.format(SYSTEM_DATE_FORMAT), endOfMonth.format(SYSTEM_DATE_FORMAT)]
+			[shop.id, startOfMonth.format(SYSTEM_DATETIME_FORMAT), endOfMonth.format(SYSTEM_DATETIME_FORMAT)]
 		)
 		return parseInt(result.rows[0].count)
 	}
