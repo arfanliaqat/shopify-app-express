@@ -25,6 +25,7 @@ export interface OrderEventData {
 	id: number
 	line_items: LineItem[]
 	cancelled_at?: string | null
+	tags: string
 }
 
 export interface Webhook {

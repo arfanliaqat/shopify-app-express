@@ -148,9 +148,14 @@ export class HooksService {
 				}
 			})
 
-			Object.values(newProductOrdersById).map(async (productOrder) => {
+			const newProductOrders = Object.values(newProductOrdersById)
+			newProductOrders.map(async (productOrder) => {
 				await service.insert(productOrder)
 			})
+
+			if (newProductOrders.length > 0) {
+				await service.refreshTags(connectedShop, orderEvent)
+			}
 
 			await service.commitTransaction()
 		} catch (e) {

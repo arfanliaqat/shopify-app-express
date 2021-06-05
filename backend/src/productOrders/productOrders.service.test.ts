@@ -6,6 +6,7 @@ import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
 import { ProductOrderService } from "./productOrders.service"
 import { ProductOrderBuilder } from "./productOrder.builder"
+import { SYSTEM_DATE_FORMAT } from "../util/constants"
 
 describe("ProductOrderService", () => {
 	let refDate: Moment
@@ -103,6 +104,46 @@ describe("ProductOrderService", () => {
 
 		const numberOfOrders = await ProductOrderService.countOrdersInMonth(shop!, refDate)
 		expect(numberOfOrders).toBe(2)
+	})
+
+	test("It generates tags from product orders", () => {
+		expect(
+			ProductOrderService.getTags([
+				{
+					id: undefined,
+					shopResourceId: "abc",
+					chosenDate: moment("2021-06-01", SYSTEM_DATE_FORMAT, "en_US"),
+					quantity: 1,
+					orderId: 123
+				}
+			])
+		).toBe("June 1 2021,Tuesday")
+
+		expect(
+			ProductOrderService.getTags([
+				{
+					id: undefined,
+					shopResourceId: "def",
+					chosenDate: moment("2021-06-02", SYSTEM_DATE_FORMAT, "en_US"),
+					quantity: 1,
+					orderId: 123
+				},
+				{
+					id: undefined,
+					shopResourceId: "abc",
+					chosenDate: moment("2021-06-01", SYSTEM_DATE_FORMAT, "en_US"),
+					quantity: 1,
+					orderId: 123
+				},
+				{
+					id: undefined,
+					shopResourceId: "def",
+					chosenDate: moment("2021-06-01", SYSTEM_DATE_FORMAT, "en_US"),
+					quantity: 1,
+					orderId: 123
+				}
+			])
+		).toBe("June 1 2021,Tuesday, June 2 2021,Wednesday")
 	})
 
 	afterAll(async () => {
