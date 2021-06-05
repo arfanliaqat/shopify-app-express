@@ -76,10 +76,6 @@ export class HooksService {
 		console.log(`[subscribeHooks|shop:${shop.domain}] Synchronising hooks...`)
 		const currentWebhooks = (await this.fetchAllHooks(shop, accessToken)) || []
 		const subscribedHooks = getSubscribedHooks()
-		console.log("== subscribedHooks ==")
-		console.log(subscribedHooks)
-		console.log("== currentWebhooks ==")
-		console.log(currentWebhooks)
 		const webhooksToDelete = currentWebhooks.filter((webhook) => {
 			return !subscribedHooks.find(
 				(subscribedHook) => subscribedHook.topic == webhook.topic && subscribedHook.address == webhook.address
@@ -96,6 +92,7 @@ export class HooksService {
 		await webhooksToCreate.map(async (webhook) => {
 			return this.subscribeHook(shop, accessToken, webhook)
 		})
+		console.log(`[subscribeHooks|shop:${shop.domain}] Done.`)
 	}
 
 	static async ingestOrderEvent(
