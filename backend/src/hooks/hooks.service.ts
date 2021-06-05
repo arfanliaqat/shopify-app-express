@@ -80,7 +80,7 @@ export class HooksService {
 		console.log(subscribedHooks)
 		console.log("== currentWebhooks ==")
 		console.log(currentWebhooks)
-		const webhooksToDelete = currentWebhooks.filter(async (webhook) => {
+		const webhooksToDelete = currentWebhooks.filter((webhook) => {
 			return !subscribedHooks.find(
 				(subscribedHook) => subscribedHook.topic == webhook.topic && subscribedHook.address == webhook.address
 			)
