@@ -117,8 +117,6 @@ export class ProductOrderService {
 		if (!shop || !shop.id) throw new UnexpectedError("'shop.id' cannot be undefined")
 		try {
 			const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
-			console.log("=== accessToken ===")
-			console.log(accessToken)
 			if (!accessToken?.token) {
 				return
 			}
