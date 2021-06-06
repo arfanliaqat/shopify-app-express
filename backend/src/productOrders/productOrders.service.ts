@@ -117,6 +117,9 @@ export class ProductOrderService {
 		if (!shop || !shop.id) throw new UnexpectedError("'shop.id' cannot be undefined")
 		try {
 			const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+			if (!accessToken?.token) {
+				return
+			}
 			const response = await axios.put(`https://${shop.domain}/admin/api/2021-04/orders/${orderId}.json`, {
 				headers: {
 					"X-Shopify-Access-Token": accessToken.token
