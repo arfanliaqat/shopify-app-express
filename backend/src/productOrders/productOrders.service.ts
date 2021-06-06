@@ -120,17 +120,20 @@ export class ProductOrderService {
 			if (!accessToken?.token) {
 				return
 			}
-			const response = await axios.put(`https://${shop.domain}/admin/api/2021-04/orders/${orderId}.json`, {
-				headers: {
-					"X-Shopify-Access-Token": accessToken.token
-				},
-				data: {
+			const response = await axios.put(
+				`https://${shop.domain}/admin/api/2021-04/orders/${orderId}.json`,
+				{
 					order: {
 						id: orderId,
 						tags: tags
 					}
+				},
+				{
+					headers: {
+						"X-Shopify-Access-Token": accessToken.token
+					}
 				}
-			})
+			)
 			return response.data
 		} catch (error) {
 			handleAxiosErrors(error)
