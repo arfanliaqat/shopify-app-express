@@ -54,6 +54,10 @@ function getProductId() {
 	return anchorElement?.getAttribute("data-productid")
 }
 
+function getIsDisabled() {
+	return anchorElement?.getAttribute("data-disabled") == "true"
+}
+
 async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	const productId = getProductId()
 	if (!productId) {
@@ -110,6 +114,7 @@ export default function AvailableDatePicker() {
 	}, [settings])
 
 	const isPreviewMode = getIsPreviewMode()
+	const isDisabled = getIsDisabled()
 	useEffect(() => {
 		if (isPreviewMode) {
 			setProductAvailabilityData(getPreviewData())
@@ -133,6 +138,7 @@ export default function AvailableDatePicker() {
 					const data = await fetchAvailabilityForProduct()
 					setProductAvailabilityData(data)
 				}
+
 				fetchStockByDateData()
 			} else {
 				async function fetchDatePickerData() {
@@ -149,7 +155,9 @@ export default function AvailableDatePicker() {
 		}
 	}, [])
 
-	const isVisible = useCallback(() => isPreviewMode || settings?.isVisible, [isPreviewMode, settings])
+	const isVisible = useCallback(() => {
+		return (isPreviewMode || settings?.isVisible) && !isDisabled
+	}, [isPreviewMode, settings, isDisabled])
 
 	useEffect(() => {
 		if (!isPreviewMode && anchorElement && isVisible()) {
