@@ -22,6 +22,18 @@ export class ShopService {
 		return result.rows.map(toShop)[0]
 	}
 
+	static async findByShopDomainOrPublicDomain(domain: string): Promise<Shop | undefined> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<ShopSchema>(
+			`
+			SELECT id, domain, public_domain, email, trial_used, uninstalled
+			FROM shops
+			WHERE (domain = $1 or public_domain = $2)`,
+			[domain, domain]
+		)
+		return result.rows.map(toShop)[0]
+	}
+
 	static async findById(shopId: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(

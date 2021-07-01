@@ -22,7 +22,7 @@ router.get("/settings", async (req: Request, res: Response) => {
 			res.status(404).send({ reason: "'shop' param missing" })
 			return
 		}
-		const shop = await ShopService.findByPublicDomain(shopDomain)
+		const shop = await ShopService.findByShopDomainOrPublicDomain(shopDomain)
 		if (!shop?.id) {
 			res.status(404).send({ reason: "No matching shop found" })
 			return
