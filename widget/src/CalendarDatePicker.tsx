@@ -29,7 +29,9 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 		return momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
 	}
 
-	const [selectedDate, setSelectedDate] = useState<string>(availableDates[0]?.date)
+	const [selectedDate, setSelectedDate] = useState<string | undefined>(
+		settings.mandatoryDateSelect ? availableDates[0]?.date : undefined
+	)
 	const momentSelectedDate = selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT) : undefined
 	const [monthStart, setMonthStart] = useState<Moment>(getMonthStart())
 
@@ -38,7 +40,7 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	const calendarEnd = monthStart.clone().endOf("month").endOf("week")
 
 	useEffect(() => {
-		setSelectedDate(availableDates[0]?.date)
+		setSelectedDate(settings.mandatoryDateSelect ? availableDates[0]?.date : undefined)
 	}, [availableDates])
 
 	const availableDatesSet = useMemo(() => {
@@ -49,11 +51,11 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	}, [availableDates])
 
 	const formattedSelectedDate = useMemo(() => {
-		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT)
+		return selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT) : undefined
 	}, [settings, selectedDate])
 
 	const formattedSelectedDay = useMemo(() => {
-		return parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(DAY_OF_WEEK_TAG_DATE_FORMAT)
+		return selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(DAY_OF_WEEK_TAG_DATE_FORMAT) : undefined
 	}, [settings, selectedDate])
 
 	useEffect(() => setMonthStart(getMonthStart()), [settings])
@@ -69,8 +71,8 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	}
 
 	return <div className="buuntoCal">
-		<input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate} />
-		<input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay} />
+		{formattedSelectedDate && <input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate}/>}
+		{formattedSelectedDay && <input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
 		<div className="buuntoCal-header-wrapper">
 			<div className="buuntoCal-header">
 				<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
@@ -91,14 +93,15 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 							const strDay = day.format(SYSTEM_DATE_FORMAT)
 							const dateIsAvailable = availableDatesSet.has(strDay)
 							const isCurrentMonth = day.month() == currentMonth
+							const isSelected = isCurrentMonth && strDay == selectedDate
 							return <div
 								className={classNames("buuntoCal-day", {
 									"buuntoCal-unavailable": isCurrentMonth && !dateIsAvailable,
 									"buuntoCal-available": isCurrentMonth && dateIsAvailable,
-									"buuntoCal-selected": isCurrentMonth && strDay == selectedDate
+									"buuntoCal-selected": isSelected
 								})}
 								key={"day" + strDay}
-								onClick={dateIsAvailable ? () => handleDateSelect(strDay) : () => {}}>
+								onClick={dateIsAvailable ? () => handleDateSelect(isSelected ? undefined : strDay) : () => {}}>
 								<span>{isCurrentMonth ? day.format("D") : ""}</span>
 							</div>
 						})}

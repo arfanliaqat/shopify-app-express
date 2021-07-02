@@ -58,15 +58,13 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 					/>
 				</FormLayout.Group>
 
-				{isStockByDateApp && (
-					<FormLayout.Group>
-						<Checkbox
-							label="A date must be selected to be able to add a product to the cart"
-							checked={widgetSettings.mandatoryDateSelect}
-							onChange={(value) => handleMandatoryDateSelectChange(value)}
-						/>
-					</FormLayout.Group>
-				)}
+				<FormLayout.Group>
+					<Checkbox
+						label="A date must be selected to be able to add a product to the cart"
+						checked={widgetSettings.mandatoryDateSelect}
+						onChange={(value) => handleMandatoryDateSelectChange(value)}
+					/>
+				</FormLayout.Group>
 			</FormLayout>
 		</Card>
 	)

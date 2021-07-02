@@ -101,11 +101,13 @@ export default function AvailableDatePicker() {
 		: generateAvailableDates(settings), [settings])
 
 	useEffect(() => {
-		const firstAvailableDate = availableDates.find(ad => !ad.isSoldOut)
-		if (firstAvailableDate) {
-			setSelectedAvailableDate(firstAvailableDate.date)
+		if (settings?.mandatoryDateSelect) {
+			const firstAvailableDate = availableDates.find(ad => !ad.isSoldOut)
+			if (firstAvailableDate) {
+				setSelectedAvailableDate(firstAvailableDate.date)
+			}
 		}
-	}, [availableDates])
+	}, [settings, availableDates])
 
 	const widgetStyles = useMemo(() => {
 		if (settings) {
@@ -163,7 +165,21 @@ export default function AvailableDatePicker() {
 		if (!isPreviewMode && anchorElement && isVisible()) {
 			const form = anchorElement.closest("form")
 			const onSubmit = (e) => {
-				if (selectedAvailableDate) return
+				let resetError = false
+				if (selectedAvailableDate) {
+					if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
+						resetError = true
+					} else {
+						const button = e.target.closest("button")
+						resetError = true
+						if (button && button.type == "submit") {
+						}
+					}
+					if (resetError) {
+						setFormError(undefined)
+					}
+					return
+				}
 				if (!settings.mandatoryDateSelect) return
 				let halt = false
 				if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
