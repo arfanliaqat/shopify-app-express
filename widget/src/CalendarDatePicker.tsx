@@ -71,8 +71,10 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	}
 
 	return <div className="buuntoCal">
-		{formattedSelectedDate && <input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate}/>}
-		{formattedSelectedDay && <input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
+		{formattedSelectedDate &&
+        <input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate}/>}
+		{formattedSelectedDay &&
+        <input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
 		<div className="buuntoCal-header-wrapper">
 			<div className="buuntoCal-header">
 				<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
@@ -101,7 +103,10 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 									"buuntoCal-selected": isSelected
 								})}
 								key={"day" + strDay}
-								onClick={dateIsAvailable ? () => handleDateSelect(isSelected ? undefined : strDay) : () => {}}>
+								onClick={dateIsAvailable ? () => {
+									handleDateSelect(isSelected && !settings.mandatoryDateSelect ? undefined : strDay)
+								} : () => {
+								}}>
 								<span>{isCurrentMonth ? day.format("D") : ""}</span>
 							</div>
 						})}
