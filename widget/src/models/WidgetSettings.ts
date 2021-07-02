@@ -41,5 +41,6 @@ export interface WidgetMessages {
 	noDateSelectedError: string
 	noAvailableDatesError: string
 	soldOut: string
+	dropdownDefaultOptionLabel?: string
 }
 

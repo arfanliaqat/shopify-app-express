@@ -36,7 +36,19 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 						onChange={handleWidgetMessageChange("noAvailableDatesError")}
 						value={widgetSettings.messages.noAvailableDatesError}
 					/>
-					{isStockByDateApp && (
+					{widgetSettings.pickerType == "DROPDOWN" && (
+						<TextField
+							label="Dropdown default option label"
+							maxLength={300}
+							onChange={handleWidgetMessageChange("dropdownDefaultOptionLabel")}
+							value={
+								widgetSettings.messages.dropdownDefaultOptionLabel === undefined
+									? "Please select..."
+									: widgetSettings.messages.dropdownDefaultOptionLabel
+							}
+						/>
+					)}
+					{isStockByDateApp && widgetSettings.pickerType == "DROPDOWN" && (
 						<TextField
 							label="Sold out"
 							maxLength={100}

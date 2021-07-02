@@ -35,7 +35,8 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 	return (
 		<Fragment>
 			<select className="buunto-dropdown" name={`properties[${TAG_LABEL}]`} onChange={handleSelect}>
-				{!settings.mandatoryDateSelect && <option value="">Please select...</option>}
+				{!settings.mandatoryDateSelect &&
+                <option value="">{settings.messages.dropdownDefaultOptionLabel || "Please select..."}</option>}
 				{availableDates.map((availableDate) => {
 					const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
 					const valueDate = momentDate.format(TAG_DATE_FORMAT)
@@ -47,7 +48,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 				})}
 			</select>
 			{formattedSelectedDay &&
-				<input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
+            <input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
 		</Fragment>
 	)
 }

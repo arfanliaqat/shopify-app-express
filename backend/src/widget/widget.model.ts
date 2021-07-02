@@ -47,7 +47,8 @@ export class WidgetSettings {
 				datePickerLabel: "Pick a delivery date:",
 				noDateSelectedError: "Please select a delivery date before adding to the cart.",
 				noAvailableDatesError: "There are currently no dates available for this product.",
-				soldOut: "sold out"
+				soldOut: "sold out",
+				dropdownDefaultOptionLabel: "Please select..."
 			}
 		})
 	}
