@@ -218,7 +218,7 @@ export default function AvailableDatePicker() {
 	if (!productAvailabilityData || !isVisible()) return undefined
 
 	return (
-		<div className="buunto-date-dropdown-picker">
+		<div className="buunto-date-picker">
 			{widgetStyles && <style>{widgetStyles}</style>}
 			<div className="buunto-date-picker-label">{settings.messages.datePickerLabel}</div>
 			{formError && <div className="buunto-date-picker-error">{formError}</div>}
