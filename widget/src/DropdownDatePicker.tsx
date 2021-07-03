@@ -34,7 +34,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 	}, [settings, selectedAvailableDate])
 
 	const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
-	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DATE_TAG_LABEL
+	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DAY_OF_WEEK_TAG_LABEL
 	const dropdownDefaultOptionLabel = settings.messages.dropdownDefaultOptionLabel || DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
 
 	return (

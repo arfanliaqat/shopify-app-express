@@ -71,7 +71,7 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	}
 
 	const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
-	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DATE_TAG_LABEL
+	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DAY_OF_WEEK_TAG_LABEL
 
 	return <div className="buuntoCal">
 		{formattedSelectedDate &&
