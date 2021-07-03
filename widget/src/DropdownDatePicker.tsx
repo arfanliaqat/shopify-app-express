@@ -1,8 +1,9 @@
 import {
-	DAY_OF_WEEK_TAG_DATE_FORMAT, DAY_OF_WEEK_TAG_LABEL,
+	DAY_OF_WEEK_TAG_DATE_FORMAT,
 	SYSTEM_DATE_FORMAT,
 	TAG_DATE_FORMAT,
-	TAG_LABEL
+	DEFAULT_DATE_TAG_LABEL,
+	DEFAULT_DAY_OF_WEEK_TAG_LABEL, DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
 } from "../../backend/src/util/constants"
 import { h, Fragment } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
@@ -32,11 +33,15 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 			: undefined
 	}, [settings, selectedAvailableDate])
 
+	const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
+	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DATE_TAG_LABEL
+	const dropdownDefaultOptionLabel = settings.messages.dropdownDefaultOptionLabel || DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
+
 	return (
 		<Fragment>
-			<select className="buunto-dropdown" name={`properties[${TAG_LABEL}]`} onChange={handleSelect}>
+			<select className="buunto-dropdown" name={`properties[${dateTagLabel}]`} onChange={handleSelect}>
 				{!settings.mandatoryDateSelect &&
-                <option value="">{settings.messages.dropdownDefaultOptionLabel || "Please select..."}</option>}
+                <option value="">{dropdownDefaultOptionLabel}</option>}
 				{availableDates.map((availableDate) => {
 					const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
 					const valueDate = momentDate.format(TAG_DATE_FORMAT)
@@ -48,7 +53,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 				})}
 			</select>
 			{formattedSelectedDay &&
-            <input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
+            <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 		</Fragment>
 	)
 }

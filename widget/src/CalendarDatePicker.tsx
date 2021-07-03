@@ -6,10 +6,10 @@ import { Moment } from "moment"
 import { useEffect, useMemo, useState } from "preact/hooks"
 import {
 	DAY_OF_WEEK_TAG_DATE_FORMAT,
-	DAY_OF_WEEK_TAG_LABEL,
 	SYSTEM_DATE_FORMAT,
 	TAG_DATE_FORMAT,
-	TAG_LABEL
+	DEFAULT_DATE_TAG_LABEL,
+	DEFAULT_DAY_OF_WEEK_TAG_LABEL
 } from "../../backend/src/util/constants"
 import classNames from "classnames"
 import { WidgetSettings } from "./models/WidgetSettings"
@@ -70,11 +70,14 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 		onSelect(strDay)
 	}
 
+	const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
+	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DATE_TAG_LABEL
+
 	return <div className="buuntoCal">
 		{formattedSelectedDate &&
-        <input type="hidden" name={`properties[${TAG_LABEL}]`} value={formattedSelectedDate}/>}
+        <input type="hidden" name={`properties[${dateTagLabel}]`} value={formattedSelectedDate}/>}
 		{formattedSelectedDay &&
-        <input type="hidden" name={`properties[${DAY_OF_WEEK_TAG_LABEL}]`} value={formattedSelectedDay}/>}
+        <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 		<div className="buuntoCal-header-wrapper">
 			<div className="buuntoCal-header">
 				<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>

@@ -42,5 +42,7 @@ export interface WidgetMessages {
 	noAvailableDatesError: string
 	soldOut: string
 	dropdownDefaultOptionLabel?: string
+	dateTagLabel?: string
+	dayOfWeekTagLabel?: string
 }
 

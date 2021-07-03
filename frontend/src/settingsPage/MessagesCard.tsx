@@ -2,6 +2,11 @@ import React from "react"
 import { Card, FormLayout, TextField } from "@shopify/polaris"
 import { WidgetMessages, WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { isStockByDateApp } from "../common/constants"
+import {
+	DEFAULT_DATE_TAG_LABEL,
+	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
+	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
+} from "../../../backend/src/util/constants"
 
 interface Props {
 	widgetSettings: WidgetSettings
@@ -42,9 +47,8 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 							maxLength={300}
 							onChange={handleWidgetMessageChange("dropdownDefaultOptionLabel")}
 							value={
-								widgetSettings.messages.dropdownDefaultOptionLabel === undefined
-									? "Please select..."
-									: widgetSettings.messages.dropdownDefaultOptionLabel
+								widgetSettings.messages.dropdownDefaultOptionLabel ??
+								DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
 							}
 						/>
 					)}
@@ -56,6 +60,18 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 							value={widgetSettings.messages.soldOut}
 						/>
 					)}
+					<TextField
+						label="Order tag date label"
+						maxLength={300}
+						onChange={handleWidgetMessageChange("dateTagLabel")}
+						value={widgetSettings.messages.dateTagLabel ?? DEFAULT_DATE_TAG_LABEL}
+					/>
+					<TextField
+						label="Order tag day of week label"
+						maxLength={300}
+						onChange={handleWidgetMessageChange("dayOfWeekTagLabel")}
+						value={widgetSettings.messages.dayOfWeekTagLabel ?? DEFAULT_DAY_OF_WEEK_TAG_LABEL}
+					/>
 				</FormLayout>
 			</Card.Section>
 		</Card>

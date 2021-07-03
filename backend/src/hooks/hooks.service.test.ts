@@ -6,7 +6,7 @@ import { ProductOrderService } from "../productOrders/productOrders.service"
 import { DatabaseTestService, getConnection } from "../util/database"
 import { Shop } from "../shop/shop.model"
 import { ShopResource } from "../shopResource/shopResource.model"
-import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
+import { SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT, DEFAULT_DATE_TAG_LABEL } from "../util/constants"
 import { AvailabilityPeriodBuilder } from "../availabilityPeriods/availabilityPeriods.builder"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import { WidgetSettingsBuilder } from "../widget/widget.builder"
@@ -33,7 +33,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -89,7 +89,7 @@ describe("HooksService", () => {
 						product_id: 6666,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -130,7 +130,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -171,7 +171,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -211,7 +211,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -252,7 +252,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -290,7 +290,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate1.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -300,7 +300,7 @@ describe("HooksService", () => {
 						product_id: 5555,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate2.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -336,7 +336,7 @@ describe("HooksService", () => {
 				quantity: 2,
 				properties: [
 					{
-						name: TAG_LABEL,
+						name: DEFAULT_DATE_TAG_LABEL,
 						value: "December 20, 2020"
 					}
 				]
@@ -354,7 +354,7 @@ describe("HooksService", () => {
 				quantity: 2,
 				properties: [
 					{
-						name: TAG_LABEL,
+						name: DEFAULT_DATE_TAG_LABEL,
 						value: "20 décembre 2020"
 					}
 				]
@@ -387,7 +387,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate1.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -421,7 +421,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]
@@ -455,7 +455,7 @@ describe("HooksService", () => {
 						product_id: 4321,
 						properties: [
 							{
-								name: TAG_LABEL,
+								name: DEFAULT_DATE_TAG_LABEL,
 								value: availableDate.format(TAG_DATE_FORMAT)
 							}
 						]

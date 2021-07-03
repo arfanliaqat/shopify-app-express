@@ -4,7 +4,7 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { TAG_DATE_FORMAT, TAG_LABEL } from "../util/constants"
+import { TAG_DATE_FORMAT, DEFAULT_DATE_TAG_LABEL } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
@@ -15,8 +15,9 @@ import { ShopPlanService } from "../shopPlan/shopPlan.service"
 import { ShopService } from "../shop/shop.service"
 
 export function getChosenDate(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): Moment | undefined {
+	const dateTagLabel = widgetSetting.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
 	const chosenDateProperty = lineItem.properties.find((property: Property) => {
-		return property.name?.toLowerCase() == TAG_LABEL.toLowerCase()
+		return property.name?.toLowerCase() == dateTagLabel.toLowerCase()
 	})
 	if (!chosenDateProperty?.value) return undefined
 	return moment(chosenDateProperty.value, TAG_DATE_FORMAT, widgetSetting.locale)

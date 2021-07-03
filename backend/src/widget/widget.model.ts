@@ -1,5 +1,10 @@
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
-import { allWeekDays } from "../util/constants"
+import {
+	allWeekDays,
+	DEFAULT_DATE_TAG_LABEL,
+	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
+	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
+} from "../util/constants"
 
 export interface WidgetSettingsSchema {
 	shop_id: string
@@ -48,7 +53,9 @@ export class WidgetSettings {
 				noDateSelectedError: "Please select a delivery date before adding to the cart.",
 				noAvailableDatesError: "There are currently no dates available for this product.",
 				soldOut: "sold out",
-				dropdownDefaultOptionLabel: "Please select..."
+				dropdownDefaultOptionLabel: DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
+				dateTagLabel: DEFAULT_DATE_TAG_LABEL,
+				dayOfWeekTagLabel: DEFAULT_DAY_OF_WEEK_TAG_LABEL
 			}
 		})
 	}
