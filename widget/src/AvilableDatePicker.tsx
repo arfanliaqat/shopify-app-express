@@ -9,8 +9,13 @@ import { WidgetSettings } from "./models/WidgetSettings"
 import { AvailableDate } from "./models/AvailableDate"
 import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
-import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../../backend/src/util/constants"
-import moment from "moment"
+import {
+	DEFAULT_DATE_TAG_LABEL, DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
+	SYSTEM_DATE_FORMAT,
+	SYSTEM_DATETIME_FORMAT,
+	TAG_DATE_FORMAT
+} from "../../backend/src/util/constants"
+import moment, { Moment } from "moment"
 
 function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
@@ -94,11 +99,47 @@ export default function AvailableDatePicker() {
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(undefined)
 	const [selectedAvailableDate, setSelectedAvailableDate] = useState<string>(undefined)
 	const [formError, setFormError] = useState<string>(undefined)
+	const [orderDate, setOrderDate] = useState<Moment>(undefined)
+	const [fetchingCartData, setFetchingCartData] = useState<boolean>(false)
 
 	const settings = productAvailabilityData?.settings
-	const availableDates = useMemo(() => appName == "STOCK_BY_DATE"
-		? (productAvailabilityData?.availableDates || [])
-		: generateAvailableDates(settings), [settings])
+	const availableDates: AvailableDate[] = useMemo(() => {
+		if (appName == "STOCK_BY_DATE") {
+			return productAvailabilityData?.availableDates || []
+		} else {
+			if (orderDate) {
+				return [{
+					date: orderDate.format(SYSTEM_DATE_FORMAT),
+					isSoldOut: false
+				} as AvailableDate]
+			} else {
+				return generateAvailableDates(settings)
+			}
+		}
+	}, [settings, orderDate])
+
+	useEffect(() => {
+		if (fetchingCartData) {
+			async function fetchOrderDate() {
+				const response = await fetch("/cart.js", {
+					headers: {
+						Accept: "application/json"
+					}
+				})
+				const cart = await response.json() as any
+				const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
+				const item = cart.items.find(item => !!item.properties[dateTagLabel])
+				if (item) {
+					const strTagDate = item.properties[dateTagLabel]
+					const tagDate = moment(strTagDate, TAG_DATE_FORMAT, settings.locale)
+					setOrderDate(tagDate)
+					setSelectedAvailableDate(tagDate.format(SYSTEM_DATE_FORMAT))
+				}
+				setFetchingCartData(false)
+			}
+			fetchOrderDate()
+		}
+	}, [settings, fetchingCartData])
 
 	useEffect(() => {
 		if (settings?.mandatoryDateSelect) {
@@ -147,8 +188,9 @@ export default function AvailableDatePicker() {
 					const data = await fetchWidgetSettings()
 					setProductAvailabilityData({
 						settings: data,
-						availableDates: []
+						availableDates: [],
 					})
+					setFetchingCartData(data.singleDatePerOrder)
 				}
 
 				fetchDatePickerData()
@@ -215,7 +257,9 @@ export default function AvailableDatePicker() {
 		setSelectedAvailableDate(value)
 	}
 
-	if (!productAvailabilityData || !isVisible()) return undefined
+	if (!productAvailabilityData || fetchingCartData || !isVisible()) return undefined
+
+	const singleDatePerOrderMessage = settings.messages.singleDatePerOrderMessage || DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
 
 	return (
 		<div className="buunto-date-picker">
@@ -231,9 +275,9 @@ export default function AvailableDatePicker() {
 			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
-                selectedAvailableDate={selectedAvailableDate}
                 settings={settings}
             />}
+			{orderDate && <div className="buunto-info-message">{singleDatePerOrderMessage}</div>}
 		</div>
 	)
 }

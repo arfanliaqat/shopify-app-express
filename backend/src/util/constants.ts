@@ -17,6 +17,7 @@ export const DAY_OF_WEEK_TAG_DATE_FORMAT = "dddd"
 export const DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL = "Please select..."
 export const DEFAULT_DATE_TAG_LABEL = "Delivery Date"
 export const DEFAULT_DAY_OF_WEEK_TAG_LABEL = "Delivery Day"
+export const DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE = "You can only choose one delivery date per order."
 
 export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"
 export const APP_NAME = (process.env.APP_NAME as AppName) || "STOCK_BY_DATE"

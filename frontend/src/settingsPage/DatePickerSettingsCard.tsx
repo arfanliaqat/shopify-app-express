@@ -23,6 +23,10 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 		onWidgetSettingsChange({ ...widgetSettings, mandatoryDateSelect })
 	}
 
+	const handleSingleDatePerOrderChange = (singleDatePerOrder: boolean) => {
+		onWidgetSettingsChange({ ...widgetSettings, singleDatePerOrder })
+	}
+
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
 		onWidgetSettingsChange({ ...widgetSettings, styles })
@@ -63,6 +67,14 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 						label="A date must be selected to be able to add a product to the cart"
 						checked={widgetSettings.mandatoryDateSelect}
 						onChange={(value) => handleMandatoryDateSelectChange(value)}
+					/>
+				</FormLayout.Group>
+
+				<FormLayout.Group>
+					<Checkbox
+						label="Only allow to select one date per order"
+						checked={widgetSettings.singleDatePerOrder}
+						onChange={(value) => handleSingleDatePerOrderChange(value)}
 					/>
 				</FormLayout.Group>
 			</FormLayout>

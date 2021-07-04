@@ -11,7 +11,8 @@ export interface WidgetSettings {
 	styles: WidgetStyles
 	mandatoryDateSelect: boolean
 	messages: WidgetMessages
-	isVisible: boolean
+	isVisible: boolean,
+	singleDatePerOrder?: boolean
 }
 
 export interface WidgetStyles {
@@ -44,5 +45,6 @@ export interface WidgetMessages {
 	dropdownDefaultOptionLabel?: string
 	dateTagLabel?: string
 	dayOfWeekTagLabel?: string
+	singleDatePerOrderMessage?: string
 }
 

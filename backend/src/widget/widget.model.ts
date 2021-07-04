@@ -27,6 +27,7 @@ export class WidgetSettings {
 			disabledDates: [],
 			mandatoryDateSelect: true,
 			isVisible: false,
+			singleDatePerOrder: false,
 			styles: {
 				errorFontColor: "#8b0000",
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",

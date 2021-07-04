@@ -5,7 +5,8 @@ import { isStockByDateApp } from "../common/constants"
 import {
 	DEFAULT_DATE_TAG_LABEL,
 	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
-	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
+	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
+	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
 } from "../../../backend/src/util/constants"
 
 interface Props {
@@ -72,6 +73,17 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 						onChange={handleWidgetMessageChange("dayOfWeekTagLabel")}
 						value={widgetSettings.messages.dayOfWeekTagLabel ?? DEFAULT_DAY_OF_WEEK_TAG_LABEL}
 					/>
+					{widgetSettings.singleDatePerOrder && (
+						<TextField
+							label="Message when a date have already been selected in the order"
+							maxLength={300}
+							onChange={handleWidgetMessageChange("singleDatePerOrderMessage")}
+							value={
+								widgetSettings.messages.singleDatePerOrderMessage ??
+								DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
+							}
+						/>
+					)}
 				</FormLayout>
 			</Card.Section>
 		</Card>

@@ -18,7 +18,6 @@ import { getMoment, parseMoment } from "./util/dates"
 interface Props {
 	onSelect: (value: string) => void,
 	availableDates: AvailableDate[],
-	selectedAvailableDate: string,
 	settings: WidgetSettings
 }
 
@@ -32,7 +31,7 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	const [selectedDate, setSelectedDate] = useState<string | undefined>(
 		settings.mandatoryDateSelect ? availableDates[0]?.date : undefined
 	)
-	const momentSelectedDate = selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT) : undefined
+	const momentSelectedDate = availableDates[0] ? parseMoment(settings, availableDates[0].date, SYSTEM_DATE_FORMAT) : undefined
 	const [monthStart, setMonthStart] = useState<Moment>(getMonthStart())
 
 	const currentMonth = monthStart.month()
