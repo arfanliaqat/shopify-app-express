@@ -21,12 +21,12 @@ function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
 	const today = getMoment(settings).startOf("day")
 	const cutOffTime = moment(moment().format(SYSTEM_DATE_FORMAT) + " " + settings.cutOffTime + ":00", SYSTEM_DATETIME_FORMAT)
-	const cutOffExtraDay = moment().isAfter(cutOffTime, "minute") ? 1 : 0
-	const firstDay = today.clone().add(settings.firstAvailableDateInDays + cutOffExtraDay, "days")
+	const needsExtraDay = moment().isAfter(cutOffTime, "minute")
+	const firstDay = today.clone().add(settings.firstAvailableDateInDays, "days")
 	const lastDay = today.clone().add(settings.lastAvailableDateInWeeks, "weeks").endOf("weeks")
 	const availableWeekDaysSet = new Set(settings.availableWeekDays)
 	const disabledDatesSet = new Set(settings.disabledDates)
-	return getDaysBetween(firstDay, lastDay, "day")
+	const availableDates = getDaysBetween(firstDay, lastDay, "day")
 		.filter((date) => {
 			const matchesPattern = availableWeekDaysSet.has(date.format("dddd").toUpperCase())
 			if (!matchesPattern) return false
@@ -37,6 +37,10 @@ function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 			date: date.format(SYSTEM_DATE_FORMAT),
 			isSoldOut: false
 		}))
+	if (needsExtraDay) {
+		availableDates.shift()
+	}
+	return availableDates
 }
 
 function getCurrentDomain() {
