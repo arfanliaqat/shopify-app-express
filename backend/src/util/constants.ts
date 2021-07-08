@@ -58,6 +58,7 @@ export const plans: { [key: string]: PlanOptions } = {
 export const isPlanTestMode = process.env.PLAN_TEST_MODE == "true"
 
 export const datePickerLanguages: { value: string; label: string }[] = [
+	{ value: "cs", label: "Czech" },
 	{ value: "nl", label: "Dutch" },
 	{ value: "en", label: "English (United States)" },
 	{ value: "en-au", label: "English (Australia)" },

@@ -30,7 +30,7 @@ module.exports = {
 				APP_NAME: JSON.stringify(process.env.APP_NAME || "DATE_PICKER"),
 				ANCHOR_ID: JSON.stringify(process.env.ANCHOR_ID || "h10-ship-by-date")
 			}),
-			new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /nl|en|en\-au|en\-ca|en\-gb|fr|fr\-ca|de|id|it|pl|pt|pt\-br|ro|ru|es|sv/)
+			new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /nl|en|en\-au|en\-ca|en\-gb|fr|fr\-ca|de|id|it|pl|pt|pt\-br|ro|ru|es|sv|cs/)
 	],
 	output: {
 		filename: process.env.WIDGET_SCRIPT_NAME || "h10-ship-by-date.js",
