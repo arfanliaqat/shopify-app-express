@@ -53,6 +53,7 @@ function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvaila
 	return data
 }
 
+let timeoutId: any
 export default function Preview({ widgetSettings }: Props) {
 	useEffect(() => {
 		const script = document.createElement("script")
@@ -67,7 +68,12 @@ export default function Preview({ widgetSettings }: Props) {
 	useEffect(() => {
 		// eslint-disable-next-line no-undef
 		const event = new CustomEvent("previewDataUpdated")
-		setTimeout(() => document.getElementById(anchorId).dispatchEvent(event), 10)
+		if (timeoutId) {
+			clearTimeout(timeoutId)
+		}
+		timeoutId = setTimeout(() => {
+			document.getElementById(anchorId).dispatchEvent(event)
+		}, 200)
 	}, [jsonWidgetSettings])
 
 	return (
