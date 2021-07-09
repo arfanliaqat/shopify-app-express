@@ -72,7 +72,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	if (!productId) {
 		throw "[Buunto] productId not found"
 	}
-	const response = await fetch(appUrl + "/product_availability/" + productId, {
+	const response = await fetch(appUrl + "/product_availability/" + productId + "?_ts=" + Date.now(), {
 		headers: {
 			Accept: "application/json"
 		}
@@ -84,7 +84,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 }
 
 async function fetchWidgetSettings(): Promise<WidgetSettings> {
-	const response = await fetch(appUrl + "/settings?shop=" + getCurrentDomain(), {
+	const response = await fetch(appUrl + "/settings?shop=" + getCurrentDomain() + "&_ts=" + Date.now(), {
 		headers: {
 			Accept: "application/json"
 		}
@@ -141,6 +141,7 @@ export default function AvailableDatePicker() {
 				}
 				setFetchingCartData(false)
 			}
+
 			fetchOrderDate()
 		}
 	}, [settings, fetchingCartData])
