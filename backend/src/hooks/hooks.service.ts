@@ -114,7 +114,10 @@ export class HooksService {
 				return
 			}
 
-			const productIds = Array.from(new Set<number>(orderEvent.line_items.map((item) => item.product_id)))
+			const rawProductIds = orderEvent.line_items
+				.map((item) => item.product_id)
+				.filter((productId) => !!productId)
+			const productIds = Array.from(new Set<number>(rawProductIds))
 			if (isStockByDateApp) {
 				eventShopResourcesArray = await ShopResourceService.findByProductIds(productIds, service.getClient())
 			} else {
