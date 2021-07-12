@@ -33,7 +33,8 @@ function initWidget() {
 	}
 }
 
-declare let jQuery: any | undefined
+
+const jQuery: any | undefined = (window as any).jQuery
 
 if (jQuery) {
 	jQuery(() => {
