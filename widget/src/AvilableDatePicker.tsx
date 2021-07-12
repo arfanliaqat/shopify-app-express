@@ -9,6 +9,7 @@ import { WidgetSettings } from "./models/WidgetSettings"
 import { AvailableDate } from "./models/AvailableDate"
 import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
+
 import {
 	DEFAULT_DATE_TAG_LABEL, DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 	SYSTEM_DATE_FORMAT,
@@ -16,6 +17,7 @@ import {
 	TAG_DATE_FORMAT
 } from "../../backend/src/util/constants"
 import moment, { Moment } from "moment"
+import axios from "axios"
 
 function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
@@ -72,7 +74,7 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	if (!productId) {
 		throw "[Buunto] productId not found"
 	}
-	const response = await fetch(appUrl + "/product_availability/" + productId + "?_ts=" + Date.now(), {
+	const response = await axios.get(appUrl + "/product_availability/" + productId + "?_ts=" + Date.now(), {
 		headers: {
 			Accept: "application/json"
 		}
@@ -80,23 +82,23 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	if (response.status != 200) {
 		throw "[Buunto] failed to fetch product availability"
 	}
-	return (await response.json()) as ProductAvailabilityData
+	return (await response.data) as ProductAvailabilityData
 }
 
 async function fetchWidgetSettings(): Promise<WidgetSettings> {
-	const response = await fetch(appUrl + "/settings?shop=" + getCurrentDomain() + "&_ts=" + Date.now(), {
+	const response = await axios.get(appUrl + "/settings?shop=" + getCurrentDomain() + "&_ts=" + Date.now(), {
 		headers: {
 			Accept: "application/json"
 		}
 	})
 	if (response.status == 403) {
-		const data = await response.json()
+		const data = await response.data
 		throw `[Buunto] ${data.reason}`
 	}
 	if (response.status != 200) {
 		throw "[Buunto] failed to fetch widget settings"
 	}
-	return (await response.json()) as WidgetSettings
+	return (await response.data) as WidgetSettings
 }
 
 export default function AvailableDatePicker() {
@@ -107,6 +109,7 @@ export default function AvailableDatePicker() {
 	const [fetchingCartData, setFetchingCartData] = useState<boolean>(false)
 
 	const settings = productAvailabilityData?.settings
+
 	const availableDates: AvailableDate[] = useMemo(() => {
 		if (appName == "STOCK_BY_DATE") {
 			return productAvailabilityData?.availableDates || []
@@ -125,12 +128,12 @@ export default function AvailableDatePicker() {
 	useEffect(() => {
 		if (fetchingCartData) {
 			async function fetchOrderDate() {
-				const response = await fetch("/cart.js", {
+				const response = await axios.get("/cart.js", {
 					headers: {
 						Accept: "application/json"
 					}
 				})
-				const cart = await response.json() as any
+				const cart = await response.data as any
 				const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
 				const item = cart.items.find(item => !!item.properties[dateTagLabel])
 				if (item) {

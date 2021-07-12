@@ -1,4 +1,4 @@
-import express, { Application, json } from "express"
+import express, { Application, json, Request } from "express"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
@@ -6,6 +6,7 @@ import cors from "cors"
 import path from "path"
 import morgan from "morgan"
 import compression from "compression"
+import useragent from "express-useragent"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -82,6 +83,13 @@ app.use(
 		}
 	})
 )
+
+app.post("/errors", [useragent.express()], (req: Request) => {
+	const browserInfo = req.useragent ? req.useragent.browser + " " + req.useragent.version : ""
+	const osInfo = req.useragent?.os || ""
+	const platformInfo = req.useragent?.platform || ""
+	console.error(`JS error (Platform: ${platformInfo}; OS: ${osInfo}; Browser: ${browserInfo}) - \n${req.body.error}`)
+})
 
 app.use(noApiCallCache)
 app.use(authRouter)
