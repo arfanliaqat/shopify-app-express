@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks"
-import { anchorElement, appName, appUrl } from "./constants"
+import { appName, appUrl } from "./constants"
 import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
 import { getCssFromWidgetStyles } from "./util/widgetStyles"
@@ -18,6 +18,7 @@ import {
 } from "../../backend/src/util/constants"
 import moment, { Moment } from "moment"
 import axios from "axios"
+import { anchorElement } from "./app"
 
 function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	if (!settings) return []
