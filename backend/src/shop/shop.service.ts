@@ -36,7 +36,7 @@ export class ShopService {
 			SELECT id, domain, public_domain, email, trial_used, uninstalled
 			FROM shops
 			WHERE (domain = $1 or public_domain in ($2, $3))`,
-			[domain, domain, altDomain]
+			[domain, domain, altDomain ?? domain]
 		)
 		return result.rows.map(toShop)[0]
 	}
