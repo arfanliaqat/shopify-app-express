@@ -24,12 +24,19 @@ export class ShopService {
 
 	static async findByShopDomainOrPublicDomain(domain: string): Promise<Shop | undefined> {
 		const conn: Pool = await getConnection()
+		let altDomain: string | undefined
+		if ((domain.match(/\./g) || []).length == 1) {
+			altDomain = "www." + domain
+		}
+		if (domain.startsWith("www.")) {
+			altDomain = domain.replace(/^www\./, "")
+		}
 		const result = await conn.query<ShopSchema>(
 			`
 			SELECT id, domain, public_domain, email, trial_used, uninstalled
 			FROM shops
-			WHERE (domain = $1 or public_domain = $2)`,
-			[domain, domain]
+			WHERE (domain = $1 or public_domain in ($2, $3))`,
+			[domain, domain, altDomain]
 		)
 		return result.rows.map(toShop)[0]
 	}
