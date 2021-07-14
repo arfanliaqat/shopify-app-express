@@ -186,7 +186,7 @@ export class ProductOrderServiceWithTransaction extends WithTransaction {
 		let tags = ProductOrderService.getTags(productOrders)
 		const arrChosenTimeSlots = Array.from(chosenTimeSlots)
 		if (arrChosenTimeSlots.length > 0) {
-			tags = "," + arrChosenTimeSlots.join(",")
+			tags += "," + arrChosenTimeSlots.join(",")
 		}
 		if (tags != orderEvent.tags) {
 			await ProductOrderService.updateTags(shop, orderEvent.id, tags)
