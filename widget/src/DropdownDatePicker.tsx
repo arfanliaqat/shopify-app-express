@@ -10,15 +10,17 @@ import { AvailableDate } from "./models/AvailableDate"
 import { WidgetSettings } from "./models/WidgetSettings"
 import { parseMoment } from "./util/dates"
 import { useMemo } from "preact/hooks"
+import classNames from "classnames"
 
 interface Props {
-	onSelect: (value: string) => void,
-	availableDates: AvailableDate[],
-	selectedAvailableDate: string | undefined,
+	onSelect: (value: string) => void
+	availableDates: AvailableDate[]
+	selectedAvailableDate: string | undefined
 	settings: WidgetSettings
+	formError: string | undefined
 }
 
-export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate }: Props) {
+export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError }: Props) {
 	const handleSelect = (e) => {
 		if (e.target.value) {
 			onSelect(e.target.value)
@@ -39,9 +41,11 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 
 	return (
 		<Fragment>
-			<select className="buunto-dropdown" name={`properties[${dateTagLabel}]`} onChange={handleSelect}>
-				{!settings.mandatoryDateSelect &&
-                <option value="">{dropdownDefaultOptionLabel}</option>}
+			{formError && <div className="buunto-error-message">{formError}</div>}
+			<select className={classNames("buunto-date-picker-dropdown", "buunto-dropdown", { "buunto-error": !!formError })}
+					name={`properties[${dateTagLabel}]`}
+					onChange={handleSelect}>
+				{settings.dateDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
 				{availableDates.map((availableDate) => {
 					const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
 					const valueDate = momentDate.format(TAG_DATE_FORMAT)
@@ -52,8 +56,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 					</option>
 				})}
 			</select>
-			{formattedSelectedDay &&
-            <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+			{formattedSelectedDay && <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 		</Fragment>
 	)
 }

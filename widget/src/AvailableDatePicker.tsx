@@ -5,7 +5,7 @@ import DropdownDatePicker from "./DropdownDatePicker"
 import CalendarDatePicker from "./CalendarDatePicker"
 import { getCssFromWidgetStyles } from "./util/widgetStyles"
 import { ProductAvailabilityData } from "./models/ProductAvailabilityData"
-import { WidgetSettings } from "./models/WidgetSettings"
+import { ConfigDay, WidgetSettings } from "./models/WidgetSettings"
 import { AvailableDate } from "./models/AvailableDate"
 import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
@@ -17,6 +17,7 @@ import {
 	TAG_DATE_FORMAT
 } from "../../backend/src/util/constants"
 import moment, { Moment } from "moment"
+import TimeSlotPicker from "./TimeSlotPicker"
 import axios from "axios"
 import { anchorElement } from "./app"
 
@@ -102,10 +103,22 @@ async function fetchWidgetSettings(): Promise<WidgetSettings> {
 	return (await response.data) as WidgetSettings
 }
 
+function isSubmitButtonClick(e: any) {
+	if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
+		return true
+	} else {
+		const button = e.target.closest("button")
+		return button?.type == "submit"
+	}
+	return false
+}
+
 export default function AvailableDatePicker() {
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(undefined)
 	const [selectedAvailableDate, setSelectedAvailableDate] = useState<string>(undefined)
-	const [formError, setFormError] = useState<string>(undefined)
+	const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(undefined)
+	const [dateFormError, setDateFormError] = useState<string>(undefined)
+	const [timeSlotFormError, setTimeSlotFormError] =  useState<string>(undefined)
 	const [orderDate, setOrderDate] = useState<Moment>(undefined)
 	const [fetchingCartData, setFetchingCartData] = useState<boolean>(false)
 
@@ -151,7 +164,7 @@ export default function AvailableDatePicker() {
 	}, [settings, fetchingCartData])
 
 	useEffect(() => {
-		if (settings?.mandatoryDateSelect) {
+		if (!settings?.dateDeselectedFirst) {
 			const firstAvailableDate = availableDates.find(ad => !ad.isSoldOut)
 			if (firstAvailableDate) {
 				setSelectedAvailableDate(firstAvailableDate.date)
@@ -178,7 +191,7 @@ export default function AvailableDatePicker() {
 			anchorElement.addEventListener("previewDataUpdated", () => {
 				const previewDate = getPreviewData()
 				setProductAvailabilityData(previewDate)
-				setFormError(undefined)
+				setDateFormError(undefined)
 			}, false)
 		}
 	}, [])
@@ -212,39 +225,25 @@ export default function AvailableDatePicker() {
 		return (isPreviewMode || settings?.isVisible) && !isDisabled
 	}, [isPreviewMode, settings, isDisabled])
 
+	const hasDateError = useCallback(() => {
+		return !isPreviewMode && anchorElement && isVisible() && settings?.mandatoryDateSelect && !selectedAvailableDate
+	}, [settings, isPreviewMode, anchorElement, isVisible, selectedAvailableDate])
+
+	const hasTimeSlotError = useCallback(() => {
+		return !isPreviewMode && anchorElement && isVisible() && settings?.mandatoryTimeSlot && !selectedTimeSlot
+	}, [settings, isPreviewMode, anchorElement, isVisible, selectedTimeSlot])
+
 	useEffect(() => {
 		if (!isPreviewMode && anchorElement && isVisible()) {
 			const form = anchorElement.closest("form")
 			const onSubmit = (e) => {
-				let resetError = false
-				if (selectedAvailableDate) {
-					if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
-						resetError = true
-					} else {
-						const button = e.target.closest("button")
-						resetError = true
-						if (button && button.type == "submit") {
-						}
+				if (isSubmitButtonClick(e)) {
+					setDateFormError(hasDateError() ? settings.messages.noDateSelectedError : undefined)
+					setTimeSlotFormError(hasTimeSlotError() ? settings.messages.noTimeSlotSelectedError : undefined)
+					if (hasDateError() || hasTimeSlotError()) {
+						e.preventDefault()
+						return false
 					}
-					if (resetError) {
-						setFormError(undefined)
-					}
-					return
-				}
-				if (!settings.mandatoryDateSelect) return
-				let halt = false
-				if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
-					halt = true
-				} else {
-					const button = e.target.closest("button")
-					if (button && button.type == "submit") {
-						halt = true
-					}
-				}
-				if (halt) {
-					setFormError(settings.messages.noDateSelectedError)
-					e.preventDefault()
-					return false
 				}
 			}
 			if (form) {
@@ -254,11 +253,11 @@ export default function AvailableDatePicker() {
 				form.removeEventListener("click", onSubmit)
 			}
 		}
-	}, [selectedAvailableDate, settings, isVisible])
+	}, [selectedAvailableDate, settings, isVisible, hasDateError, hasTimeSlotError])
 
 	useEffect(() => {
 		if (productAvailabilityData && availableDates.length == 0) {
-			setFormError(settings.messages.noAvailableDatesError)
+			setDateFormError(settings.messages.noAvailableDatesError)
 		}
 	}, [productAvailabilityData, availableDates, settings])
 
@@ -266,27 +265,41 @@ export default function AvailableDatePicker() {
 		setSelectedAvailableDate(value)
 	}
 
+	const handleTimeSlotSelect = (value: string | undefined) => {
+		setSelectedTimeSlot(value)
+	}
+
 	if (!productAvailabilityData || fetchingCartData || !isVisible()) return undefined
 
 	const singleDatePerOrderMessage = settings.messages.singleDatePerOrderMessage || DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
+
+	const selectedDay = moment(selectedAvailableDate, SYSTEM_DATE_FORMAT)?.format("dddd")?.toUpperCase() as ConfigDay
 
 	return (
 		<div className="buunto-date-picker">
 			{widgetStyles && <style>{widgetStyles}</style>}
 			<div className="buunto-date-picker-label">{settings.messages.datePickerLabel}</div>
-			{formError && <div className="buunto-date-picker-error">{formError}</div>}
 			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}
                 settings={settings}
+				formError={dateFormError}
             />}
 			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 settings={settings}
+				formError={dateFormError}
             />}
 			{orderDate && <div className="buunto-info-message">{singleDatePerOrderMessage}</div>}
+			{settings.timeSlotsEnabled && Object.keys(settings.timeSlotsByDay || {}).length > 0 && <TimeSlotPicker
+				formError={timeSlotFormError}
+				settings={settings}
+				onSelect={handleTimeSlotSelect}
+				selectedTimeSlot={selectedTimeSlot}
+				configDay={selectedDay || "DEFAULT"}
+			/>}
 		</div>
 	)
 }

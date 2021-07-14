@@ -1,7 +1,9 @@
 import { WidgetStyles } from "../models/WidgetSettings"
+import { defaultWidgetStyles } from "../../../backend/src/util/constants"
 
 const queries: WidgetStyles = {
-	errorFontColor: ".buunto-date-picker-error { color: $$ }",
+	errorFontColor: ".buunto-error-message { color: $$ }",
+	errorBorderColor: ".buuntoCal.buunto-error { border: 1px solid $$ } .buunto-dropdown.buunto-error { border: 1px solid $$ }",
 	calendarBoxShadow: ".buuntoCal { box-shadow: $$ }",
 	calendarBorderRadius: ".buuntoCal { border-radius: $$ }",
 	calendarBackgroundColor: ".buuntoCal { background-color: $$ }",
@@ -25,8 +27,8 @@ const queries: WidgetStyles = {
 export function getCssFromWidgetStyles(widgetStyles: WidgetStyles): string {
 	const css = []
 	for (const [key, query] of Object.entries(queries)) {
-		if (query && widgetStyles[key]) {
-			css.push(query.replace("$$", widgetStyles[key]))
+		if (query && (widgetStyles[key] || defaultWidgetStyles[key])) {
+			css.push(query.replace(/\$\$/g, widgetStyles[key] ?? defaultWidgetStyles[key]))
 		}
 	}
 	return css.join("\n")

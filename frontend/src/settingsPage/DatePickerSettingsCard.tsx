@@ -3,7 +3,7 @@ import { Card, Checkbox, FormLayout, Select } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { PickerType, WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
 import { isStockByDateApp } from "../common/constants"
-import { datePickerLanguages } from "../../../backend/src/util/constants"
+import { datePickerLanguages, defaultWidgetStyles } from "../../../backend/src/util/constants"
 
 interface Props {
 	widgetSettings: WidgetSettings
@@ -21,6 +21,10 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 
 	const handleMandatoryDateSelectChange = (mandatoryDateSelect: boolean) => {
 		onWidgetSettingsChange({ ...widgetSettings, mandatoryDateSelect })
+	}
+
+	const handleDateDeselectedFirstChange = (dateUnselectedFirst: boolean) => {
+		onWidgetSettingsChange({ ...widgetSettings, dateDeselectedFirst: dateUnselectedFirst })
 	}
 
 	const handleSingleDatePerOrderChange = (singleDatePerOrder: boolean) => {
@@ -54,29 +58,35 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 					/>
 				</FormLayout.Group>
 
-				<FormLayout.Group>
-					<ColorPickerField
-						label="Error font color"
-						onChange={handleWidgetStyleChange("errorFontColor")}
-						value={widgetSettings.styles.errorFontColor}
-					/>
-				</FormLayout.Group>
+				<ColorPickerField
+					label="Error font color"
+					onChange={handleWidgetStyleChange("errorFontColor")}
+					value={widgetSettings.styles.errorFontColor}
+				/>
 
-				<FormLayout.Group>
-					<Checkbox
-						label="A date must be selected to be able to add a product to the cart"
-						checked={widgetSettings.mandatoryDateSelect}
-						onChange={(value) => handleMandatoryDateSelectChange(value)}
-					/>
-				</FormLayout.Group>
+				<ColorPickerField
+					label="Error border color"
+					onChange={handleWidgetStyleChange("errorBorderColor")}
+					value={widgetSettings.styles.errorBorderColor ?? defaultWidgetStyles.errorBorderColor}
+				/>
 
-				<FormLayout.Group>
-					<Checkbox
-						label="Only allow to select one date per order"
-						checked={widgetSettings.singleDatePerOrder}
-						onChange={(value) => handleSingleDatePerOrderChange(value)}
-					/>
-				</FormLayout.Group>
+				<Checkbox
+					label="A date must be selected to be able to add a product to the cart"
+					checked={widgetSettings.mandatoryDateSelect}
+					onChange={(value) => handleMandatoryDateSelectChange(value)}
+				/>
+
+				<Checkbox
+					label="The date appears deselected at first"
+					checked={widgetSettings.dateDeselectedFirst}
+					onChange={(value) => handleDateDeselectedFirstChange(value)}
+				/>
+
+				<Checkbox
+					label="Only allow to select one date per order"
+					checked={widgetSettings.singleDatePerOrder}
+					onChange={(value) => handleSingleDatePerOrderChange(value)}
+				/>
 			</FormLayout>
 		</Card>
 	)

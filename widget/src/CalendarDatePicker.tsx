@@ -1,4 +1,4 @@
-import { h } from "preact"
+import { h, Fragment } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
 import { ArrowLeftCircle, ArrowRightCircle } from "./Icons"
 import { getDaysBetween } from "../../frontend/src/util/tools"
@@ -19,17 +19,17 @@ interface Props {
 	onSelect: (value: string) => void,
 	availableDates: AvailableDate[],
 	settings: WidgetSettings
+	formError: string | undefined
 }
 
-
-export default function CalendarDatePicker({ availableDates, settings, onSelect }: Props) {
+export default function CalendarDatePicker({ availableDates, settings, onSelect, formError }: Props) {
 
 	const getMonthStart = () => {
 		return momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
 	}
 
 	const [selectedDate, setSelectedDate] = useState<string | undefined>(
-		settings.mandatoryDateSelect ? availableDates[0]?.date : undefined
+		settings.dateDeselectedFirst ? undefined : availableDates[0]?.date
 	)
 	const momentSelectedDate = availableDates[0] ? parseMoment(settings, availableDates[0].date, SYSTEM_DATE_FORMAT) : undefined
 	const [monthStart, setMonthStart] = useState<Moment>(getMonthStart())
@@ -39,7 +39,7 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	const calendarEnd = monthStart.clone().endOf("month").endOf("week")
 
 	useEffect(() => {
-		setSelectedDate(settings.mandatoryDateSelect ? availableDates[0]?.date : undefined)
+		setSelectedDate(settings.dateDeselectedFirst ? undefined : availableDates[0]?.date)
 	}, [availableDates])
 
 	const availableDatesSet = useMemo(() => {
@@ -72,49 +72,52 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect 
 	const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
 	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DAY_OF_WEEK_TAG_LABEL
 
-	return <div className="buuntoCal">
-		{formattedSelectedDate &&
-        <input type="hidden" name={`properties[${dateTagLabel}]`} value={formattedSelectedDate}/>}
-		{formattedSelectedDay &&
-        <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
-		<div className="buuntoCal-header-wrapper">
-			<div className="buuntoCal-header">
-				<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
-				<div className="buuntoCal-month">{monthStart.format("MMMM YYYY")}</div>
-				<div className="buuntoCal-next" onClick={moveMonth(1)}><ArrowRightCircle/></div>
+	return <Fragment>
+		{formError && <div className="buunto-error-message">{formError}</div>}
+		<div className={classNames("buuntoCal", { "buunto-error": !!formError })}>
+			{formattedSelectedDate &&
+            <input type="hidden" name={`properties[${dateTagLabel}]`} value={formattedSelectedDate}/>}
+			{formattedSelectedDay &&
+            <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+			<div className="buuntoCal-header-wrapper">
+				<div className="buuntoCal-header">
+					<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>
+					<div className="buuntoCal-month">{monthStart.format("MMMM YYYY")}</div>
+					<div className="buuntoCal-next" onClick={moveMonth(1)}><ArrowRightCircle/></div>
+				</div>
+			</div>
+			<div className="buuntoCal-day-names">
+				{getDaysBetween(calendarStart, calendarStart.clone().endOf("week"), "day").map((day) => (
+					<div className="buuntoCal-day-name" key={"day" + day.format("YYYY-MM-DD")}>{day.format("dd")}</div>
+				))}
+			</div>
+			<div className="buuntoCal-body">
+				{getDaysBetween(calendarStart, calendarEnd, "week").map((weekStart) => (
+					<div className="buuntoCal-week-wrapper" key={"week" + weekStart.format(SYSTEM_DATE_FORMAT)}>
+						<div className="buuntoCal-week">
+							{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
+								const strDay = day.format(SYSTEM_DATE_FORMAT)
+								const dateIsAvailable = availableDatesSet.has(strDay)
+								const isCurrentMonth = day.month() == currentMonth
+								const isSelected = isCurrentMonth && strDay == selectedDate
+								return <div
+									className={classNames("buuntoCal-day", {
+										"buuntoCal-unavailable": isCurrentMonth && !dateIsAvailable,
+										"buuntoCal-available": isCurrentMonth && dateIsAvailable,
+										"buuntoCal-selected": isSelected
+									})}
+									key={"day" + strDay}
+									onClick={dateIsAvailable ? () => {
+										handleDateSelect(isSelected ? undefined : strDay)
+									} : () => {
+									}}>
+									<span>{isCurrentMonth ? day.format("D") : ""}</span>
+								</div>
+							})}
+						</div>
+					</div>
+				))}
 			</div>
 		</div>
-		<div className="buuntoCal-day-names">
-			{getDaysBetween(calendarStart, calendarStart.clone().endOf("week"), "day").map((day) => (
-				<div className="buuntoCal-day-name" key={"day" + day.format("YYYY-MM-DD")}>{day.format("dd")}</div>
-			))}
-		</div>
-		<div className="buuntoCal-body">
-			{getDaysBetween(calendarStart, calendarEnd, "week").map((weekStart) => (
-				<div className="buuntoCal-week-wrapper" key={"week" + weekStart.format(SYSTEM_DATE_FORMAT)}>
-					<div className="buuntoCal-week">
-						{getDaysBetween(weekStart, weekStart.clone().endOf("week"), "day").map((day) => {
-							const strDay = day.format(SYSTEM_DATE_FORMAT)
-							const dateIsAvailable = availableDatesSet.has(strDay)
-							const isCurrentMonth = day.month() == currentMonth
-							const isSelected = isCurrentMonth && strDay == selectedDate
-							return <div
-								className={classNames("buuntoCal-day", {
-									"buuntoCal-unavailable": isCurrentMonth && !dateIsAvailable,
-									"buuntoCal-available": isCurrentMonth && dateIsAvailable,
-									"buuntoCal-selected": isSelected
-								})}
-								key={"day" + strDay}
-								onClick={dateIsAvailable ? () => {
-									handleDateSelect(isSelected && !settings.mandatoryDateSelect ? undefined : strDay)
-								} : () => {
-								}}>
-								<span>{isCurrentMonth ? day.format("D") : ""}</span>
-							</div>
-						})}
-					</div>
-				</div>
-			))}
-		</div>
-	</div>
+	</Fragment>
 }

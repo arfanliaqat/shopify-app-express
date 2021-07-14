@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { Layout, Page, PageActions } from "@shopify/polaris"
+import { Card, Layout, Page, PageActions } from "@shopify/polaris"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { useApi } from "../util/useApi"
 import _ from "lodash"
@@ -18,6 +18,7 @@ import VisibilityToggle from "./VisibilityToggle"
 
 import { Toast, useAppBridge } from "@shopify/app-bridge-react"
 import { useHistory } from "react-router"
+import TimeSlotsCard from "./timeSlots/TimeSlotCard"
 
 interface Props {}
 
@@ -159,6 +160,13 @@ export default function SettingsPage({}: Props) {
 									/>
 								</Layout.Section>
 							)}
+
+							<Layout.Section>
+								<TimeSlotsCard
+									widgetSettings={widgetSettings}
+									onWidgetSettingsChange={setWidgetSettings}
+								/>
+							</Layout.Section>
 						</Layout>
 					</Layout.Section>
 					<Layout.Section oneThird>

@@ -3,7 +3,13 @@ import {
 	allWeekDays,
 	DEFAULT_DATE_TAG_LABEL,
 	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
-	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
+	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
+	DEFAULT_NO_TIME_SLOT_SELECTED_ERROR,
+	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
+	DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL,
+	DEFAULT_TIME_SLOT_LABEL,
+	DEFAULT_TIME_SLOT_TAG_LABEL,
+	defaultWidgetStyles
 } from "../util/constants"
 
 export interface WidgetSettingsSchema {
@@ -28,8 +34,11 @@ export class WidgetSettings {
 			mandatoryDateSelect: true,
 			isVisible: false,
 			singleDatePerOrder: false,
+			dateDeselectedFirst: false,
+			timeSlotDeselectedFirst: false,
 			styles: {
 				errorFontColor: "#8b0000",
+				errorBorderColor: defaultWidgetStyles.errorBorderColor,
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",
 				calendarBorderRadius: "10px",
 				calendarBackgroundColor: "#ffffff",
@@ -56,7 +65,12 @@ export class WidgetSettings {
 				soldOut: "sold out",
 				dropdownDefaultOptionLabel: DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
 				dateTagLabel: DEFAULT_DATE_TAG_LABEL,
-				dayOfWeekTagLabel: DEFAULT_DAY_OF_WEEK_TAG_LABEL
+				dayOfWeekTagLabel: DEFAULT_DAY_OF_WEEK_TAG_LABEL,
+				singleDatePerOrderMessage: DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
+				timeSlotLabel: DEFAULT_TIME_SLOT_LABEL,
+				timeSlotTagLabel: DEFAULT_TIME_SLOT_TAG_LABEL,
+				noTimeSlotSelectedError: DEFAULT_NO_TIME_SLOT_SELECTED_ERROR,
+				timeSlotDropdownDefaultOptionLabel: DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL
 			}
 		})
 	}

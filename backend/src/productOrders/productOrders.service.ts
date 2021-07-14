@@ -181,9 +181,13 @@ export class ProductOrderServiceWithTransaction extends WithTransaction {
 		return productOrder
 	}
 
-	async refreshTags(shop: Shop, orderEvent: OrderEventData): Promise<void> {
+	async refreshTags(shop: Shop, orderEvent: OrderEventData, chosenTimeSlots: Set<string>): Promise<void> {
 		const productOrders = await this.findByOrderId(orderEvent.id)
-		const tags = ProductOrderService.getTags(productOrders)
+		let tags = ProductOrderService.getTags(productOrders)
+		const arrChosenTimeSlots = Array.from(chosenTimeSlots)
+		if (arrChosenTimeSlots.length > 0) {
+			tags = "," + arrChosenTimeSlots.join(",")
+		}
 		if (tags != orderEvent.tags) {
 			await ProductOrderService.updateTags(shop, orderEvent.id, tags)
 		}

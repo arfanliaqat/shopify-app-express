@@ -4,7 +4,7 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { TAG_DATE_FORMAT, DEFAULT_DATE_TAG_LABEL } from "../util/constants"
+import { TAG_DATE_FORMAT, DEFAULT_DATE_TAG_LABEL, DEFAULT_TIME_SLOT_TAG_LABEL } from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
@@ -21,6 +21,14 @@ export function getChosenDate(widgetSetting: WidgetSettingsViewModel, lineItem: 
 	})
 	if (!chosenDateProperty?.value) return undefined
 	return moment(chosenDateProperty.value, TAG_DATE_FORMAT, widgetSetting.locale)
+}
+
+export function getChosenTimeSlot(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): string | undefined {
+	const timeSlotTagLabel = widgetSetting.messages.timeSlotTagLabel || DEFAULT_TIME_SLOT_TAG_LABEL
+	const timeSlotProperty = lineItem.properties.find(
+		(property: Property) => property.name?.toLowerCase() == timeSlotTagLabel.toLowerCase()
+	)
+	return timeSlotProperty?.value
 }
 
 export class HooksService {
@@ -131,10 +139,13 @@ export class HooksService {
 			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
+			const chosenTimeSlots = new Set<string>()
 
 			orderEvent.line_items.forEach((item) => {
 				const shopResource = eventShopResources[item.product_id]
 				if (!shopResource || !shopResource.id) return
+				const chosenTimeSlot = getChosenTimeSlot(widgetSettings, item)
+				if (chosenTimeSlot) chosenTimeSlots.add(chosenTimeSlot)
 				const chosenDate = getChosenDate(widgetSettings, item)
 				if (!chosenDate) return
 				const key = shopResource.id + ":" + chosenDate
@@ -158,7 +169,7 @@ export class HooksService {
 			})
 
 			if (newProductOrders.length > 0) {
-				await service.refreshTags(connectedShop, orderEvent)
+				await service.refreshTags(connectedShop, orderEvent, chosenTimeSlots)
 			}
 
 			await service.commitTransaction()

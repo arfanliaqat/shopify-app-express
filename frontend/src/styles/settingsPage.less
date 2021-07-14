@@ -10,9 +10,6 @@
   .widgetPreview {
     padding: 2rem
   }
-  .errorMessagePreview {
-    margin-top: 20px;
-  }
   .Polaris-ChoiceList__Choices {
     display: flex;
     justify-items: stretch;
@@ -20,7 +17,7 @@
   .Polaris-ChoiceList__Choices li {
     flex: 1
   }
-  .disabledDates {
+  .disabledDates, .timeSlotsSection {
       .tags {
         margin: 5px 0 5px 0;
         em {
@@ -35,11 +32,31 @@
   .ordersCount {
     margin-bottom: 10px
   }
+  .timeSlotsSection {
+    .buttons {
+      display: flex;
+      .buttonHolder {
+        margin-right: 5px;
+      }
+    }
+  }
+  .timeSlotsConfigDay {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    .label {
+      font-weight: bold;
+    }
+  }
 }
 
 .datePickerHolder {
   width: 250px;
   padding: 10px;
+}
+
+.addTimeSlot {
+  width: 380px;
+  padding: 20px;
 }
 
 @media (max-width: 960px) {

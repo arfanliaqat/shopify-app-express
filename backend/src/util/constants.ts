@@ -1,4 +1,5 @@
 import { safeParseInt } from "./tools"
+import { WidgetStyles } from "../../../widget/src/models/WidgetSettings"
 
 export const isDev = process.env.NODE_ENV != "production"
 export const isChargeTestMode = isDev || (process.env.CHARGE_TEST_MODE || "") === "true"
@@ -14,10 +15,18 @@ export const SHORT_DISPLAY_FORMAT = "ddd D MMM"
 export const SHORT_DISPLAY_FORMAT_WITH_YEAR = "ddd D MMM YYYY"
 export const TAG_DATE_FORMAT = "LL"
 export const DAY_OF_WEEK_TAG_DATE_FORMAT = "dddd"
+export const DEFAULT_TIME_SLOT_LABEL = "Pick a delivery time:"
 export const DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL = "Please select..."
 export const DEFAULT_DATE_TAG_LABEL = "Delivery Date"
 export const DEFAULT_DAY_OF_WEEK_TAG_LABEL = "Delivery Day"
+export const DEFAULT_TIME_SLOT_TAG_LABEL = "Delivery Time"
 export const DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE = "You can only choose one delivery date per order."
+export const DEFAULT_NO_TIME_SLOT_SELECTED_ERROR = "Please select a time slot before adding to the cart."
+export const DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL = "Please select..."
+
+export const defaultWidgetStyles: Partial<WidgetStyles> = {
+	errorBorderColor: "#bc6363"
+}
 
 export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"
 export const APP_NAME = (process.env.APP_NAME as AppName) || "STOCK_BY_DATE"
