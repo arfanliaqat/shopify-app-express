@@ -13,7 +13,7 @@ function initWidget() {
 	anchorElement = document.getElementById(anchorId)
 	if (!anchorElement) {
 		const productForm = document.querySelectorAll("form[action*='/cart/add']")
-		if (productForm?.length > 0) {
+		if (productForm?.length === 1) {
 			anchorElement = document.createElement("div")
 			anchorElement.id = anchorId
 			productForm[0].append(anchorElement)
