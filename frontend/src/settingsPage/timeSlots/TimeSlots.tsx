@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Button, Popover, Tag } from "@shopify/polaris"
 import AddTimeSlot from "./AddTimeSlot"
-import { ConfigDay, TimeSlot, TimeSlotByDay, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
+import { ConfigDay, TimeSlot, TimeSlotsByDay, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
 import _ from "lodash"
 import AddTimeSlotException from "./AddTimeSlotException"
 
@@ -19,27 +19,27 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 	const timeSlots = widgetSettings.timeSlotsByDay ? widgetSettings.timeSlotsByDay[configDay] || [] : []
 
 	const handleAddTimeSlot = (newTimeSlot: TimeSlot) => {
-		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotByDay)
+		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		timeSlotsByDay[configDay] = _.sortBy([...timeSlots, newTimeSlot], "from")
 		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay: timeSlotsByDay })
 		setAddTimeSlotOpen(false)
 	}
 
 	const handleRemoveTimeSlot = (index: number) => () => {
-		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotByDay)
+		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		timeSlotsByDay[configDay] = [...timeSlots]
 		timeSlotsByDay[configDay].splice(index, 1)
 		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay })
 	}
 
 	const handleRemoveException = (configDay: ConfigDay) => () => {
-		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotByDay)
+		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		delete timeSlotsByDay[configDay]
 		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay })
 	}
 
 	const handleAddTimeSlotException = (configDay: ConfigDay) => {
-		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotByDay)
+		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		timeSlotsByDay[configDay] = []
 		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay })
 		setAddException(false)

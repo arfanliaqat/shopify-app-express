@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { ConfigDay, WidgetSettings } from "./models/WidgetSettings"
+import { ConfigDay, TimeSlot, TimeSlotsByDay, WidgetSettings } from "./models/WidgetSettings"
 import {
 	DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL,
 	DEFAULT_TIME_SLOT_LABEL,
@@ -15,20 +15,28 @@ interface Props {
 	configDay: ConfigDay
 }
 
+export function getTimeSlotsByConfigDay(timeSlotsByDay: TimeSlotsByDay | undefined, configDay: ConfigDay): TimeSlot[] {
+	if (timeSlotsByDay) {
+		if ((timeSlotsByDay[configDay] || []).length == 0) {
+			return timeSlotsByDay["DEFAULT"]
+		} else {
+			return timeSlotsByDay[configDay] || []
+		}
+	}
+	return []
+}
+
+export function toTimeSlotValue(timeSlot: TimeSlot): string {
+	return `${timeSlot.from} - ${timeSlot.to}`
+}
+
 export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, formError, configDay }: Props) {
 
 	const dropdownDefaultOptionLabel = settings.messages.timeSlotDropdownDefaultOptionLabel || DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL
 	const timeSlotLabel = settings.messages.timeSlotLabel || DEFAULT_TIME_SLOT_LABEL
 	const timeSlotTagLabel = settings.messages.timeSlotTagLabel || DEFAULT_TIME_SLOT_TAG_LABEL
 
-	let timeSlots = []
-	if (settings.timeSlotsByDay) {
-		if ((settings.timeSlotsByDay[configDay] || []).length == 0) {
-			timeSlots = settings.timeSlotsByDay["DEFAULT"]
-		} else {
-			timeSlots = settings.timeSlotsByDay[configDay] || []
-		}
-	}
+	let timeSlots = getTimeSlotsByConfigDay(settings.timeSlotsByDay, configDay)
 
 	return (
 		<div className="buunto-time-slot-picker">
@@ -39,7 +47,7 @@ export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, f
 					onChange={e => onSelect((e?.target as any)?.value)}>
 				{settings.timeSlotDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
 				{timeSlots.map((timeSlot) => {
-					const timeSlotValue = `${timeSlot.from} - ${timeSlot.to}`
+					const timeSlotValue = toTimeSlotValue(timeSlot)
 					return <option value={timeSlotValue} selected={timeSlotValue == selectedTimeSlot}>
 						{timeSlotValue}
 					</option>

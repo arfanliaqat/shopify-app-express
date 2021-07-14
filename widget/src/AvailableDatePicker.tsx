@@ -17,7 +17,7 @@ import {
 	TAG_DATE_FORMAT
 } from "../../backend/src/util/constants"
 import moment, { Moment } from "moment"
-import TimeSlotPicker from "./TimeSlotPicker"
+import TimeSlotPicker, { getTimeSlotsByConfigDay, toTimeSlotValue } from "./TimeSlotPicker"
 import axios from "axios"
 import { anchorElement } from "./app"
 
@@ -164,10 +164,19 @@ export default function AvailableDatePicker() {
 	}, [settings, fetchingCartData])
 
 	useEffect(() => {
-		if (!settings?.dateDeselectedFirst) {
-			const firstAvailableDate = availableDates.find(ad => !ad.isSoldOut)
-			if (firstAvailableDate) {
-				setSelectedAvailableDate(firstAvailableDate.date)
+		if (settings) {
+			if (!settings.dateDeselectedFirst) {
+				const firstAvailableDate = availableDates.find(ad => !ad.isSoldOut)
+				if (firstAvailableDate) {
+					setSelectedAvailableDate(firstAvailableDate.date)
+				}
+				if (settings.timeSlotsEnabled && !settings.timeSlotDeselectedFirst && firstAvailableDate) {
+					const configDay = moment(firstAvailableDate.date).format("dddd").toUpperCase() as ConfigDay
+					const timeSlots = getTimeSlotsByConfigDay(settings.timeSlotsByDay, configDay)
+					if (timeSlots.length > 0) {
+						setSelectedTimeSlot(toTimeSlotValue(timeSlots[0]))
+					}
+				}
 			}
 		}
 	}, [settings, availableDates])
