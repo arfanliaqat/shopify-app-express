@@ -81,11 +81,13 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 					onChange={(value) => handleDateDeselectedFirstChange(value)}
 				/>
 
-				<Checkbox
-					label="Only allow to select one date per order"
-					checked={widgetSettings.singleDatePerOrder}
-					onChange={(value) => handleSingleDatePerOrderChange(value)}
-				/>
+				{widgetSettings.showOnPage == "PRODUCT" && (
+					<Checkbox
+						label="Only allow to select one date per order"
+						checked={widgetSettings.singleDatePerOrder}
+						onChange={(value) => handleSingleDatePerOrderChange(value)}
+					/>
+				)}
 			</FormLayout>
 		</Card>
 	)

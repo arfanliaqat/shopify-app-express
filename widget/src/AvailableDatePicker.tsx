@@ -156,7 +156,7 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
 				})
 				const cart = await response.data as any
 				const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
-				const item = cart.items.find(item => !!item.properties[dateTagLabel])
+				const item = cart.items.find(item => item.properties && !!item.properties[dateTagLabel])
 				if (item) {
 					const strTagDate = item.properties[dateTagLabel]
 					const tagDate = moment(strTagDate, TAG_DATE_FORMAT, settings.locale)
@@ -228,7 +228,7 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
 						settings: data,
 						availableDates: [],
 					})
-					setFetchingCartData(data.singleDatePerOrder)
+					setFetchingCartData(data.singleDatePerOrder && data.showOnPage == "PRODUCT")
 				}
 
 				fetchDatePickerData()
