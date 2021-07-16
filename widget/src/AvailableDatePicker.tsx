@@ -228,7 +228,8 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
 						settings: data,
 						availableDates: [],
 					})
-					setFetchingCartData(data.singleDatePerOrder && data.showOnPage == "PRODUCT")
+					const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
+					setFetchingCartData(data.singleDatePerOrder && showOnPage == "PRODUCT")
 				}
 
 				fetchDatePickerData()
