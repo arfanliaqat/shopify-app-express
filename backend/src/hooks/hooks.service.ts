@@ -149,8 +149,8 @@ export class HooksService {
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 			const chosenTimeSlots = new Set<string>()
 
-			const orderChosenDate = getChosenDate(widgetSettings, orderEvent.node_attributes || [])
-			const orderChosenTimeSlot = getChosenTimeSlot(widgetSettings, orderEvent.node_attributes || [])
+			const orderChosenDate = getChosenDate(widgetSettings, orderEvent.note_attributes || [])
+			const orderChosenTimeSlot = getChosenTimeSlot(widgetSettings, orderEvent.note_attributes || [])
 
 			orderEvent.line_items.forEach((item) => {
 				const shopResource = eventShopResources[item.product_id]
