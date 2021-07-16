@@ -4,7 +4,12 @@ import { ProductOrderServiceWithTransaction } from "../productOrders/productOrde
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
-import { TAG_DATE_FORMAT, DEFAULT_DATE_TAG_LABEL, DEFAULT_TIME_SLOT_TAG_LABEL } from "../util/constants"
+import {
+	TAG_DATE_FORMAT,
+	DEFAULT_DATE_TAG_LABEL,
+	DEFAULT_TIME_SLOT_TAG_LABEL,
+	DEBUG_LOG_ENABLED
+} from "../util/constants"
 import axios from "axios"
 import { handleAxiosErrors } from "../util/error"
 import { AccessToken } from "../accessToken/accessToken.model"
@@ -110,6 +115,9 @@ export class HooksService {
 		orderEvent: OrderEventData,
 		isStockByDateApp: boolean
 	): Promise<void> {
+		if (DEBUG_LOG_ENABLED) {
+			console.log(orderEvent)
+		}
 		let eventShopResourcesArray
 		const service = new ProductOrderServiceWithTransaction()
 		await service.initClient()
