@@ -7,6 +7,7 @@ export interface TimeSlot {
 
 export type ConfigDay = "DEFAULT" | "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY"
 export type TimeSlotsByDay = { [D in ConfigDay]: TimeSlot[] }
+export type Page = "PRODUCT" | "CART"
 
 export interface WidgetSettings {
 	pickerType: PickerType
@@ -26,6 +27,7 @@ export interface WidgetSettings {
 	mandatoryTimeSlot?: boolean
 	timeSlotDeselectedFirst?: boolean
 	timeSlotsByDay?: TimeSlotsByDay
+	showOnPage?: Page
 }
 
 export interface WidgetStyles {

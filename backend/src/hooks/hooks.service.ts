@@ -1,4 +1,4 @@
-import { getSubscribedHooks, LineItem, OrderEventData, OrderEventType, Property, Webhook } from "./hooks.model"
+import { getSubscribedHooks, OrderEventData, OrderEventType, Property, Webhook } from "./hooks.model"
 import { Shop } from "../shop/shop.model"
 import { ProductOrderServiceWithTransaction } from "../productOrders/productOrders.service"
 import { ProductOrder } from "../productOrders/productOrders.model"
@@ -14,18 +14,18 @@ import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/m
 import { ShopPlanService } from "../shopPlan/shopPlan.service"
 import { ShopService } from "../shop/shop.service"
 
-export function getChosenDate(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): Moment | undefined {
+export function getChosenDate(widgetSetting: WidgetSettingsViewModel, properties: Property[]): Moment | undefined {
 	const dateTagLabel = widgetSetting.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
-	const chosenDateProperty = lineItem.properties.find((property: Property) => {
+	const chosenDateProperty = properties.find((property: Property) => {
 		return property.name?.toLowerCase() == dateTagLabel.toLowerCase()
 	})
 	if (!chosenDateProperty?.value) return undefined
 	return moment(chosenDateProperty.value, TAG_DATE_FORMAT, widgetSetting.locale)
 }
 
-export function getChosenTimeSlot(widgetSetting: WidgetSettingsViewModel, lineItem: LineItem): string | undefined {
+export function getChosenTimeSlot(widgetSetting: WidgetSettingsViewModel, properties: Property[]): string | undefined {
 	const timeSlotTagLabel = widgetSetting.messages.timeSlotTagLabel || DEFAULT_TIME_SLOT_TAG_LABEL
-	const timeSlotProperty = lineItem.properties.find(
+	const timeSlotProperty = properties.find(
 		(property: Property) => property.name?.toLowerCase() == timeSlotTagLabel.toLowerCase()
 	)
 	return timeSlotProperty?.value
@@ -141,12 +141,19 @@ export class HooksService {
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
 			const chosenTimeSlots = new Set<string>()
 
+			const orderChosenDate = getChosenDate(widgetSettings, orderEvent.node_attributes || [])
+			const orderChosenTimeSlot = getChosenTimeSlot(widgetSettings, orderEvent.node_attributes || [])
+
 			orderEvent.line_items.forEach((item) => {
 				const shopResource = eventShopResources[item.product_id]
 				if (!shopResource || !shopResource.id) return
-				const chosenTimeSlot = getChosenTimeSlot(widgetSettings, item)
+				const chosenTimeSlot = orderChosenTimeSlot
+					? orderChosenTimeSlot
+					: getChosenTimeSlot(widgetSettings, item.properties || [])
 				if (chosenTimeSlot) chosenTimeSlots.add(chosenTimeSlot)
-				const chosenDate = getChosenDate(widgetSettings, item)
+				const chosenDate = orderChosenDate
+					? orderChosenDate
+					: getChosenDate(widgetSettings, item.properties || [])
 				if (!chosenDate) return
 				const key = shopResource.id + ":" + chosenDate
 				const newProductOrder = newProductOrdersById[key]

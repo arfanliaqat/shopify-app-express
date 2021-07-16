@@ -26,6 +26,7 @@ export interface OrderEventData {
 	line_items: LineItem[]
 	cancelled_at?: string | null
 	tags?: string
+	node_attributes?: Property[]
 }
 
 export interface Webhook {

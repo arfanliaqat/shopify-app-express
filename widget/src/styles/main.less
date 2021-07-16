@@ -1,15 +1,7 @@
 @import "calendar";
 @import "dropdown";
 
-.buunto-date-picker {
-}
-
-.buunto-date-picker-label {
-    font-weight: bold;
-}
-
 .buunto-date-picker-error {
-    color: darkred;
     margin-bottom: 20px;
 }
 
@@ -21,12 +13,19 @@
     padding-top: 12px;
 }
 
-.buunto-time-slot-picker-label {
+.buunto-date-picker-label, .buunto-time-slot-picker-label {
     font-weight: bold;
-}
-.buunto-time-slot-picker {
 }
 
 .buunto-error-message {
     margin-top: 8px;
+}
+
+.buunto-date-picker {
+    &.buunto-cart-page {
+        max-width: 300px;
+        margin-left: auto;
+        text-align: left;
+        margin-bottom: 25px;
+    }
 }

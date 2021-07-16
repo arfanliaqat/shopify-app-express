@@ -11,6 +11,7 @@ import { WidgetSettings } from "./models/WidgetSettings"
 import { parseMoment } from "./util/dates"
 import { useMemo } from "preact/hooks"
 import classNames from "classnames"
+import { FormAttributeName } from "./AvailableDatePicker"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -18,9 +19,10 @@ interface Props {
 	selectedAvailableDate: string | undefined
 	settings: WidgetSettings
 	formError: string | undefined
+	formAttributeName: FormAttributeName
 }
 
-export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError }: Props) {
+export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError, formAttributeName }: Props) {
 	const handleSelect = (e) => {
 		if (e.target.value) {
 			onSelect(e.target.value)
@@ -43,7 +45,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 		<Fragment>
 			{formError && <div className="buunto-error-message">{formError}</div>}
 			<select className={classNames("buunto-date-picker-dropdown", "buunto-dropdown", { "buunto-error": !!formError })}
-					name={`properties[${dateTagLabel}]`}
+					name={`${formAttributeName}[${dateTagLabel}]`}
 					onChange={handleSelect}>
 				{settings.dateDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
 				{availableDates.map((availableDate) => {
@@ -56,7 +58,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 					</option>
 				})}
 			</select>
-			{formattedSelectedDay && <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+			{formattedSelectedDay && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 		</Fragment>
 	)
 }

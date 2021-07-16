@@ -6,6 +6,7 @@ import {
 	DEFAULT_TIME_SLOT_TAG_LABEL,
 } from "../../backend/src/util/constants"
 import classNames from "classnames"
+import { FormAttributeName } from "./AvailableDatePicker"
 
 interface Props {
 	settings: WidgetSettings
@@ -13,6 +14,7 @@ interface Props {
 	onSelect: (value: string | undefined) => void
 	formError: string | undefined
 	configDay: ConfigDay
+	formAttributeName: FormAttributeName
 }
 
 export function getTimeSlotsByConfigDay(timeSlotsByDay: TimeSlotsByDay | undefined, configDay: ConfigDay): TimeSlot[] {
@@ -30,7 +32,7 @@ export function toTimeSlotValue(timeSlot: TimeSlot): string {
 	return `${timeSlot.from} - ${timeSlot.to}`
 }
 
-export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, formError, configDay }: Props) {
+export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, formError, configDay, formAttributeName }: Props) {
 
 	const dropdownDefaultOptionLabel = settings.messages.timeSlotDropdownDefaultOptionLabel || DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL
 	const timeSlotLabel = settings.messages.timeSlotLabel || DEFAULT_TIME_SLOT_LABEL
@@ -43,7 +45,7 @@ export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, f
 			<div className="buunto-time-slot-picker-label">{timeSlotLabel}</div>
 			{formError && <div className="buunto-error-message">{formError}</div>}
 			<select className={classNames("buunto-time-slot-picker-dropdown", "buunto-dropdown", { "buunto-error": !!formError })}
-					name={`properties[${timeSlotTagLabel}]`}
+					name={`${formAttributeName}[${timeSlotTagLabel}]`}
 					onChange={e => onSelect((e?.target as any)?.value)}>
 				{settings.timeSlotDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
 				{timeSlots.map((timeSlot) => {

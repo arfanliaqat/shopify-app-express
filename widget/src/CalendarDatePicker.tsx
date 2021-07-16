@@ -14,15 +14,17 @@ import {
 import classNames from "classnames"
 import { WidgetSettings } from "./models/WidgetSettings"
 import { getMoment, parseMoment } from "./util/dates"
+import { FormAttributeName } from "./AvailableDatePicker"
 
 interface Props {
-	onSelect: (value: string) => void,
-	availableDates: AvailableDate[],
+	onSelect: (value: string) => void
+	availableDates: AvailableDate[]
 	settings: WidgetSettings
 	formError: string | undefined
+	formAttributeName: FormAttributeName
 }
 
-export default function CalendarDatePicker({ availableDates, settings, onSelect, formError }: Props) {
+export default function CalendarDatePicker({ availableDates, settings, onSelect, formError, formAttributeName }: Props) {
 
 	const getMonthStart = () => {
 		return momentSelectedDate ? momentSelectedDate.clone().startOf("month") : getMoment(settings).startOf("month")
@@ -76,9 +78,9 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect,
 		{formError && <div className="buunto-error-message">{formError}</div>}
 		<div className={classNames("buuntoCal", { "buunto-error": !!formError })}>
 			{formattedSelectedDate &&
-            <input type="hidden" name={`properties[${dateTagLabel}]`} value={formattedSelectedDate}/>}
+            <input type="hidden" name={`${formAttributeName}[${dateTagLabel}]`} value={formattedSelectedDate}/>}
 			{formattedSelectedDay &&
-            <input type="hidden" name={`properties[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+            <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 			<div className="buuntoCal-header-wrapper">
 				<div className="buuntoCal-header">
 					<div className="buuntoCal-previous" onClick={moveMonth(-1)}><ArrowLeftCircle/></div>

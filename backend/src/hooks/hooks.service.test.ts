@@ -331,16 +331,12 @@ describe("HooksService", () => {
 
 	test("Date is parsed correctly", async () => {
 		{
-			const availableDate = getChosenDate(widgetSettings.settings, {
-				product_id: 123,
-				quantity: 2,
-				properties: [
-					{
-						name: DEFAULT_DATE_TAG_LABEL,
-						value: "December 20, 2020"
-					}
-				]
-			})
+			const availableDate = getChosenDate(widgetSettings.settings, [
+				{
+					name: DEFAULT_DATE_TAG_LABEL,
+					value: "December 20, 2020"
+				}
+			])
 
 			expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
 		}
@@ -349,16 +345,12 @@ describe("HooksService", () => {
 		{
 			widgetSettings.settings.locale = "fr"
 
-			const availableDate = getChosenDate(widgetSettings.settings, {
-				product_id: 123,
-				quantity: 2,
-				properties: [
-					{
-						name: DEFAULT_DATE_TAG_LABEL,
-						value: "20 décembre 2020"
-					}
-				]
-			})
+			const availableDate = getChosenDate(widgetSettings.settings, [
+				{
+					name: DEFAULT_DATE_TAG_LABEL,
+					value: "20 décembre 2020"
+				}
+			])
 
 			expect(availableDate!.format(SYSTEM_DATE_FORMAT)).toBe("2020-12-20")
 		}
