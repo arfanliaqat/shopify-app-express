@@ -11,7 +11,7 @@ function initWidget() {
 		return
 	}
 
-	const isCartPage = document.querySelectorAll("form[action='/cart']").length > 0
+	const isCartPage = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']").length > 0
 	if (isCartPage) {
 		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
@@ -40,9 +40,7 @@ function initWidget() {
 
 	if (anchorElement) {
 		try {
-			if (anchorElement) {
-				render(<AvailableDatePicker isCartPage={isCartPage} />, anchorElement)
-			}
+			render(<AvailableDatePicker isCartPage={isCartPage} />, anchorElement)
 		} catch (e) {
 			console.error(e)
 			axios.post(appUrl + "/errors", { error: e.stack }, {
