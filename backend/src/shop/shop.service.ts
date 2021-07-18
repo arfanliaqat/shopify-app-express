@@ -50,6 +50,18 @@ export class ShopService {
 		return result.rows.map(toShop)[0]
 	}
 
+	static async findByIdWithRawData(shopId: string): Promise<Shop | undefined> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<ShopSchema>(
+			`
+			SELECT id, domain, public_domain, email, trial_used, uninstalled, raw_data::text as raw_data
+			FROM shops
+			WHERE id = $1`,
+			[shopId]
+		)
+		return result.rows.map(toShop)[0]
+	}
+
 	static async findAllActiveShops(): Promise<Shop[]> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(
