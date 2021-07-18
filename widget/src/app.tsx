@@ -11,7 +11,10 @@ function initWidget() {
 		return
 	}
 
-	const isCartPage = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']").length > 0
+	const hasProductForm = document.querySelectorAll("form[action*='/cart/add']").length == 1
+	const hasCartForm = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']").length > 0
+	const isCartPage = hasCartForm && !hasProductForm
+
 	if (isCartPage) {
 		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
