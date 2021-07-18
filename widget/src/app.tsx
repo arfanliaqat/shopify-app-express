@@ -15,9 +15,10 @@ function initWidget() {
 	if (isCartPage) {
 		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
-			const submitButtonContainer = document.querySelectorAll("div.cart__buttons-container")
+			let submitButtonContainer = document.querySelectorAll("div.cart__buttons-container")
+			if (!submitButtonContainer) submitButtonContainer = document.querySelectorAll("#checkout-buttons")
 			if (submitButtonContainer?.length === 1) {
-				const submitButtonParent = submitButtonContainer[0].closest(":not(.cart__buttons-container)")
+				const submitButtonParent = submitButtonContainer[0].closest(":not(.cart__buttons-container,#checkout-buttons)")
 				if (submitButtonParent) {
 					anchorElement = document.createElement("div")
 					anchorElement.id = anchorId
