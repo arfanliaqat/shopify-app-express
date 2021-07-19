@@ -34,7 +34,7 @@ function initWidget() {
 
 	if (isCartPage) {
 		anchorElement = document.getElementById(anchorId)
-		if (!anchorElement) {
+		if (!anchorElement && cartForm.length > 0) {
 			insertDiv(cartForm[0], "[type='submit']", true)
 		}
 	} else {
