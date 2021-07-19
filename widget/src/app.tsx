@@ -26,10 +26,11 @@ function initWidget() {
 		return
 	}
 
-	const hasProductForm = document.querySelectorAll("form[action*='/cart/add']").length == 1
+	const productForm = document.querySelectorAll("form[action*='/cart/add']")
+	const hasProductForm = productForm.length > 1
 	const cartForm = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']")
 	const hasCartForm = cartForm.length > 0
-	const isCartPage = hasCartForm && !hasProductForm
+	const isCartPage = hasCartForm && !hasProductForm || window.location.pathname.startsWith("/cart")
 
 	if (isCartPage) {
 		anchorElement = document.getElementById(anchorId)
@@ -39,7 +40,6 @@ function initWidget() {
 	} else {
 		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
-			const productForm = document.querySelectorAll("form[action*='/cart/add']")
 			if (productForm?.length === 1) {
 				anchorElement = document.createElement("div")
 				anchorElement.id = anchorId
