@@ -6,28 +6,35 @@ import axios from "axios"
 
 export let anchorElement = undefined
 
+function insertDiv(form: Element, query: string, grandParentElement?: true): boolean {
+	const submitButtonContainer = form.querySelectorAll(query)
+	if (submitButtonContainer?.length === 1) {
+		const containerElement = grandParentElement ? submitButtonContainer[0].parentNode : submitButtonContainer[0]
+		const submitButtonParent = containerElement.parentNode
+		if (submitButtonParent) {
+			anchorElement = document.createElement("div")
+			anchorElement.id = anchorId
+			submitButtonParent.insertBefore(anchorElement, containerElement)
+			return true
+		}
+	}
+	return false
+}
+
 function initWidget() {
 	if (anchorElement) {
 		return
 	}
 
 	const hasProductForm = document.querySelectorAll("form[action*='/cart/add']").length == 1
-	const hasCartForm = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']").length > 0
+	const cartForm = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']")
+	const hasCartForm = cartForm.length > 0
 	const isCartPage = hasCartForm && !hasProductForm
 
 	if (isCartPage) {
 		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
-			let submitButtonContainer = document.querySelectorAll("div.cart__buttons-container")
-			if (!submitButtonContainer) submitButtonContainer = document.querySelectorAll("#checkout-buttons")
-			if (submitButtonContainer?.length === 1) {
-				const submitButtonParent = submitButtonContainer[0].closest(":not(.cart__buttons-container,#checkout-buttons)")
-				if (submitButtonParent) {
-					anchorElement = document.createElement("div")
-					anchorElement.id = anchorId
-					submitButtonParent.insertBefore(anchorElement, submitButtonContainer[0])
-				}
-			}
+			insertDiv(cartForm[0], "[type='submit']", true)
 		}
 	} else {
 		anchorElement = document.getElementById(anchorId)
