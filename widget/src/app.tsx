@@ -8,7 +8,7 @@ export let anchorElement = undefined
 
 function insertDiv(form: Element, query: string, grandParentElement?: true): boolean {
 	const submitButtonContainer = form.querySelectorAll(query)
-	if (submitButtonContainer?.length > 1) {
+	if (submitButtonContainer?.length > 0) {
 		const containerElement = grandParentElement ? submitButtonContainer[0].parentNode : submitButtonContainer[0]
 		const submitButtonParent = containerElement.parentNode
 		if (submitButtonParent) {
