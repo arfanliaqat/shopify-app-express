@@ -27,7 +27,7 @@ function initWidget() {
 	}
 
 	const productForm = document.querySelectorAll("form[action*='/cart/add']")
-	const hasProductForm = productForm.length > 1
+	const hasProductForm = productForm.length > 0
 	const cartForm = document.querySelectorAll("form[action='/cart'],form[action*='/cart?']")
 	const hasCartForm = cartForm.length > 0
 	const isCartPage = hasCartForm && !hasProductForm || window.location.pathname.startsWith("/cart")
