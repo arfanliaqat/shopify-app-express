@@ -32,13 +32,12 @@ function initWidget() {
 	const hasCartForm = cartForm.length > 0
 	const isCartPage = hasCartForm && !hasProductForm || window.location.pathname.startsWith("/cart")
 
+	anchorElement = document.getElementById(anchorId)
 	if (isCartPage) {
-		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement && cartForm.length > 0) {
 			insertDiv(cartForm[0], "[type='submit']", true)
 		}
 	} else {
-		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
 			if (productForm?.length === 1) {
 				anchorElement = document.createElement("div")

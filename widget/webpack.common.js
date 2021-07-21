@@ -28,12 +28,12 @@ module.exports = {
 			new webpack.DefinePlugin({
 				SHOPIFY_APP_URL: JSON.stringify(process.env.SHOPIFY_APP_URL || "https://shopify-app.dev"),
 				APP_NAME: JSON.stringify(process.env.APP_NAME || "DATE_PICKER"),
-				ANCHOR_ID: JSON.stringify(process.env.ANCHOR_ID || "h10-ship-by-date")
+				ANCHOR_ID: JSON.stringify(process.env.ANCHOR_ID || "buunto-date-picker")
 			}),
 			new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /nl|en|en\-au|en\-ca|en\-gb|fr|fr\-ca|de|id|it|pl|pt|pt\-br|ro|ru|es|sv|cs/)
 	],
 	output: {
-		filename: process.env.WIDGET_SCRIPT_NAME || "h10-ship-by-date.js",
+		filename: process.env.WIDGET_SCRIPT_NAME || "buunto-date-picker.js",
 		path: path.resolve(__dirname, "public/build")
 	}
 }
