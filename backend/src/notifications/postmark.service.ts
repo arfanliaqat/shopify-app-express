@@ -6,7 +6,7 @@ import { APP_NAME, isDev } from "../util/constants"
 export const emailTestStore: TemplatedMessage[] = []
 
 const globalTemplateModel = {
-	product_name: APP_NAME == "STOCK_BY_DATE" ? "Buunto Date Picker" : "Buunto Stock By Date",
+	product_name: APP_NAME == "STOCK_BY_DATE" ? "Buunto Stock By Date" : "Buunto Date Picker",
 	company_name: "Buunto"
 }
 
