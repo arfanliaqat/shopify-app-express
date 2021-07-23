@@ -72,7 +72,10 @@ export default function Preview({ widgetSettings }: Props) {
 			clearTimeout(timeoutId)
 		}
 		timeoutId = setTimeout(() => {
-			document.getElementById(anchorId).dispatchEvent(event)
+			const anchorElement = document.getElementById(anchorId)
+			if (anchorElement) {
+				anchorElement.dispatchEvent(event)
+			}
 		}, 200)
 	}, [jsonWidgetSettings])
 
