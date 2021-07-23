@@ -16,6 +16,7 @@ import PlansPage from "./plansPage/PlansPage"
 import { shopifyConfig } from "./models/ShopifyConfig"
 import GuidePage from "./helpPage/GuidePage"
 import HelpScoutBeacon from "./util/HelpScoutBeacon"
+import ErrorBoundary from "./util/ErrorBoundary"
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/
 
@@ -43,30 +44,34 @@ function Link({ children, url = "", external, ref, ...rest }: any) {
 ReactDOM.render(
 	<AppProvider i18n={translations} linkComponent={Link}>
 		<Provider config={shopifyConfig}>
-			<HelpScoutBeacon />
-			<BrowserRouter>
-				<Switch>
-					<Route exact path="/app" component={isStockByDateApp ? HomePage : SettingsPage} />
-					{isStockByDateApp && (
-						<Route
-							exact
-							path="/app/resources/:shopResourceId/calendar/:year/:month"
-							component={CalendarPage}
-						/>
-					)}
-					{isStockByDateApp && (
-						<Route
-							exact
-							path="/app/availability_periods/:availabilityPeriodId"
-							component={AvailabilityPeriodPage}
-						/>
-					)}
-					{isStockByDateApp && <Route exact path="/app/settings" component={SettingsPage} />}
-					<Route path="/app/plans" component={PlansPage} />
-					<Route path="/app/guide" component={GuidePage} />
-					<Route path="*" component={NotFoundPage} />
-				</Switch>
-			</BrowserRouter>
+			<ErrorBoundary>
+				<HelpScoutBeacon />
+			</ErrorBoundary>
+			<ErrorBoundary>
+				<BrowserRouter>
+					<Switch>
+						<Route exact path="/app" component={isStockByDateApp ? HomePage : SettingsPage} />
+						{isStockByDateApp && (
+							<Route
+								exact
+								path="/app/resources/:shopResourceId/calendar/:year/:month"
+								component={CalendarPage}
+							/>
+						)}
+						{isStockByDateApp && (
+							<Route
+								exact
+								path="/app/availability_periods/:availabilityPeriodId"
+								component={AvailabilityPeriodPage}
+							/>
+						)}
+						{isStockByDateApp && <Route exact path="/app/settings" component={SettingsPage} />}
+						<Route path="/app/plans" component={PlansPage} />
+						<Route path="/app/guide" component={GuidePage} />
+						<Route path="*" component={NotFoundPage} />
+					</Switch>
+				</BrowserRouter>
+			</ErrorBoundary>
 		</Provider>
 	</AppProvider>,
 	document.getElementById("app")
