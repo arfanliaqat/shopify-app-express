@@ -2,8 +2,6 @@ import React, { useEffect } from "react"
 import { useAppBridge } from "@shopify/app-bridge-react"
 import { useApi } from "./useApi"
 
-const Beacon: any | undefined = (window as any).Beacon
-
 interface HelpScoutInfo {
 	name?: string
 	email?: string
@@ -15,14 +13,15 @@ export default function HelpScoutBeacon() {
 	const { setApiRequest: loadHelpScoutInfo, data: helpScoutInfo } = useApi<HelpScoutInfo>({}, app)
 
 	useEffect(() => {
-		if (Beacon) {
+		if ((window as any).Beacon) {
 			loadHelpScoutInfo({ url: "/help_scout_info" })
 		}
 	}, [])
 
 	useEffect(() => {
-		if (Beacon && helpScoutInfo) {
-			Beacon("identify", helpScoutInfo)
+		const beacon = (window as any).Beacon
+		if (beacon && helpScoutInfo) {
+			beacon("identify", helpScoutInfo)
 		}
 	}, [helpScoutInfo])
 
