@@ -1,10 +1,10 @@
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 import {
-	allWeekDays,
+	allWeekDays, DEFAULT_ANCHOR_POSITION,
 	DEFAULT_DATE_TAG_LABEL,
 	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
 	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
-	DEFAULT_NO_TIME_SLOT_SELECTED_ERROR, DEFAULT_SHOW_ON_PAGE,
+	DEFAULT_NO_TIME_SLOT_SELECTED_ERROR, DEFAULT_PLACEMENT_METHOD, DEFAULT_SHOW_ON_PAGE,
 	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 	DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL,
 	DEFAULT_TIME_SLOT_LABEL,
@@ -37,6 +37,8 @@ export class WidgetSettings {
 			dateDeselectedFirst: false,
 			timeSlotDeselectedFirst: false,
 			showOnPage: DEFAULT_SHOW_ON_PAGE,
+			placementMethod: DEFAULT_PLACEMENT_METHOD,
+			anchorPosition: DEFAULT_ANCHOR_POSITION,
 			styles: {
 				errorFontColor: "#8b0000",
 				errorBorderColor: defaultWidgetStyles.errorBorderColor,

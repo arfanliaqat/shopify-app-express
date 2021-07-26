@@ -21,6 +21,7 @@ import moment, { Moment } from "moment"
 import TimeSlotPicker, { getTimeSlotsByConfigDay, toTimeSlotValue } from "./TimeSlotPicker"
 import axios from "axios"
 import { anchorElement } from "./app"
+import { fetchWidgetSettings } from "./util/api"
 
 export type FormAttributeName = "properties" | "attributes"
 
@@ -48,14 +49,6 @@ function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
 		availableDates.shift()
 	}
 	return availableDates
-}
-
-function getCurrentDomain() {
-	let url = window.location.href
-	const start = url.indexOf("://") + 3
-	url = url.substring(start)
-	const end = url.indexOf("/")
-	return url.substring(0, end)
 }
 
 function getIsPreviewMode() {
@@ -90,22 +83,6 @@ async function fetchAvailabilityForProduct(): Promise<ProductAvailabilityData> {
 	return (await response.data) as ProductAvailabilityData
 }
 
-async function fetchWidgetSettings(): Promise<WidgetSettings> {
-	const response = await axios.get(appUrl + "/settings?shop=" + getCurrentDomain() + "&_ts=" + Date.now(), {
-		headers: {
-			Accept: "application/json"
-		}
-	})
-	if (response.status == 403) {
-		const data = await response.data
-		throw `[Buunto] ${data.reason}`
-	}
-	if (response.status != 200) {
-		throw "[Buunto] failed to fetch widget settings"
-	}
-	return (await response.data) as WidgetSettings
-}
-
 function isSubmitButtonClick(e: any) {
 	if (e.target.tagName == "BUTTON" && e.target.type == "submit") {
 		return true
@@ -118,14 +95,20 @@ function isSubmitButtonClick(e: any) {
 
 export interface Props {
 	isCartPage?: boolean
+	widgetSettings?: WidgetSettings
 }
 
-export default function AvailableDatePicker({ isCartPage }: Props) {
-	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(undefined)
+export default function AvailableDatePicker({ isCartPage, widgetSettings }: Props) {
+
+	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(widgetSettings ? {
+		settings: widgetSettings,
+		availableDates: [],
+	} : undefined)
+
 	const [selectedAvailableDate, setSelectedAvailableDate] = useState<string>(undefined)
 	const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(undefined)
 	const [dateFormError, setDateFormError] = useState<string>(undefined)
-	const [timeSlotFormError, setTimeSlotFormError] =  useState<string>(undefined)
+	const [timeSlotFormError, setTimeSlotFormError] = useState<string>(undefined)
 	const [orderDate, setOrderDate] = useState<Moment>(undefined)
 	const [fetchingCartData, setFetchingCartData] = useState<boolean>(false)
 
@@ -213,7 +196,7 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
 	}, [])
 
 	useEffect(() => {
-		if (!isPreviewMode) {
+		if (!isPreviewMode && !settings) {
 			if (appName == "STOCK_BY_DATE") {
 				async function fetchStockByDateData() {
 					const data = await fetchAvailabilityForProduct()
@@ -234,7 +217,6 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
 
 				fetchDatePickerData()
 			}
-
 		}
 	}, [])
 
@@ -299,7 +281,7 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
 	const formAttributeName = isCartPage ? "attributes" : "properties"
 
 	return (
-		<div className={classNames("buunto-date-picker", { "buunto-cart-page": isCartPage })} >
+		<div className={classNames("buunto-date-picker", isCartPage ? "buunto-cart-page" : "buunto-product-page")}>
 			{widgetStyles && <style>{widgetStyles}</style>}
 			<div className="buunto-date-picker-label">{settings.messages.datePickerLabel}</div>
 			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
@@ -307,25 +289,25 @@ export default function AvailableDatePicker({ isCartPage }: Props) {
                 onSelect={handleAvailableDateSelect}
                 selectedAvailableDate={selectedAvailableDate}
                 settings={settings}
-				formError={dateFormError}
-				formAttributeName={formAttributeName}
+                formError={dateFormError}
+                formAttributeName={formAttributeName}
             />}
 			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
                 availableDates={availableDates}
                 onSelect={handleAvailableDateSelect}
                 settings={settings}
-				formError={dateFormError}
+                formError={dateFormError}
                 formAttributeName={formAttributeName}
             />}
 			{orderDate && <div className="buunto-info-message">{singleDatePerOrderMessage}</div>}
 			{settings.timeSlotsEnabled && Object.keys(settings.timeSlotsByDay || {}).length > 0 && <TimeSlotPicker
-				formError={timeSlotFormError}
-				settings={settings}
-				onSelect={handleTimeSlotSelect}
-				selectedTimeSlot={selectedTimeSlot}
-				configDay={selectedDay || "DEFAULT"}
+                formError={timeSlotFormError}
+                settings={settings}
+                onSelect={handleTimeSlotSelect}
+                selectedTimeSlot={selectedTimeSlot}
+                configDay={selectedDay || "DEFAULT"}
                 formAttributeName={formAttributeName}
-			/>}
+            />}
 		</div>
 	)
 }

@@ -8,6 +8,8 @@ export interface TimeSlot {
 export type ConfigDay = "DEFAULT" | "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY"
 export type TimeSlotsByDay = { [D in ConfigDay]: TimeSlot[] }
 export type Page = "PRODUCT" | "CART"
+export type PlacementMethod = "AUTOMATIC" | "MANUAL"
+export type AnchorPosition = "BEFORE" | "FIRST_ELEMENT" | "LAST_ELEMENT" | "AFTER"
 
 export interface WidgetSettings {
 	pickerType: PickerType
@@ -28,6 +30,9 @@ export interface WidgetSettings {
 	timeSlotDeselectedFirst?: boolean
 	timeSlotsByDay?: TimeSlotsByDay
 	showOnPage?: Page
+	placementMethod?: PlacementMethod
+	anchorSelector?: string
+	anchorPosition?: AnchorPosition
 }
 
 export interface WidgetStyles {
