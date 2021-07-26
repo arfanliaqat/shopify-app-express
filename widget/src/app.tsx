@@ -80,7 +80,6 @@ function getCartQueryAndPosition(): [string, AnchorPosition] {
 }
 
 function initWidget() {
-
 	fetchWidgetSettings().then((widgetSettings: WidgetSettings) => {
 		if (anchorElement) {
 			return
@@ -140,7 +139,7 @@ function initWidget() {
 				}
 			}
 			try {
-				render(<AvailableDatePicker widgetSettings={widgetSettings} isCartPage={isCartPage}/>, anchorElement)
+				render(<AvailableDatePicker widgetSettings={widgetSettings} isCartPage={isCartPage} />, anchorElement)
 			} catch (e) {
 				console.error(e)
 				axios.post(appUrl + "/errors", { error: e.stack }, {
@@ -151,16 +150,20 @@ function initWidget() {
 			}
 		}
 	})
-
 }
 
+const isAdmin = window.location.href.startsWith(appUrl)
 
-const jQuery: any | undefined = (window as any).jQuery
-
-if (jQuery) {
-	jQuery(() => {
-		initWidget()
-	})
+if (isAdmin) {
+	anchorElement = document.getElementById(anchorId)
+	render(<AvailableDatePicker />, anchorElement)
 } else {
-	initWidget()
+	const jQuery: any | undefined = (window as any).jQuery
+	if (jQuery) {
+		jQuery(() => {
+			initWidget()
+		})
+	} else {
+		initWidget()
+	}
 }
