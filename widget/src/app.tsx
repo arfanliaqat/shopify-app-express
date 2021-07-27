@@ -152,11 +152,37 @@ function initWidget() {
 	})
 }
 
+function initOrderConfirmationPage() {
+	if ((orderInfo?.attributes || []).length > 0) {
+		const refElement = document.querySelector("p.os-step__description:last-child")
+
+		const holderElement = document.createElement("div")
+		holderElement.className = "buunto-order-confirmation-attributes"
+		refElement.insertAdjacentElement(toInsertPosition("AFTER"), holderElement)
+
+		orderInfo.attributes.forEach(attribute => {
+			const attributeElement = document.createElement("p")
+			attributeElement.className = "buunto-order-confirmation-attribute"
+			attributeElement.innerHTML = `<strong>${attribute.label}:</strong> ${attribute.value}`
+			holderElement.insertAdjacentElement(toInsertPosition("LAST_ELEMENT"), attributeElement)
+		})
+	}
+}
+
 const isAdmin = window.location.href.startsWith(appUrl)
+
+type OrderAttribute = { label: string, value: string }
+interface OrderInfo {
+	attributes?: OrderAttribute[]
+}
+
+const orderInfo = (window as any).BuuntoOrder as OrderInfo
 
 if (isAdmin) {
 	anchorElement = document.getElementById(anchorId)
 	render(<AvailableDatePicker />, anchorElement)
+} else if (orderInfo) {
+	initOrderConfirmationPage()
 } else {
 	const jQuery: any | undefined = (window as any).jQuery
 	if (jQuery) {
