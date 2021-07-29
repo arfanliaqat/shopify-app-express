@@ -98,6 +98,14 @@ export interface Props {
 	widgetSettings?: WidgetSettings
 }
 
+function initialFetchingCartData(settings?: WidgetSettings) {
+	if (!settings) {
+		return false
+	}
+	const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
+	return settings.singleDatePerOrder && showOnPage == "PRODUCT"
+}
+
 export default function AvailableDatePicker({ isCartPage, widgetSettings }: Props) {
 
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(widgetSettings ? {
@@ -110,7 +118,7 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 	const [dateFormError, setDateFormError] = useState<string>(undefined)
 	const [timeSlotFormError, setTimeSlotFormError] = useState<string>(undefined)
 	const [orderDate, setOrderDate] = useState<Moment>(undefined)
-	const [fetchingCartData, setFetchingCartData] = useState<boolean>(false)
+	const [fetchingCartData, setFetchingCartData] = useState<boolean>(initialFetchingCartData(productAvailabilityData?.settings))
 
 	const settings = productAvailabilityData?.settings
 
@@ -211,8 +219,7 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 						settings: data,
 						availableDates: [],
 					})
-					const showOnPage = data.showOnPage || DEFAULT_SHOW_ON_PAGE
-					setFetchingCartData(data.singleDatePerOrder && showOnPage == "PRODUCT")
+					setFetchingCartData(initialFetchingCartData(data))
 				}
 
 				fetchDatePickerData()
