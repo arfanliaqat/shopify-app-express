@@ -1,4 +1,3 @@
-
 import { WidgetSettings } from "../models/WidgetSettings"
 import axios from "axios"
 import { appUrl } from "../constants"
@@ -11,8 +10,16 @@ function getCurrentDomain() {
 	return url.substring(0, end)
 }
 
-export async function fetchWidgetSettings(): Promise<WidgetSettings> {
-	const response = await axios.get(appUrl + "/settings?shop=" + getCurrentDomain() + "&_ts=" + Date.now(), {
+function toQueryString(parameters: { [key: string]: string }): string {
+	return Object.entries(parameters).map(([key, value]) => key + "=" + value).join("&")
+}
+
+export async function fetchWidgetSettings(productVariantId?: number): Promise<WidgetSettings> {
+	const parameters = {} as { [key: string]: string }
+	parameters["shop"] = getCurrentDomain()
+	if (productVariantId) parameters["productVariantId"] = productVariantId + ""
+	parameters["_ts"] = Date.now() + ""
+	const response = await axios.get(appUrl + "/settings?" + toQueryString(parameters), {
 		headers: {
 			Accept: "application/json"
 		}
@@ -25,4 +32,29 @@ export async function fetchWidgetSettings(): Promise<WidgetSettings> {
 		throw "[Buunto] failed to fetch widget settings"
 	}
 	return (await response.data) as WidgetSettings
+}
+
+
+export async function fetchDatePickerVisibility(productVariantIds: number[]): Promise<boolean> {
+	const params = {
+		shop: getCurrentDomain(),
+		productVariantIds: productVariantIds.join(","),
+		_ts: Date.now() + ""
+	} as { [key: string]: string }
+	const response = await axios.get(appUrl + "/date_picker_visibility?" + toQueryString(params), {
+		headers: {
+			Accept: "application/json"
+		}
+	})
+	const { isVisible } = await response.data as any
+	return isVisible as boolean
+}
+
+export async function fetchCartData(): Promise<any> {
+	const response = await axios.get("/cart.js", {
+		headers: {
+			Accept: "application/json"
+		}
+	})
+	return await response.data as any
 }

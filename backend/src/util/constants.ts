@@ -1,5 +1,11 @@
 import { safeParseInt } from "./tools"
-import { AnchorPosition, Page, PlacementMethod, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import {
+	AnchorPosition,
+	FilterType,
+	Page,
+	PlacementMethod,
+	WidgetStyles
+} from "../../../widget/src/models/WidgetSettings"
 
 export const isDev = process.env.NODE_ENV != "production"
 export const isChargeTestMode = isDev || (process.env.CHARGE_TEST_MODE || "") === "true"
@@ -28,6 +34,7 @@ export const DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL = "Please select...
 export const DEFAULT_SHOW_ON_PAGE: Page = "PRODUCT"
 export const DEFAULT_PLACEMENT_METHOD: PlacementMethod = "AUTOMATIC"
 export const DEFAULT_ANCHOR_POSITION: AnchorPosition = "BEFORE"
+export const DEFAULT_FILTER_TYPE: FilterType = "ALL"
 
 export const defaultWidgetStyles: Partial<WidgetStyles> = {
 	errorBorderColor: "#bc6363"

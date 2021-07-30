@@ -14,7 +14,7 @@ import DropdownStylesCard from "./DropdownStylesCard"
 import { isStockByDateApp } from "../common/constants"
 import ShopPlan from "../models/ShopPlan"
 import CurrentPlanCard from "./CurrentPlanCard"
-import VisibilityToggle from "./VisibilityToggle"
+import DatePickerPlacementCard from "./DatePickerPlacementCard"
 
 import { Toast, useAppBridge } from "@shopify/app-bridge-react"
 import { useHistory } from "react-router"
@@ -110,7 +110,7 @@ export default function SettingsPage({}: Props) {
 			>
 				<Layout>
 					<Layout.Section>
-						<VisibilityToggle
+						<DatePickerPlacementCard
 							initialWidgetSettings={initialWidgetSettings}
 							widgetSettings={widgetSettings}
 							onWidgetSettingsChange={setWidgetSettings}

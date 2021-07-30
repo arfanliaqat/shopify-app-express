@@ -10,6 +10,12 @@ export type TimeSlotsByDay = { [D in ConfigDay]: TimeSlot[] }
 export type Page = "PRODUCT" | "CART"
 export type PlacementMethod = "AUTOMATIC" | "MANUAL"
 export type AnchorPosition = "BEFORE" | "FIRST_ELEMENT" | "LAST_ELEMENT" | "AFTER"
+export type FilterType = "ALL" | "COLLECTIONS"
+
+export interface Collection {
+	id: number
+	title: string
+}
 
 export interface WidgetSettings {
 	pickerType: PickerType
@@ -33,6 +39,8 @@ export interface WidgetSettings {
 	placementMethod?: PlacementMethod
 	anchorSelector?: string
 	anchorPosition?: AnchorPosition
+	filterType?: FilterType
+	filterCollections?: Collection[]
 }
 
 export interface WidgetStyles {

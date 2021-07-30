@@ -79,8 +79,20 @@ function getCartQueryAndPosition(): [string, AnchorPosition] {
 	return ["table", "AFTER"]
 }
 
+function getProductVariantId(): number | undefined {
+	const productForm = document.querySelector("form[action*='/cart/add']")
+	if (productForm) {
+		const selectedOption = productForm.querySelector("select[name='id'] option[selected]")
+		if (selectedOption) {
+			const strProductVariantId = selectedOption.getAttribute("value")
+			return parseInt(strProductVariantId)
+		}
+	}
+}
+
 function initWidget() {
-	fetchWidgetSettings().then((widgetSettings: WidgetSettings) => {
+	const productVariantId = getProductVariantId()
+	fetchWidgetSettings(productVariantId).then((widgetSettings: WidgetSettings) => {
 		if (anchorElement) {
 			return
 		}

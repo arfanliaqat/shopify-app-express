@@ -10,6 +10,7 @@ import { AvailableDate } from "./models/AvailableDate"
 import { getMoment } from "./util/dates"
 import { getDaysBetween } from "../../frontend/src/util/tools"
 import classNames from "classnames"
+import _ from "lodash"
 
 import {
 	DEFAULT_DATE_TAG_LABEL, DEFAULT_SHOW_ON_PAGE, DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
@@ -21,7 +22,7 @@ import moment, { Moment } from "moment"
 import TimeSlotPicker, { getTimeSlotsByConfigDay, toTimeSlotValue } from "./TimeSlotPicker"
 import axios from "axios"
 import { anchorElement } from "./app"
-import { fetchWidgetSettings } from "./util/api"
+import { fetchCartData, fetchDatePickerVisibility, fetchWidgetSettings } from "./util/api"
 
 export type FormAttributeName = "properties" | "attributes"
 
@@ -90,7 +91,6 @@ function isSubmitButtonClick(e: any) {
 		const button = e.target.closest("button")
 		return button?.type == "submit"
 	}
-	return false
 }
 
 export interface Props {
@@ -103,7 +103,8 @@ function initialFetchingCartData(settings?: WidgetSettings) {
 		return false
 	}
 	const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
-	return settings.singleDatePerOrder && showOnPage == "PRODUCT"
+	if (settings.singleDatePerOrder && showOnPage == "PRODUCT") return true
+	else return settings.filterType == "COLLECTIONS" && showOnPage == "CART"
 }
 
 export default function AvailableDatePicker({ isCartPage, widgetSettings }: Props) {
@@ -119,6 +120,9 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 	const [timeSlotFormError, setTimeSlotFormError] = useState<string>(undefined)
 	const [orderDate, setOrderDate] = useState<Moment>(undefined)
 	const [fetchingCartData, setFetchingCartData] = useState<boolean>(initialFetchingCartData(productAvailabilityData?.settings))
+	const [productVariantIds, setProductVariantIds] = useState<number[]>(undefined)
+	const [isVisibleOverride, setIsVisibleOverride] = useState<boolean>(undefined)
+	const [fetchingDatePickerVisibility, setFetchingDatePickerVisibility] = useState<boolean>(false)
 
 	const settings = productAvailabilityData?.settings
 
@@ -139,27 +143,38 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 
 	useEffect(() => {
 		if (fetchingCartData) {
-			async function fetchOrderDate() {
-				const response = await axios.get("/cart.js", {
-					headers: {
-						Accept: "application/json"
+			const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
+			if (!isCartPage && showOnPage == "PRODUCT" && settings.singleDatePerOrder) {
+				fetchCartData().then((cart) => {
+					const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
+					const item = cart.items.find(item => item.properties && !!item.properties[dateTagLabel])
+					if (item) {
+						const strTagDate = item.properties[dateTagLabel]
+						const tagDate = moment(strTagDate, TAG_DATE_FORMAT, settings.locale)
+						setOrderDate(tagDate)
+						setSelectedAvailableDate(tagDate.format(SYSTEM_DATE_FORMAT))
 					}
+					setFetchingCartData(false)
 				})
-				const cart = await response.data as any
-				const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
-				const item = cart.items.find(item => item.properties && !!item.properties[dateTagLabel])
-				if (item) {
-					const strTagDate = item.properties[dateTagLabel]
-					const tagDate = moment(strTagDate, TAG_DATE_FORMAT, settings.locale)
-					setOrderDate(tagDate)
-					setSelectedAvailableDate(tagDate.format(SYSTEM_DATE_FORMAT))
-				}
-				setFetchingCartData(false)
 			}
-
-			fetchOrderDate()
+			if (isCartPage && showOnPage == "CART" && settings.filterType == "COLLECTIONS") {
+				fetchCartData().then((cart) => {
+					setProductVariantIds(_.uniq((cart.items || []).map(item => item.id) as number[]))
+					setFetchingCartData(false)
+					setFetchingDatePickerVisibility(true)
+				})
+			}
 		}
-	}, [settings, fetchingCartData])
+	}, [settings, fetchingCartData, setFetchingDatePickerVisibility])
+
+	useEffect(() => {
+		if (fetchingDatePickerVisibility && productVariantIds) {
+			fetchDatePickerVisibility(productVariantIds).then((isVisible) => {
+				setIsVisibleOverride(isVisible)
+				setFetchingDatePickerVisibility(false)
+			})
+		}
+	}, [productVariantIds, fetchingDatePickerVisibility])
 
 	useEffect(() => {
 		if (settings) {
@@ -231,9 +246,10 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 		if (isPreviewMode) return true
 		if (isDisabled) return false
 		if (settings === undefined || !settings.isVisible) return false
+		if (isVisibleOverride === false) return false
 		const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
 		return isCartPage ? showOnPage == "CART" : showOnPage == "PRODUCT"
-	}, [isPreviewMode, settings, isDisabled, isCartPage])
+	}, [isPreviewMode, settings, isDisabled, isCartPage, isVisibleOverride])
 
 	const hasDateError = useCallback(() => {
 		return !isPreviewMode && anchorElement && isVisible() && settings?.mandatoryDateSelect && !selectedAvailableDate
@@ -279,7 +295,7 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 		setSelectedTimeSlot(value)
 	}
 
-	if (!productAvailabilityData || fetchingCartData || !isVisible()) return undefined
+	if (!productAvailabilityData || fetchingCartData || fetchingDatePickerVisibility || !isVisible()) return undefined
 
 	const singleDatePerOrderMessage = settings.messages.singleDatePerOrderMessage || DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
 

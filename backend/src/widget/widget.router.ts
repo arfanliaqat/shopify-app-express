@@ -12,6 +12,8 @@ import { ShopPlanService } from "../shopPlan/shopPlan.service"
 import { ShopPlan } from "../shopPlan/shopPlan.model"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import { ShopService } from "../shop/shop.service"
+import { AccessTokenService } from "../accessToken/accessToken.service"
+import _ from "lodash"
 
 const router = Router()
 
@@ -41,9 +43,63 @@ router.get("/settings", async (req: Request, res: Response) => {
 			res.status(404).send({ reason: "Widget settings not found" })
 			return
 		}
+
+		// Filter by collection
+		const strProductVariantId = req.query.productVariantId?.toString()
+		if (widgetSettings.isVisible && strProductVariantId && widgetSettings.filterType == "COLLECTIONS") {
+			const productVariantId = parseInt(strProductVariantId)
+			const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+			const productCollectionIds = await ShopResourceService.fetchCollectionIdsByProductVariantIds(
+				shop,
+				accessToken,
+				[productVariantId]
+			)
+			const filteredCollectionIds = widgetSettings.filterCollections?.map((collection) => collection.id) || []
+			widgetSettings.isVisible = _.intersection(productCollectionIds, filteredCollectionIds).length > 0
+		}
+
 		res.send(widgetSettings)
 	} catch (error) {
 		handleErrors(res, error)
+	}
+})
+
+router.get("/date_picker_visibility", async (req: Request, res: Response) => {
+	const shopDomain = req.query.shop?.toString()
+	const strProductVariantIds = req.query.productVariantIds?.toString()
+	if (!strProductVariantIds) {
+		res.status(403).send({ reason: "No productVariantIds provided" })
+		return
+	}
+	if (!shopDomain) {
+		res.status(404).send({ reason: "'shop' param missing" })
+		return
+	}
+	const shop = await ShopService.findByShopDomainOrPublicDomain(shopDomain)
+	if (!shop?.id) {
+		res.status(404).send({ reason: "No matching shop found" })
+		return
+	}
+	const widgetSettings = await WidgetService.findWidgetSettingsByShopId(shop.id)
+	if (!widgetSettings) {
+		res.status(404).send({ reason: "Widget settings not found" })
+		return
+	}
+	if (widgetSettings.filterType == "ALL") {
+		res.send({ isVisible: widgetSettings.isVisible })
+	} else if (widgetSettings.filterType == "COLLECTIONS") {
+		const productVariantIds = strProductVariantIds.split(",").map((strId) => parseInt(strId))
+		const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+		const productCollectionIds = await ShopResourceService.fetchCollectionIdsByProductVariantIds(
+			shop,
+			accessToken,
+			productVariantIds
+		)
+		const filteredCollectionIds = widgetSettings.filterCollections?.map((collection) => collection.id) || []
+		const isVisible = _.intersection(productCollectionIds, filteredCollectionIds).length > 0
+		res.send({
+			isVisible
+		})
 	}
 })
 

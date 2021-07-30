@@ -269,4 +269,55 @@ export class ShopResourceService {
 			}
 		}
 	}
+
+	static async fetchCollectionIdsByProductVariantIds(
+		shop: Shop,
+		accessToken: AccessToken,
+		productVariantIds: number[]
+	): Promise<number[] | undefined> {
+		try {
+			const response = await Axios({
+				method: "POST",
+				url: `https://${shop.domain}/admin/api/graphql.json`,
+				headers: {
+					"Content-Type": "application/json",
+					"X-Shopify-Access-Token": accessToken.token
+				},
+				data: {
+					query: `
+						{
+							productVariants(first: ${productVariantIds.length} query:"id:${productVariantIds.join(" OR ")}") {
+								edges {
+									node {
+										product {
+											collections(first: 100) {
+												edges {
+													node {
+														id
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}`
+				}
+			})
+			const collectionIds = new Set<number>()
+			const productVariants = (response.data.data?.productVariants.edges || []) as any[]
+			productVariants.forEach((productVariant) => {
+				const collections = (productVariant?.node?.product?.collections?.edges || []) as any[]
+				collections
+					.map((edge) => parseResourceGid(edge.node.id)?.id || 0)
+					.filter((id) => id !== undefined)
+					.forEach((id) => {
+						collectionIds.add(id)
+					})
+			})
+			return Array.from(collectionIds)
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
 }
