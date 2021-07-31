@@ -5,7 +5,8 @@ export interface TimeSlot {
 	to: string
 }
 
-export type ConfigDay = "DEFAULT" | "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY"
+export type WeekDay = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY"
+export type ConfigDay = "DEFAULT" | WeekDay
 export type TimeSlotsByDay = { [D in ConfigDay]: TimeSlot[] }
 export type Page = "PRODUCT" | "CART"
 export type PlacementMethod = "AUTOMATIC" | "MANUAL"
@@ -23,7 +24,7 @@ export interface WidgetSettings {
 	firstAvailableDateInDays: number
 	cutOffTime: string
 	lastAvailableDateInWeeks: number
-	availableWeekDays: string[]
+	availableWeekDays: WeekDay[]
 	disabledDates: string[]
 	styles: WidgetStyles
 	mandatoryDateSelect: boolean

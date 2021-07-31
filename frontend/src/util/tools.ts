@@ -5,7 +5,7 @@ export function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase()
 }
 
-export function capitalizeWords(str: string): string {
+export function capitalizeWords(str: string): string | null {
 	if (!str) {
 		return null
 	} else {
@@ -24,8 +24,10 @@ export function getDaysBetween(start: Moment, end: Moment, unit: "day" | "week")
 	return days
 }
 
-export function hexToRgb(h): RGBColor {
-	let r: string, g: string, b: string
+export function hexToRgb(h: string): RGBColor {
+	let r: string = ""
+	let g: string = ""
+	let b: string = ""
 	if (h.length == 4) {
 		r = "0x" + h[1] + h[1]
 		g = "0x" + h[2] + h[2]

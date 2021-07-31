@@ -23,34 +23,9 @@ import TimeSlotPicker, { getTimeSlotsByConfigDay, toTimeSlotValue } from "./Time
 import axios from "axios"
 import { anchorElement } from "./app"
 import { fetchCartData, fetchDatePickerVisibility, fetchWidgetSettings } from "./util/api"
+import { generateAvailableDates } from "./util/generateAvailableDates"
 
 export type FormAttributeName = "properties" | "attributes"
-
-function generateAvailableDates(settings: WidgetSettings): AvailableDate[] {
-	if (!settings) return []
-	const today = getMoment(settings).startOf("day")
-	const cutOffTime = moment(moment().format(SYSTEM_DATE_FORMAT) + " " + settings.cutOffTime + ":00", SYSTEM_DATETIME_FORMAT)
-	const needsExtraDay = moment().isAfter(cutOffTime, "minute")
-	const firstDay = today.clone().add(settings.firstAvailableDateInDays, "days")
-	const lastDay = today.clone().add(settings.lastAvailableDateInWeeks, "weeks").endOf("weeks")
-	const availableWeekDaysSet = new Set(settings.availableWeekDays)
-	const disabledDatesSet = new Set(settings.disabledDates)
-	const availableDates = getDaysBetween(firstDay, lastDay, "day")
-		.filter((date) => {
-			const matchesPattern = availableWeekDaysSet.has(date.format("dddd").toUpperCase())
-			if (!matchesPattern) return false
-			const matchesDisabledDate = disabledDatesSet.has(date.format(SYSTEM_DATE_FORMAT))
-			return !matchesDisabledDate
-		})
-		.map((date) => ({
-			date: date.format(SYSTEM_DATE_FORMAT),
-			isSoldOut: false
-		}))
-	if (needsExtraDay) {
-		availableDates.shift()
-	}
-	return availableDates
-}
 
 function getIsPreviewMode() {
 	return anchorElement?.getAttribute("data-preview") == "true"
