@@ -67,13 +67,13 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 							max={19}
 							helpText={`The first date available will be ${getTextFromFirstAvailableDateInDays(
 								widgetSettings.firstAvailableDateInDays
-							)}`}
+							)}.`}
 						/>
 						<Select
 							label="Cut off time"
 							onChange={handleCutOffTimeChange}
 							options={getCutOffTimeOptions()}
-							helpText="Time after witch the first available date becomes unavailable"
+							helpText="Time after witch the first available date becomes unavailable."
 							value={widgetSettings.cutOffTime}
 						/>
 					</FormLayout.Group>

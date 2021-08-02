@@ -3,7 +3,8 @@ import {
 	AnchorPosition,
 	FilterType,
 	Page,
-	PlacementMethod, WeekDay,
+	PlacementMethod,
+	WeekDay,
 	WidgetStyles
 } from "../../../widget/src/models/WidgetSettings"
 
@@ -35,6 +36,7 @@ export const DEFAULT_SHOW_ON_PAGE: Page = "PRODUCT"
 export const DEFAULT_PLACEMENT_METHOD: PlacementMethod = "AUTOMATIC"
 export const DEFAULT_ANCHOR_POSITION: AnchorPosition = "BEFORE"
 export const DEFAULT_FILTER_TYPE: FilterType = "ALL"
+export const DEFAULT_SHOW_DAY_OF_WEEK_TAG = true
 
 export const defaultWidgetStyles: Partial<WidgetStyles> = {
 	errorBorderColor: "#bc6363"

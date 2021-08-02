@@ -2,7 +2,11 @@ import React from "react"
 import { Card, Checkbox, FormLayout, Select } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { PickerType, WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
-import { datePickerLanguages, defaultWidgetStyles } from "../../../backend/src/util/constants"
+import {
+	datePickerLanguages,
+	DEFAULT_SHOW_DAY_OF_WEEK_TAG,
+	defaultWidgetStyles
+} from "../../../backend/src/util/constants"
 
 interface Props {
 	widgetSettings: WidgetSettings
@@ -33,6 +37,10 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
 		onWidgetSettingsChange({ ...widgetSettings, styles })
+	}
+
+	const handleShowDayOfWeekTagChange = (showDayOfWeekTag) => {
+		onWidgetSettingsChange({ ...widgetSettings, showDayOfWeekTag })
 	}
 
 	return (
@@ -89,6 +97,13 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 						onChange={(value) => handleSingleDatePerOrderChange(value)}
 					/>
 				)}
+
+				<Checkbox
+					label="Show the day of week in the cart and checkout page (e.g. Delivery Day: Monday)"
+					helpText="If turned off only the date will show. (e.g. Delivery Date: August 2, 2021)"
+					checked={widgetSettings.showDayOfWeekTag ?? DEFAULT_SHOW_DAY_OF_WEEK_TAG}
+					onChange={(value) => handleShowDayOfWeekTagChange(value)}
+				/>
 			</FormLayout>
 		</Card>
 	)

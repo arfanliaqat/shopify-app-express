@@ -41,6 +41,7 @@ export interface WidgetSettings {
 	anchorPosition?: AnchorPosition
 	filterType?: FilterType
 	filterCollections?: Collection[]
+	showDayOfWeekTag?: boolean
 }
 
 export interface WidgetStyles {

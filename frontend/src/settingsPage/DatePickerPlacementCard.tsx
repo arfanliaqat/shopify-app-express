@@ -96,7 +96,7 @@ export default function DatePickerPlacementCard({
 								/>
 								<RadioButton
 									label="On the Cart page"
-									helpText="Ask your customers to select a date just before starting the checkout process"
+									helpText="Ask your customers to select a date just before starting the checkout process."
 									id="CART"
 									checked={showOnPage == "CART"}
 									onChange={handleShowOnPage}
@@ -129,7 +129,7 @@ export default function DatePickerPlacementCard({
 							<FormLayout.Group condensed>
 								<TextField
 									label="CSS selector"
-									helpText="Select the element you wish to anchor the date picker onto (for example: .cart_footer > div:first-child)"
+									helpText="Select the element you wish to anchor the date picker onto (for example: .cart_footer > div:first-child)."
 									value={widgetSettings.anchorSelector || ""}
 									onChange={handleAnchorSelector}
 								/>

@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "preact/hooks"
 import {
 	DAY_OF_WEEK_TAG_DATE_FORMAT,
 	DEFAULT_DATE_TAG_LABEL,
-	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
+	DEFAULT_DAY_OF_WEEK_TAG_LABEL, DEFAULT_SHOW_DAY_OF_WEEK_TAG,
 	SYSTEM_DATE_FORMAT, TAG_DATE_FORMAT
 } from "../../backend/src/util/constants"
 import { parseMoment } from "./util/dates"
@@ -38,6 +38,7 @@ export default function TextInputDatePicker({ onSelect, availableDates, settings
 
 	const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
 	const dayOfWeekTagLabel = settings.messages.dayOfWeekTagLabel || DEFAULT_DAY_OF_WEEK_TAG_LABEL
+	const showDayOfWeekTag = settings.showDayOfWeekTag ?? DEFAULT_SHOW_DAY_OF_WEEK_TAG
 
 	const formattedSelectedDate = useMemo(() => {
 		return selectedDate ? parseMoment(settings, selectedDate, SYSTEM_DATE_FORMAT)?.format(TAG_DATE_FORMAT) : undefined
@@ -90,7 +91,7 @@ export default function TextInputDatePicker({ onSelect, availableDates, settings
 							return false
 						}}
 					/>
-					{formattedSelectedDay && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+					{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 				</div>
 				{open && <div className="buunto-popover">
                   <Calendar

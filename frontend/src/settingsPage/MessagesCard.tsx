@@ -7,6 +7,7 @@ import {
 	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
 	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
 	DEFAULT_NO_TIME_SLOT_SELECTED_ERROR,
+	DEFAULT_SHOW_DAY_OF_WEEK_TAG,
 	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 	DEFAULT_TIME_SLOT_LABEL,
 	DEFAULT_TIME_SLOT_TAG_LABEL
@@ -22,6 +23,8 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 		const messages: WidgetMessages = { ...widgetSettings.messages, [key]: value }
 		onWidgetSettingsChange({ ...widgetSettings, messages })
 	}
+
+	const showDayOfWeekTag = widgetSettings.showDayOfWeekTag ?? DEFAULT_SHOW_DAY_OF_WEEK_TAG
 
 	return (
 		<Card title="Messages">
@@ -70,12 +73,14 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 						onChange={handleWidgetMessageChange("dateTagLabel")}
 						value={widgetSettings.messages.dateTagLabel ?? DEFAULT_DATE_TAG_LABEL}
 					/>
-					<TextField
-						label="Order tag day of week label"
-						maxLength={300}
-						onChange={handleWidgetMessageChange("dayOfWeekTagLabel")}
-						value={widgetSettings.messages.dayOfWeekTagLabel ?? DEFAULT_DAY_OF_WEEK_TAG_LABEL}
-					/>
+					{showDayOfWeekTag && (
+						<TextField
+							label="Order tag day of week label"
+							maxLength={300}
+							onChange={handleWidgetMessageChange("dayOfWeekTagLabel")}
+							value={widgetSettings.messages.dayOfWeekTagLabel ?? DEFAULT_DAY_OF_WEEK_TAG_LABEL}
+						/>
+					)}
 					{widgetSettings.singleDatePerOrder && (
 						<TextField
 							label="Message when a date have already been selected in the order"
