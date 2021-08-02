@@ -43,6 +43,7 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 						label="Type"
 						options={[
 							{ value: "CALENDAR", label: "Calendar" },
+							{ value: "TEXT_INPUT", label: "Text + Calendar" },
 							{ value: "DROPDOWN", label: "Dropdown" }
 						]}
 						value={widgetSettings.pickerType}

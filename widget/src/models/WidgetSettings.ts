@@ -1,10 +1,9 @@
-export type PickerType = "CALENDAR" | "DROPDOWN"
-
 export interface TimeSlot {
 	from: string,
 	to: string
 }
 
+export type PickerType = "CALENDAR" | "DROPDOWN" | "TEXT_INPUT"
 export type WeekDay = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY"
 export type ConfigDay = "DEFAULT" | WeekDay
 export type TimeSlotsByDay = { [D in ConfigDay]: TimeSlot[] }

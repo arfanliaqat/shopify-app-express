@@ -3,7 +3,7 @@ import {
 	SYSTEM_DATE_FORMAT,
 	TAG_DATE_FORMAT,
 	DEFAULT_DATE_TAG_LABEL,
-	DEFAULT_DAY_OF_WEEK_TAG_LABEL, DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL
+	DEFAULT_DAY_OF_WEEK_TAG_LABEL, DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL, DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
 } from "../../backend/src/util/constants"
 import { h, Fragment } from "preact"
 import { AvailableDate } from "./models/AvailableDate"
@@ -12,6 +12,7 @@ import { parseMoment } from "./util/dates"
 import { useMemo } from "preact/hooks"
 import classNames from "classnames"
 import { FormAttributeName } from "./AvailableDatePicker"
+import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -20,9 +21,10 @@ interface Props {
 	settings: WidgetSettings
 	formError: string | undefined
 	formAttributeName: FormAttributeName
+	showOnlyOnDatePerOrderMessage: boolean
 }
 
-export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError, formAttributeName }: Props) {
+export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError, formAttributeName, showOnlyOnDatePerOrderMessage }: Props) {
 	const handleSelect = (e) => {
 		if (e.target.value) {
 			onSelect(e.target.value)
@@ -59,6 +61,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 				})}
 			</select>
 			{formattedSelectedDay && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+			{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
 		</Fragment>
 	)
 }

@@ -7,15 +7,14 @@ import { getCssFromWidgetStyles } from "./util/widgetStyles"
 import { ProductAvailabilityData } from "./models/ProductAvailabilityData"
 import { ConfigDay, WidgetSettings } from "./models/WidgetSettings"
 import { AvailableDate } from "./models/AvailableDate"
-import { getMoment } from "./util/dates"
-import { getDaysBetween } from "../../frontend/src/util/tools"
 import classNames from "classnames"
 import _ from "lodash"
 
 import {
-	DEFAULT_DATE_TAG_LABEL, DEFAULT_SHOW_ON_PAGE, DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
+	DEFAULT_DATE_TAG_LABEL,
+	DEFAULT_SHOW_ON_PAGE,
+	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 	SYSTEM_DATE_FORMAT,
-	SYSTEM_DATETIME_FORMAT,
 	TAG_DATE_FORMAT
 } from "../../backend/src/util/constants"
 import moment, { Moment } from "moment"
@@ -24,6 +23,7 @@ import axios from "axios"
 import { anchorElement } from "./app"
 import { fetchCartData, fetchDatePickerVisibility, fetchWidgetSettings } from "./util/api"
 import { generateAvailableDates } from "./util/generateAvailableDates"
+import TextInputDatePicker from "./TextInputDatePicker"
 
 export type FormAttributeName = "properties" | "attributes"
 
@@ -263,16 +263,16 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 	}, [productAvailabilityData, availableDates, settings])
 
 	const handleAvailableDateSelect = (value: string | undefined) => {
+		setDateFormError(undefined)
 		setSelectedAvailableDate(value)
 	}
 
 	const handleTimeSlotSelect = (value: string | undefined) => {
+		setTimeSlotFormError(undefined)
 		setSelectedTimeSlot(value)
 	}
 
 	if (!productAvailabilityData || fetchingCartData || fetchingDatePickerVisibility || !isVisible()) return undefined
-
-	const singleDatePerOrderMessage = settings.messages.singleDatePerOrderMessage || DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE
 
 	const selectedDay = moment(selectedAvailableDate, SYSTEM_DATE_FORMAT)?.format("dddd")?.toUpperCase() as ConfigDay
 
@@ -283,29 +283,38 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 			{widgetStyles && <style>{widgetStyles}</style>}
 			<div className="buunto-date-picker-label">{settings.messages.datePickerLabel}</div>
 			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker
-                availableDates={availableDates}
-                onSelect={handleAvailableDateSelect}
-                selectedAvailableDate={selectedAvailableDate}
-                settings={settings}
-                formError={dateFormError}
-                formAttributeName={formAttributeName}
-            />}
+				availableDates={availableDates}
+				onSelect={handleAvailableDateSelect}
+				selectedAvailableDate={selectedAvailableDate}
+				settings={settings}
+				formError={dateFormError}
+				formAttributeName={formAttributeName}
+				showOnlyOnDatePerOrderMessage={!!orderDate}
+			/>}
 			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
-                availableDates={availableDates}
-                onSelect={handleAvailableDateSelect}
-                settings={settings}
-                formError={dateFormError}
-                formAttributeName={formAttributeName}
-            />}
-			{orderDate && <div className="buunto-info-message">{singleDatePerOrderMessage}</div>}
+				availableDates={availableDates}
+				onSelect={handleAvailableDateSelect}
+				settings={settings}
+				formError={dateFormError}
+				formAttributeName={formAttributeName}
+				showOnlyOnDatePerOrderMessage={!!orderDate}
+			/>}
+			{settings.pickerType == "TEXT_INPUT" && availableDates.length > 0 && <TextInputDatePicker
+				availableDates={availableDates}
+				onSelect={handleAvailableDateSelect}
+				settings={settings}
+				formError={dateFormError}
+				formAttributeName={formAttributeName}
+				showOnlyOnDatePerOrderMessage={!!orderDate}
+			/>}
 			{settings.timeSlotsEnabled && Object.keys(settings.timeSlotsByDay || {}).length > 0 && <TimeSlotPicker
-                formError={timeSlotFormError}
-                settings={settings}
-                onSelect={handleTimeSlotSelect}
-                selectedTimeSlot={selectedTimeSlot}
-                configDay={selectedDay || "DEFAULT"}
-                formAttributeName={formAttributeName}
-            />}
+				formError={timeSlotFormError}
+				settings={settings}
+				onSelect={handleTimeSlotSelect}
+				selectedTimeSlot={selectedTimeSlot}
+				configDay={selectedDay || "DEFAULT"}
+				formAttributeName={formAttributeName}
+			/>}
 		</div>
 	)
 }

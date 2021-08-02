@@ -3,7 +3,7 @@ import {
 	AnchorPosition,
 	FilterType,
 	Page,
-	PlacementMethod,
+	PlacementMethod, WeekDay,
 	WidgetStyles
 } from "../../../widget/src/models/WidgetSettings"
 
@@ -44,7 +44,7 @@ export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"
 export const APP_NAME = (process.env.APP_NAME as AppName) || "STOCK_BY_DATE"
 export const WIDGET_SCRIPT_NAME = process.env.WIDGET_SCRIPT_NAME || "buunto-date-picker.js"
 
-export const allWeekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
+export const allWeekDays: WeekDay[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
 
 export const TRIAL_DAYS = 7
 
