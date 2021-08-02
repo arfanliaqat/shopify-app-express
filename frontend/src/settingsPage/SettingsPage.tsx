@@ -150,7 +150,7 @@ export default function SettingsPage({}: Props) {
 								/>
 							</Layout.Section>
 
-							{widgetSettings.pickerType == "CALENDAR" && (
+							{(widgetSettings.pickerType == "CALENDAR" || widgetSettings.pickerType == "TEXT_INPUT") && (
 								<Layout.Section>
 									<CalendarStylesCard
 										widgetSettings={widgetSettings}
@@ -159,7 +159,9 @@ export default function SettingsPage({}: Props) {
 								</Layout.Section>
 							)}
 
-							{(widgetSettings.pickerType == "DROPDOWN" || widgetSettings.timeSlotsEnabled) && (
+							{(widgetSettings.pickerType == "DROPDOWN" ||
+								widgetSettings.pickerType == "TEXT_INPUT" ||
+								widgetSettings.timeSlotsEnabled) && (
 								<Layout.Section>
 									<DropdownStylesCard
 										widgetSettings={widgetSettings}

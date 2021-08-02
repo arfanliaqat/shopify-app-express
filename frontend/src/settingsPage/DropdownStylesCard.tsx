@@ -25,7 +25,7 @@ export default function DropdownStylesCard({ widgetSettings, onWidgetSettingsCha
 	}
 
 	return (
-		<Card title="Dropdown styles">
+		<Card title={widgetSettings.pickerType == "TEXT_INPUT" ? "Text input styles" : "Dropdown styles"}>
 			<Card.Section>
 				<FormLayout>
 					<FormLayout.Group>
