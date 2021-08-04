@@ -4,6 +4,7 @@ import AddTimeSlot from "./AddTimeSlot"
 import { ConfigDay, TimeSlot, TimeSlotsByDay, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
 import _ from "lodash"
 import AddTimeSlotException from "./AddTimeSlotException"
+import { toTimeSlotDisplay } from "../../../../widget/src/util/dates"
 
 interface Props {
 	configDay: ConfigDay
@@ -51,7 +52,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 				{timeSlots.map((timeSlot, index) => {
 					return (
 						<Tag key={index} onRemove={handleRemoveTimeSlot(index)}>
-							{`${timeSlot.from} - ${timeSlot.to}`}
+							{toTimeSlotDisplay(widgetSettings, timeSlot)}
 						</Tag>
 					)
 				})}
@@ -69,7 +70,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 						onClose={() => setAddTimeSlotOpen(false)}
 						preferredAlignment="left"
 					>
-						<AddTimeSlot onAdd={handleAddTimeSlot} />
+						<AddTimeSlot widgetSettings={widgetSettings} onAdd={handleAddTimeSlot} />
 					</Popover>
 				</div>
 				{configDay != "DEFAULT" && (

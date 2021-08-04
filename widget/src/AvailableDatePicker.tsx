@@ -13,17 +13,17 @@ import _ from "lodash"
 import {
 	DEFAULT_DATE_TAG_LABEL,
 	DEFAULT_SHOW_ON_PAGE,
-	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 	SYSTEM_DATE_FORMAT,
 	TAG_DATE_FORMAT
 } from "../../backend/src/util/constants"
 import moment, { Moment } from "moment"
-import TimeSlotPicker, { getTimeSlotsByConfigDay, toTimeSlotValue } from "./TimeSlotPicker"
+import TimeSlotPicker, { getTimeSlotsByConfigDay } from "./TimeSlotPicker"
 import axios from "axios"
 import { anchorElement } from "./app"
 import { fetchCartData, fetchDatePickerVisibility, fetchWidgetSettings } from "./util/api"
 import { generateAvailableDates } from "./util/generateAvailableDates"
 import TextInputDatePicker from "./TextInputDatePicker"
+import { toTimeSlotDisplay } from "./util/dates"
 
 export type FormAttributeName = "properties" | "attributes"
 
@@ -162,7 +162,7 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 					const configDay = moment(firstAvailableDate.date).format("dddd").toUpperCase() as ConfigDay
 					const timeSlots = getTimeSlotsByConfigDay(settings.timeSlotsByDay, configDay)
 					if (timeSlots.length > 0) {
-						setSelectedTimeSlot(toTimeSlotValue(timeSlots[0]))
+						setSelectedTimeSlot(toTimeSlotDisplay(widgetSettings, timeSlots[0]))
 					}
 				}
 			}

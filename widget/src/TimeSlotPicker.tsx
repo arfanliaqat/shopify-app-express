@@ -7,6 +7,7 @@ import {
 } from "../../backend/src/util/constants"
 import classNames from "classnames"
 import { FormAttributeName } from "./AvailableDatePicker"
+import { toTimeSlotDisplay } from "./util/dates"
 
 interface Props {
 	settings: WidgetSettings
@@ -28,10 +29,6 @@ export function getTimeSlotsByConfigDay(timeSlotsByDay: TimeSlotsByDay | undefin
 	return []
 }
 
-export function toTimeSlotValue(timeSlot: TimeSlot): string {
-	return `${timeSlot.from} - ${timeSlot.to}`
-}
-
 export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, formError, configDay, formAttributeName }: Props) {
 
 	const dropdownDefaultOptionLabel = settings.messages.timeSlotDropdownDefaultOptionLabel || DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL
@@ -49,9 +46,9 @@ export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, f
 					onChange={e => onSelect((e?.target as any)?.value)}>
 				{settings.timeSlotDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
 				{timeSlots.map((timeSlot) => {
-					const timeSlotValue = toTimeSlotValue(timeSlot)
-					return <option value={timeSlotValue} selected={timeSlotValue == selectedTimeSlot}>
-						{timeSlotValue}
+					const timeSlotDisplay = toTimeSlotDisplay(settings, timeSlot)
+					return <option value={timeSlotDisplay} selected={timeSlotDisplay == selectedTimeSlot}>
+						{timeSlotDisplay}
 					</option>
 				})}
 			</select>
