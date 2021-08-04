@@ -178,6 +178,16 @@ export class HooksService {
 				}
 			})
 
+			console.log({
+				name: "hook_debug_log",
+				shop: connectedShop.domain,
+				"orderEvent.note_attributes": orderEvent?.note_attributes,
+				"line_items.property": orderEvent?.line_items?.map((item) => ({
+					productId: item.product_id,
+					properties: item.properties
+				}))
+			})
+
 			const newProductOrders = Object.values(newProductOrdersById)
 			newProductOrders.map(async (productOrder) => {
 				await service.insert(productOrder)
