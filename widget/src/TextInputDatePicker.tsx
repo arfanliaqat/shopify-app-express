@@ -92,15 +92,15 @@ export default function TextInputDatePicker({ onSelect, availableDates, settings
 						}}
 					/>
 					{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+					{open && <div className="buunto-popover">
+                      <Calendar
+                          availableDates={availableDates}
+                          selectedDate={selectedDate}
+                          onSelect={handleSelectedDate}
+                          settings={settings}
+                      />
+                    </div>}
 				</div>
-				{open && <div className="buunto-popover">
-                  <Calendar
-                      availableDates={availableDates}
-                      selectedDate={selectedDate}
-                      onSelect={handleSelectedDate}
-                      settings={settings}
-                  />
-                </div>}
 				{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
 			</div>
 		</Fragment>

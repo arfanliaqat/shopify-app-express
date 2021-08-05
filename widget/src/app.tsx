@@ -5,7 +5,11 @@ import { anchorId, appUrl } from "./constants"
 import axios from "axios"
 import { fetchWidgetSettings } from "./util/api"
 import { AnchorPosition, WidgetSettings } from "./models/WidgetSettings"
-import { DEFAULT_ANCHOR_POSITION, DEFAULT_PLACEMENT_METHOD } from "../../backend/src/util/constants"
+import {
+	DEFAULT_ANCHOR_POSITION,
+	DEFAULT_PLACEMENT_METHOD,
+	DEFAULT_SHOW_ON_PAGE
+} from "../../backend/src/util/constants"
 
 export let anchorElement = undefined
 
@@ -65,7 +69,7 @@ function getProductQueryAndPosition(): [string | undefined, AnchorPosition] {
 	return [undefined, "FIRST_ELEMENT"]
 }
 
-function getCartQueryAndPosition(): [string, AnchorPosition] {
+function getCartPageQueryAndPosition(): [string, AnchorPosition] {
 	const theme = getTheme()
 	if (theme == "DEBUT") return [".cart__buttons-container", "BEFORE"]
 	if (theme == "NARRATIVE") return [".cart-policies", "AFTER"]
@@ -77,6 +81,13 @@ function getCartQueryAndPosition(): [string, AnchorPosition] {
 	if (theme == "VENTURE") return [".cart__taxes", "AFTER"]
 	if (theme == "EXPRESS") return [".cart__totals", "AFTER"]
 	return ["table", "AFTER"]
+}
+
+function getCartDrawerQueryAndPosition(): [string, AnchorPosition] {
+	const theme = getTheme()
+	if (theme == "NARRATIVE") return [".cart-drawer__disclaimer", "AFTER"]
+	if (theme == "EXPRESS") return [".cart-drawer__notice", "AFTER"]
+	return [undefined, undefined]
 }
 
 function getProductVariantId(): number | undefined {
@@ -97,11 +108,13 @@ function initWidget() {
 			return
 		}
 
+		const showOnPage = widgetSettings.showOnPage || DEFAULT_SHOW_ON_PAGE
 		const productForm = document.querySelectorAll("form[action*='/cart/add']")
 		const hasProductForm = productForm.length > 0
-		const cartForm = document.querySelector("form[action='/cart']:not(#CartDrawer),form[action*='/cart?']:not(#CartDrawer)")
+		const cartForm = document.querySelector("form[action='/cart'],form[action*='/cart?']")
 		const hasCartForm = !!cartForm
 		const isCartPage = hasCartForm && !hasProductForm || window.location.pathname.startsWith("/cart")
+		let isCartDrawer = false
 
 		anchorElement = document.getElementById(anchorId)
 		if (!anchorElement) {
@@ -116,12 +129,20 @@ function initWidget() {
 					refElement.insertAdjacentElement(toInsertPosition(anchorPosition), anchorElement)
 				}
 			} else {
-				if (isCartPage) {
+				if (showOnPage == "CART") {
 					if (!anchorElement && cartForm) {
 						anchorElement = document.createElement("div")
 						anchorElement.id = anchorId
-						const [elementQuery, anchorPosition] = getCartQueryAndPosition()
-						const refElement = cartForm.querySelector(elementQuery)
+						const [cartDrawerQuery, cartDrawerAnchorPosition] = getCartDrawerQueryAndPosition()
+						let refElement = cartDrawerQuery ? cartForm.querySelector(cartDrawerQuery) : undefined
+						let anchorPosition = cartDrawerAnchorPosition
+						if (!refElement) {
+							const [cartPageQuery, cartPageAnchorPosition] = getCartPageQueryAndPosition()
+							anchorPosition = cartPageAnchorPosition
+							refElement = cartForm.querySelector(cartPageQuery)
+						} else {
+							isCartDrawer = true
+						}
 						if (refElement) {
 							refElement.insertAdjacentElement(toInsertPosition(anchorPosition), anchorElement)
 						}
@@ -151,7 +172,8 @@ function initWidget() {
 				}
 			}
 			try {
-				render(<AvailableDatePicker widgetSettings={widgetSettings} isCartPage={isCartPage} />, anchorElement)
+				render(<AvailableDatePicker widgetSettings={widgetSettings} isCartPage={isCartPage || isCartDrawer}
+											isCartDrawer={isCartDrawer}/>, anchorElement)
 			} catch (e) {
 				console.error(e)
 				axios.post(appUrl + "/errors", { error: e.stack }, {
@@ -184,6 +206,7 @@ function initOrderConfirmationPage() {
 const isAdmin = window.location.href.startsWith(appUrl)
 
 type OrderAttribute = { label: string, value: string }
+
 interface OrderInfo {
 	attributes?: OrderAttribute[]
 }
@@ -192,7 +215,7 @@ const orderInfo = (window as any).BuuntoOrder as OrderInfo
 
 if (isAdmin) {
 	anchorElement = document.getElementById(anchorId)
-	render(<AvailableDatePicker />, anchorElement)
+	render(<AvailableDatePicker/>, anchorElement)
 } else if (orderInfo) {
 	initOrderConfirmationPage()
 } else {

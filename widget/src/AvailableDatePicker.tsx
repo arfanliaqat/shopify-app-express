@@ -70,6 +70,7 @@ function isSubmitButtonClick(e: any) {
 
 export interface Props {
 	isCartPage?: boolean
+	isCartDrawer?: boolean
 	widgetSettings?: WidgetSettings
 }
 
@@ -82,7 +83,7 @@ function initialFetchingCartData(settings?: WidgetSettings) {
 	else return settings.filterType == "COLLECTIONS" && showOnPage == "CART"
 }
 
-export default function AvailableDatePicker({ isCartPage, widgetSettings }: Props) {
+export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSettings }: Props) {
 
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(widgetSettings ? {
 		settings: widgetSettings,
@@ -100,6 +101,7 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 	const [fetchingDatePickerVisibility, setFetchingDatePickerVisibility] = useState<boolean>(false)
 
 	const settings = productAvailabilityData?.settings
+	const showOnPage = settings ? settings.showOnPage || DEFAULT_SHOW_ON_PAGE : undefined
 
 	const availableDates: AvailableDate[] = useMemo(() => {
 		if (appName == "STOCK_BY_DATE") {
@@ -276,10 +278,14 @@ export default function AvailableDatePicker({ isCartPage, widgetSettings }: Prop
 
 	const selectedDay = moment(selectedAvailableDate, SYSTEM_DATE_FORMAT)?.format("dddd")?.toUpperCase() as ConfigDay
 
-	const formAttributeName = isCartPage ? "attributes" : "properties"
+	const formAttributeName = showOnPage == "CART" ? "attributes" : "properties"
 
 	return (
-		<div className={classNames("buunto-date-picker", isCartPage ? "buunto-cart-page" : "buunto-product-page")}>
+		<div className={classNames("buunto-date-picker", {
+			"buunto-cart-page": isCartPage,
+			"buunto-product-page": !isCartPage,
+			"buunto-cart-drawer": isCartDrawer
+		})}>
 			{widgetStyles && <style>{widgetStyles}</style>}
 			<div className="buunto-date-picker-label">{settings.messages.datePickerLabel}</div>
 			{settings.pickerType == "DROPDOWN" && availableDates.length > 0 && <DropdownDatePicker

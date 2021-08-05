@@ -18,10 +18,10 @@ const queries: WidgetStyles = {
 	daySelectedBackgroundColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-selected > span { background-color: $$ }",
 	daySelectedFontColor: ".buuntoCal .buuntoCal-body .buuntoCal-week .buuntoCal-day.buuntoCal-selected > span { color: $$ }",
 	previewBackgroundColor: "",
-	dropdownBorderColor: ".buunto-dropdown { border-color: $$ } .buunto-text-input { border-color: $$ }",
-	dropdownBorderWidth: ".buunto-dropdown { border-width: $$ } .buunto-text-input { border-width: $$ }",
-	dropdownBackgroundColor: ".buunto-dropdown { background-color: $$ } .buunto-text-input { background-color: $$ }",
-	dropdownTextColor: ".buunto-dropdown { color: $$ } .buunto-text-input { color: $$ } .buunto-text-input-date-picker .buunto-calendar-icon { color: $$ }"
+	dropdownBorderColor: ".buunto-dropdown { border-color: $$ } input.buunto-text-input { border-color: $$ }",
+	dropdownBorderWidth: ".buunto-dropdown { border-width: $$ } input.buunto-text-input { border-width: $$ }",
+	dropdownBackgroundColor: ".buunto-dropdown { background-color: $$ } input.buunto-text-input { background-color: $$ }",
+	dropdownTextColor: ".buunto-dropdown { color: $$ } input.buunto-text-input { color: $$ } .buunto-text-input-date-picker .buunto-calendar-icon { color: $$ }"
 }
 
 export function getCssFromWidgetStyles(widgetStyles: WidgetStyles): string {
