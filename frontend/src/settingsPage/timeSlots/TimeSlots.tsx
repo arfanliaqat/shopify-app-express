@@ -47,7 +47,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 	}
 
 	return (
-		<div className="timeSlotsSection">
+		<div className="tagsField timeSlotsSection">
 			<div className="tags">
 				{timeSlots.map((timeSlot, index) => {
 					return (
@@ -56,7 +56,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 						</Tag>
 					)
 				})}
-				{timeSlots.length == 0 && <em>No time slots defined</em>}
+				{timeSlots.length == 0 && <em>No time slots defined yet</em>}
 			</div>
 			<div className="buttons">
 				<div className="buttonHolder">

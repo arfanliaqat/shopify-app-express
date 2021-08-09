@@ -44,10 +44,11 @@ router.get("/settings", async (req: Request, res: Response) => {
 			return
 		}
 
-		// Filter by collection
 		const strProductVariantId = req.query.productVariantId?.toString()
-		if (widgetSettings.isVisible && strProductVariantId && widgetSettings.filterType == "COLLECTIONS") {
-			const productVariantId = parseInt(strProductVariantId)
+		const productVariantId = strProductVariantId ? parseInt(strProductVariantId) : undefined
+
+		// Filter by collection
+		if (widgetSettings.isVisible && productVariantId && widgetSettings.filterType == "COLLECTIONS") {
 			const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
 			const productCollectionIds = await ShopResourceService.fetchCollectionIdsByProductVariantIds(
 				shop,
@@ -56,6 +57,20 @@ router.get("/settings", async (req: Request, res: Response) => {
 			)
 			const filteredCollectionIds = widgetSettings.filterCollections?.map((collection) => collection.id) || []
 			widgetSettings.isVisible = _.intersection(productCollectionIds, filteredCollectionIds).length > 0
+		}
+
+		// Filter by product tag
+		if (widgetSettings.isVisible && productVariantId && widgetSettings.filterType == "PRODUCT_TAGS") {
+			const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+			const productTags =
+				(await ShopResourceService.fetchProductTagsByProductVariantIds(shop, accessToken, [
+					productVariantId
+				])) || []
+			widgetSettings.isVisible =
+				_.intersection(
+					productTags.map((t) => t.toLowerCase()),
+					(widgetSettings.filterProductTags || []).map((t) => t.toLowerCase())
+				).length > 0
 		}
 
 		res.send(widgetSettings)
@@ -87,19 +102,34 @@ router.get("/date_picker_visibility", async (req: Request, res: Response) => {
 	}
 	if (widgetSettings.filterType == "ALL") {
 		res.send({ isVisible: widgetSettings.isVisible })
-	} else if (widgetSettings.filterType == "COLLECTIONS") {
+	} else {
 		const productVariantIds = strProductVariantIds.split(",").map((strId) => parseInt(strId))
 		const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
-		const productCollectionIds = await ShopResourceService.fetchCollectionIdsByProductVariantIds(
-			shop,
-			accessToken,
-			productVariantIds
-		)
-		const filteredCollectionIds = widgetSettings.filterCollections?.map((collection) => collection.id) || []
-		const isVisible = _.intersection(productCollectionIds, filteredCollectionIds).length > 0
-		res.send({
-			isVisible
-		})
+		if (widgetSettings.filterType == "COLLECTIONS") {
+			const productCollectionIds = await ShopResourceService.fetchCollectionIdsByProductVariantIds(
+				shop,
+				accessToken,
+				productVariantIds
+			)
+			const filteredCollectionIds = widgetSettings.filterCollections?.map((collection) => collection.id) || []
+			const isVisible = _.intersection(productCollectionIds, filteredCollectionIds).length > 0
+			res.send({
+				isVisible
+			})
+		}
+		if (widgetSettings.filterType == "PRODUCT_TAGS") {
+			const productTags =
+				(await ShopResourceService.fetchProductTagsByProductVariantIds(shop, accessToken, productVariantIds)) ||
+				[]
+			const isVisible =
+				_.intersection(
+					productTags.map((t) => t.toLowerCase().trim()),
+					(widgetSettings.filterProductTags || []).map((t) => t.toLowerCase().trim())
+				).length > 0
+			res.send({
+				isVisible
+			})
+		}
 	}
 })
 

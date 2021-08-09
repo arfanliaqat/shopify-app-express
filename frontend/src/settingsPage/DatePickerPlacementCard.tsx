@@ -15,6 +15,7 @@ import {
 	DEFAULT_SHOW_ON_PAGE
 } from "../../../backend/src/util/constants"
 import CollectionPicker from "./CollectionPicker"
+import ProductTagPicker from "./ProductTagPicker"
 
 interface Props {
 	initialWidgetSettings: WidgetSettings
@@ -53,6 +54,10 @@ export default function DatePickerPlacementCard({
 
 	const handleCollectionsChange = (filterCollections: Collection[]) => {
 		onWidgetSettingsChange({ ...widgetSettings, filterCollections })
+	}
+
+	const handleProductTagsChange = (filterProductTags: string[]) => {
+		onWidgetSettingsChange({ ...widgetSettings, filterProductTags })
 	}
 
 	const showOnPage = widgetSettings.showOnPage || DEFAULT_SHOW_ON_PAGE
@@ -180,6 +185,18 @@ export default function DatePickerPlacementCard({
 									<CollectionPicker
 										collections={widgetSettings.filterCollections || []}
 										onChange={handleCollectionsChange}
+									/>
+								)}
+								<RadioButton
+									label="Only show the date picker for specific product tags"
+									id="PRODUCT_TAGS"
+									checked={filterType == "PRODUCT_TAGS"}
+									onChange={handleFilterType}
+								/>
+								{filterType == "PRODUCT_TAGS" && (
+									<ProductTagPicker
+										productTags={widgetSettings.filterProductTags || []}
+										onChange={handleProductTagsChange}
 									/>
 								)}
 							</Stack>

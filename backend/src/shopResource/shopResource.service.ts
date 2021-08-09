@@ -320,4 +320,44 @@ export class ShopResourceService {
 			handleAxiosErrors(error)
 		}
 	}
+
+	static async fetchProductTagsByProductVariantIds(
+		shop: Shop,
+		accessToken: AccessToken,
+		productVariantIds: number[]
+	): Promise<string[] | undefined> {
+		try {
+			const response = await Axios({
+				method: "POST",
+				url: `https://${shop.domain}/admin/api/graphql.json`,
+				headers: {
+					"Content-Type": "application/json",
+					"X-Shopify-Access-Token": accessToken.token
+				},
+				data: {
+					query: `
+						{
+							productVariants(first: 100, query:"id:${productVariantIds.join(" OR ")}") {
+								edges {
+									node {
+										product {
+											tags
+										}
+									}
+								}
+							}
+						}`
+				}
+			})
+			const productTags = new Set<string>()
+			const productVariants = (response.data.data?.productVariants.edges || []) as any[]
+			productVariants.forEach((productVariant) => {
+				const tags = (productVariant?.node?.product?.tags || []) as any[]
+				;(tags || []).forEach((tag) => productTags.add(tag))
+			})
+			return Array.from(productTags)
+		} catch (error) {
+			handleAxiosErrors(error)
+		}
+	}
 }

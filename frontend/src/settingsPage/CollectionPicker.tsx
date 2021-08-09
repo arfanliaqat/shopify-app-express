@@ -51,7 +51,8 @@ export default function CollectionPicker({ collections, onChange }: Props) {
 				onSelection={handleCollectionsSelected}
 				onCancel={() => setPickerOpen(false)}
 			/>
-			<div className="collectionPicker">
+			<div className="tagsField">
+				<div className="fieldLabel">Collections</div>
 				<div className="tags">
 					{collections.map((collection, index) => {
 						return (
@@ -60,6 +61,7 @@ export default function CollectionPicker({ collections, onChange }: Props) {
 							</Tag>
 						)
 					})}
+					{collections.length == 0 && <em>No collections defined yet</em>}
 				</div>
 				<Button onClick={() => setPickerOpen(!pickerOpen)}>Add collections</Button>
 			</div>

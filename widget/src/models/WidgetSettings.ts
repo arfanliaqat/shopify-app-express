@@ -10,7 +10,7 @@ export type TimeSlotsByDay = { [D in ConfigDay]: TimeSlot[] }
 export type Page = "PRODUCT" | "CART"
 export type PlacementMethod = "AUTOMATIC" | "MANUAL"
 export type AnchorPosition = "BEFORE" | "FIRST_ELEMENT" | "LAST_ELEMENT" | "AFTER"
-export type FilterType = "ALL" | "COLLECTIONS"
+export type FilterType = "ALL" | "COLLECTIONS" | "PRODUCT_TAGS"
 
 export interface Collection {
 	id: number
@@ -41,6 +41,7 @@ export interface WidgetSettings {
 	anchorPosition?: AnchorPosition
 	filterType?: FilterType
 	filterCollections?: Collection[]
+	filterProductTags?: string[]
 	showDayOfWeekTag?: boolean
 }
 

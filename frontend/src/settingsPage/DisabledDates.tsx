@@ -38,7 +38,7 @@ export default function DisabledDates({ dates, onChange }: Props) {
 	const togglePopoverActive = () => setAddDateOpen((active) => !active)
 
 	return (
-		<div className="disabledDates">
+		<div className="tagsField">
 			<div className="fieldLabel">Disabled dates</div>
 			<div className="tags">
 				{momentDates.map((md, index) => {
@@ -49,7 +49,7 @@ export default function DisabledDates({ dates, onChange }: Props) {
 						</Tag>
 					)
 				})}
-				{momentDates.length == 0 && <em>No disabled dates defined</em>}
+				{momentDates.length == 0 && <em>No disabled dates defined yet</em>}
 			</div>
 			<Popover
 				activator={
@@ -61,7 +61,7 @@ export default function DisabledDates({ dates, onChange }: Props) {
 				onClose={() => setAddDateOpen(false)}
 				preferredAlignment="left"
 			>
-				<div className="datePickerHolder">
+				<div className="productTagHolder">
 					<DatePicker
 						month={month}
 						year={year}

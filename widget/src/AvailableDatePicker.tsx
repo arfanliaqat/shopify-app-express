@@ -80,7 +80,8 @@ function initialFetchingCartData(settings?: WidgetSettings) {
 	}
 	const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
 	if (settings.singleDatePerOrder && showOnPage == "PRODUCT") return true
-	else return settings.filterType == "COLLECTIONS" && showOnPage == "CART"
+	else if (settings.filterType == "COLLECTIONS" && showOnPage == "CART") return true
+	else return settings.filterType == "PRODUCT_TAGS" && showOnPage == "CART"
 }
 
 export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSettings }: Props) {
@@ -124,7 +125,7 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 			if (!isCartPage && showOnPage == "PRODUCT" && settings.singleDatePerOrder) {
 				fetchCartData().then((cart) => {
 					const dateTagLabel = settings.messages.dateTagLabel || DEFAULT_DATE_TAG_LABEL
-					const item = cart.items.find(item => item.properties && !!item.properties[dateTagLabel])
+					const item = (cart.items || []).find(item => item.properties && !!item.properties[dateTagLabel])
 					if (item) {
 						const strTagDate = item.properties[dateTagLabel]
 						const tagDate = moment(strTagDate, TAG_DATE_FORMAT, settings.locale)
@@ -133,8 +134,7 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 					}
 					setFetchingCartData(false)
 				})
-			}
-			if (isCartPage && showOnPage == "CART" && settings.filterType == "COLLECTIONS") {
+			} else if (isCartPage && showOnPage == "CART" && settings.filterType != "ALL") {
 				fetchCartData().then((cart) => {
 					setProductVariantIds(_.uniq((cart.items || []).map(item => item.id) as number[]))
 					setFetchingCartData(false)
