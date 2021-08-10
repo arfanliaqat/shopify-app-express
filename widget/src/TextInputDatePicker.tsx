@@ -14,6 +14,7 @@ import { parseMoment } from "./util/dates"
 import { CalendarIcon } from "./Icons"
 import classNames from "classnames"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
+import DatePickerInfoText from "./DatePickerInfoText"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -74,7 +75,7 @@ export default function TextInputDatePicker({ onSelect, availableDates, settings
 	return (
 		<Fragment>
 			{formError && <div className="buunto-error-message">{formError}</div>}
-			<div className="buunto-text-input-date-picker">
+			<div className="buunto-text-input-date-picker buunto-field">
 				<div className="buunto-text-input-holder">
 					<div className="buunto-calendar-icon"><CalendarIcon/></div>
 					<input
@@ -93,15 +94,16 @@ export default function TextInputDatePicker({ onSelect, availableDates, settings
 					/>
 					{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
 					{open && <div className="buunto-popover">
-                      <Calendar
-                          availableDates={availableDates}
-                          selectedDate={selectedDate}
-                          onSelect={handleSelectedDate}
-                          settings={settings}
-                      />
-                    </div>}
+					  <Calendar
+						  availableDates={availableDates}
+						  selectedDate={selectedDate}
+						  onSelect={handleSelectedDate}
+						  settings={settings}
+					  />
+					</div>}
 				</div>
 				{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
+				<DatePickerInfoText settings={settings} />
 			</div>
 		</Fragment>
 	)

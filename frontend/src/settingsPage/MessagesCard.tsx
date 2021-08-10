@@ -37,6 +37,13 @@ export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }:
 						value={widgetSettings.messages.datePickerLabel}
 					/>
 					<TextField
+						label="Date picker info text"
+						helpText="Will appear underneath the date picker field"
+						maxLength={300}
+						onChange={handleWidgetMessageChange("datePickerInfoText")}
+						value={widgetSettings.messages.datePickerInfoText}
+					/>
+					<TextField
 						label="No date selected error"
 						maxLength={300}
 						onChange={handleWidgetMessageChange("noDateSelectedError")}

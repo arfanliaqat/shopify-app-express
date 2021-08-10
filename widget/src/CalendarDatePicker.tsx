@@ -13,6 +13,7 @@ import { parseMoment } from "./util/dates"
 import { FormAttributeName } from "./AvailableDatePicker"
 import Calendar from "./Calendar"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
+import DatePickerInfoText from "./DatePickerInfoText"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -52,15 +53,18 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect,
 
 	return <Fragment>
 		{formError && <div className="buunto-error-message">{formError}</div>}
-		{formattedSelectedDate && <input type="hidden" name={`${formAttributeName}[${dateTagLabel}]`} value={formattedSelectedDate}/>}
-		{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
-		<Calendar
-			availableDates={availableDates}
-			selectedDate={selectedDate}
-			onSelect={handleSelectedDate}
-			settings={settings}
-			hasFormError={!!formError}
-		/>
-		{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
+		<div className="buunto-field">
+			{formattedSelectedDate && <input type="hidden" name={`${formAttributeName}[${dateTagLabel}]`} value={formattedSelectedDate}/>}
+			{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+			<Calendar
+				availableDates={availableDates}
+				selectedDate={selectedDate}
+				onSelect={handleSelectedDate}
+				settings={settings}
+				hasFormError={!!formError}
+			/>
+			{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
+			<DatePickerInfoText settings={settings} />
+		</div>
 	</Fragment>
 }

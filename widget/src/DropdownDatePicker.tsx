@@ -16,6 +16,7 @@ import { useMemo } from "preact/hooks"
 import classNames from "classnames"
 import { FormAttributeName } from "./AvailableDatePicker"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
+import DatePickerInfoText from "./DatePickerInfoText"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -50,22 +51,25 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 	return (
 		<Fragment>
 			{formError && <div className="buunto-error-message">{formError}</div>}
-			<select className={classNames("buunto-date-picker-dropdown", "buunto-dropdown", { "buunto-error": !!formError })}
-					name={`${formAttributeName}[${dateTagLabel}]`}
-					onChange={handleSelect}>
-				{settings.dateDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
-				{availableDates.map((availableDate) => {
-					const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
-					const valueDate = momentDate.format(TAG_DATE_FORMAT)
-					return <option value={valueDate} disabled={availableDate.isSoldOut}
-								   selected={valueDate == selectedAvailableDate}>
-						{momentDate.format("dddd, LL")}
-						{availableDate.isSoldOut && settings.messages.soldOut ? ` (${settings.messages.soldOut})` : ""}
-					</option>
-				})}
-			</select>
-			{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
-			{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
+			<div className="buunto-field">
+				<select className={classNames("buunto-date-picker-dropdown", "buunto-dropdown", { "buunto-error": !!formError })}
+						name={`${formAttributeName}[${dateTagLabel}]`}
+						onChange={handleSelect}>
+					{settings.dateDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
+					{availableDates.map((availableDate) => {
+						const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
+						const valueDate = momentDate.format(TAG_DATE_FORMAT)
+						return <option value={valueDate} disabled={availableDate.isSoldOut}
+									   selected={valueDate == selectedAvailableDate}>
+							{momentDate.format("dddd, LL")}
+							{availableDate.isSoldOut && settings.messages.soldOut ? ` (${settings.messages.soldOut})` : ""}
+						</option>
+					})}
+				</select>
+				{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+				{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
+				<DatePickerInfoText settings={settings} />
+			</div>
 		</Fragment>
 	)
 }

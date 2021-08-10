@@ -81,5 +81,6 @@ export interface WidgetMessages {
 	dateTagLabel?: string
 	noTimeSlotSelectedError?: string
 	timeSlotDropdownDefaultOptionLabel?: string
+	datePickerInfoText?: string
 }
 

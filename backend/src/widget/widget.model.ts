@@ -71,7 +71,7 @@ export class WidgetSettings {
 				dayOfWeekTagLabel: DEFAULT_DAY_OF_WEEK_TAG_LABEL,
 				singleDatePerOrderMessage: DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 				timeSlotLabel: DEFAULT_TIME_SLOT_LABEL,
-				timeSlotTagLabel: DEFAULT_TIME_SLOT_TAG_LABEL,
+				datePickerInfoText: DEFAULT_TIME_SLOT_TAG_LABEL,
 				noTimeSlotSelectedError: DEFAULT_NO_TIME_SLOT_SELECTED_ERROR,
 				timeSlotDropdownDefaultOptionLabel: DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL
 			}
