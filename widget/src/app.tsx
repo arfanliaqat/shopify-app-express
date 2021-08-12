@@ -127,6 +127,9 @@ function initWidget() {
 					anchorElement = document.createElement("div")
 					anchorElement.id = anchorId
 					refElement.insertAdjacentElement(toInsertPosition(anchorPosition), anchorElement)
+					if (!isCartPage && !anchorElement.closest("form[action*='/cart/add']")) {
+						isCartDrawer = true
+					}
 				}
 			} else {
 				if (showOnPage == "CART") {
