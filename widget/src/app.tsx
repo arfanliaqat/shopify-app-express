@@ -219,12 +219,5 @@ if (isAdmin) {
 } else if (orderInfo) {
 	initOrderConfirmationPage()
 } else {
-	const jQuery: any | undefined = (window as any).jQuery
-	if (jQuery) {
-		jQuery(() => {
-			initWidget()
-		})
-	} else {
-		initWidget()
-	}
+	initWidget()
 }
