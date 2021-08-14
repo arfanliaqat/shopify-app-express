@@ -77,6 +77,11 @@ describe("generateAvailableDates", () => {
 		const saturday = moment("2021-08-14 10:00:00")
 		expect(saturday.format("dddd")).toBe("Saturday")
 		expect(generateAvailableDates(mockSettingsCopy, saturday)[0].date).toBe("2021-08-17") // First avail. date: Tuesday
+
+		mockSettingsCopy.firstAvailableDateInDays = 1
+		mockSettingsCopy.cutOffTime = "07:00"
+		expect(generateAvailableDates(mockSettingsCopy, moment("2021-08-08 06:00:00"))[0].date).toBe("2021-08-10")
+		expect(generateAvailableDates(mockSettingsCopy, moment("2021-08-08 08:00:00"))[0].date).toBe("2021-08-13")
 	})
 
 	test("Cutoff time logic", async () => {
