@@ -22,6 +22,7 @@ export interface WidgetSettings {
 	locale: string
 	firstAvailableDateInDays: number
 	cutOffTime: string
+	skipUnavailableDates?: boolean
 	lastAvailableDateInWeeks: number
 	availableWeekDays: WeekDay[]
 	disabledDates: string[]

@@ -5,12 +5,12 @@ import moment, { Moment } from "moment"
 import { getDaysBetween } from "../../../frontend/src/util/tools"
 import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../../../backend/src/util/constants"
 
-export function getCutoffTime(availableWeekDays: WeekDay[], cutoffTime: string, refDate: Moment): Moment {
+export function getCutoffTime(availableWeekDays: WeekDay[], cutoffTime: string, refDate: Moment, skipUnavailableDates: boolean): Moment {
 	const refWeekDay = refDate.format("dddd").toUpperCase() as WeekDay
-	if (availableWeekDays.length == 0 || availableWeekDays.includes(refWeekDay)) {
+	if (!skipUnavailableDates || availableWeekDays.length == 0 || availableWeekDays.includes(refWeekDay)) {
 		return moment(refDate.format(SYSTEM_DATE_FORMAT) + " " + cutoffTime + ":00", SYSTEM_DATETIME_FORMAT)
 	} else {
-		return getCutoffTime(availableWeekDays, cutoffTime, refDate.clone().subtract(1, "day"))
+		return getCutoffTime(availableWeekDays, cutoffTime, refDate.clone().subtract(1, "day"), skipUnavailableDates)
 	}
 }
 
@@ -18,7 +18,7 @@ export function generateAvailableDates(settings?: WidgetSettings, refDate?: Mome
 	if (!settings) return []
 	const now = getMoment(settings, refDate)
 	const today = now.clone().startOf("day")
-	const cutOffTime = getCutoffTime(settings.availableWeekDays, settings.cutOffTime, today)
+	const cutOffTime = getCutoffTime(settings.availableWeekDays, settings.cutOffTime, today, settings.skipUnavailableDates ?? false)
 	const needsExtraDay = now.isAfter(cutOffTime, "minute")
 	const firstDay = today.clone().add(settings.firstAvailableDateInDays, "days")
 	const lastDay = today.clone().add(settings.lastAvailableDateInWeeks, "weeks").endOf("weeks")

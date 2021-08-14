@@ -9,6 +9,7 @@ const mockSettings: WidgetSettings = {
 	locale: "en",
 	firstAvailableDateInDays: 1,
 	cutOffTime: "15:00",
+	skipUnavailableDates: true,
 	lastAvailableDateInWeeks: 12,
 	availableWeekDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
 	disabledDates: [],
@@ -44,13 +45,13 @@ const mockSettings: WidgetSettings = {
 
 describe("generateAvailableDates", () => {
 	test("Get cutoff time", () => {
-		expect(getCutoffTime([], "15:00", moment("2021-07-26 10:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-26 15:00:00")
-		expect(getCutoffTime(["MONDAY"], "15:00", moment("2021-07-26 10:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-26 15:00:00")
-		expect(getCutoffTime(["MONDAY"], "15:00", moment("2021-07-26 16:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-26 15:00:00")
-		expect(getCutoffTime(["SUNDAY"], "15:00", moment("2021-07-26 10:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-25 15:00:00")
-		expect(getCutoffTime(["SUNDAY"], "15:00", moment("2021-07-26 16:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-25 15:00:00")
-		expect(getCutoffTime(["SATURDAY"], "15:00", moment("2021-07-26 10:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-24 15:00:00")
-		expect(getCutoffTime(["TUESDAY"], "15:00", moment("2021-07-26 10:00:00")).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-20 15:00:00")
+		expect(getCutoffTime([], "15:00", moment("2021-07-26 10:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-26 15:00:00")
+		expect(getCutoffTime(["MONDAY"], "15:00", moment("2021-07-26 10:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-26 15:00:00")
+		expect(getCutoffTime(["MONDAY"], "15:00", moment("2021-07-26 16:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-26 15:00:00")
+		expect(getCutoffTime(["SUNDAY"], "15:00", moment("2021-07-26 10:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-25 15:00:00")
+		expect(getCutoffTime(["SUNDAY"], "15:00", moment("2021-07-26 16:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-25 15:00:00")
+		expect(getCutoffTime(["SATURDAY"], "15:00", moment("2021-07-26 10:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-24 15:00:00")
+		expect(getCutoffTime(["TUESDAY"], "15:00", moment("2021-07-26 10:00:00"), true).format(SYSTEM_DATETIME_FORMAT)).toBe("2021-07-20 15:00:00")
 	})
 
 	test("Cutoff time logic with firstAvailableDateInDays set to 2", async () => {
@@ -61,17 +62,21 @@ describe("generateAvailableDates", () => {
 		expect(generateAvailableDates(mockSettingsCopy, moment("2021-08-09 15:10:00"))[0].date).toBe("2021-08-12") // First avail. date: Thursday
 	})
 
-	test("First available date logic", async () => {
+	test("First available date logic with skipUnavailableDates false", async () => {
 		const mockSettingsCopy = Object.assign({}, mockSettings)
 		mockSettingsCopy.cutOffTime = "15:00"
 		mockSettingsCopy.firstAvailableDateInDays = 2
 		mockSettingsCopy.availableWeekDays = ["TUESDAY", "FRIDAY"]
+		mockSettingsCopy.skipUnavailableDates = false;
 		const tuesday = moment("2021-08-10 10:00:00")
 		expect(tuesday.format("dddd")).toBe("Tuesday")
 		expect(generateAvailableDates(mockSettingsCopy, tuesday)[0].date).toBe("2021-08-13") // First avail. date: Friday
 		const wednesday = moment("2021-08-11 10:00:00")
 		expect(wednesday.format("dddd")).toBe("Wednesday")
-		expect(generateAvailableDates(mockSettingsCopy, wednesday)[0].date).toBe("2021-08-17") // First avail. date: Tuesday
+		expect(generateAvailableDates(mockSettingsCopy, wednesday)[0].date).toBe("2021-08-13") // First avail. date: Tuesday
+		const saturday = moment("2021-08-14 10:00:00")
+		expect(saturday.format("dddd")).toBe("Saturday")
+		expect(generateAvailableDates(mockSettingsCopy, saturday)[0].date).toBe("2021-08-17") // First avail. date: Tuesday
 	})
 
 	test("Cutoff time logic", async () => {
@@ -84,4 +89,5 @@ describe("generateAvailableDates", () => {
 		expect(generateAvailableDates(mockSettings, moment("2021-08-01 14:00:00"))[0].date).toBe("2021-08-03") // Saturday before 15:00 => Tuesday
 		expect(generateAvailableDates(mockSettings, moment("2021-08-01 16:00:00"))[0].date).toBe("2021-08-03") // Saturday after 15:00 => Tuesday
 	})
+
 })
