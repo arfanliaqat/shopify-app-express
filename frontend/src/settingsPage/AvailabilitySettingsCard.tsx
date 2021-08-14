@@ -1,5 +1,5 @@
 import React from "react"
-import { Card, FormLayout, TextField, ChoiceList, Select } from "@shopify/polaris"
+import { Card, FormLayout, TextField, ChoiceList, Select, Checkbox } from "@shopify/polaris"
 import { WeekDay, WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { allWeekDays } from "../../../backend/src/util/constants"
 import { capitalize } from "../util/tools"
@@ -52,8 +52,26 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 		onWidgetSettingsChange({ ...widgetSettings, cutOffTime: value })
 	}
 
+	const handleSkipUnavailableDatesChange = (skipUnavailableDates: boolean) => {
+		onWidgetSettingsChange({ ...widgetSettings, skipUnavailableDates })
+	}
+
 	return (
 		<Card title="Availability settings">
+			<Card.Section>
+				<div className="availableDaysField">
+					<ChoiceList
+						allowMultiple
+						title="Available days"
+						choices={allWeekDays.map((day) => ({
+							label: capitalize(day),
+							value: day
+						}))}
+						selected={widgetSettings.availableWeekDays}
+						onChange={handleAvailableWeekDaysChange}
+					/>
+				</div>
+			</Card.Section>
 			<Card.Section>
 				<FormLayout>
 					<FormLayout.Group>
@@ -69,15 +87,6 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 								widgetSettings.firstAvailableDateInDays
 							)}.`}
 						/>
-						<Select
-							label="Cut off time"
-							onChange={handleCutOffTimeChange}
-							options={getCutOffTimeOptions()}
-							helpText="Time after witch the first available date becomes unavailable."
-							value={widgetSettings.cutOffTime}
-						/>
-					</FormLayout.Group>
-					<FormLayout.Group>
 						<TextField
 							type="number"
 							label="Last available date"
@@ -88,21 +97,22 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 							max={20}
 						/>
 					</FormLayout.Group>
+					<FormLayout.Group>
+						<Select
+							label="Cut off time"
+							onChange={handleCutOffTimeChange}
+							options={getCutOffTimeOptions()}
+							helpText="Time after witch the first available date becomes unavailable."
+							value={widgetSettings.cutOffTime}
+						/>
+						<Checkbox
+							label="Carry the cut off time rule over unavailable dates"
+							onChange={handleSkipUnavailableDatesChange}
+							checked={widgetSettings.skipUnavailableDates}
+							helpText="Please refer to the documentation for more information"
+						/>
+					</FormLayout.Group>
 				</FormLayout>
-			</Card.Section>
-			<Card.Section>
-				<div className="availableDaysField">
-					<ChoiceList
-						allowMultiple
-						title="Available days"
-						choices={allWeekDays.map((day) => ({
-							label: capitalize(day),
-							value: day
-						}))}
-						selected={widgetSettings.availableWeekDays}
-						onChange={handleAvailableWeekDaysChange}
-					/>
-				</div>
 			</Card.Section>
 			<Card.Section>
 				<DisabledDates dates={widgetSettings.disabledDates || []} onChange={handleDisabledDatesChange} />
