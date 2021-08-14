@@ -1,3 +1,29 @@
+.cardWithHelpHeader {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: stretch;
+  padding-left: 2rem;
+  padding-top: 2rem;
+  padding-right: 2rem;
+  .cardTitle {
+    flex: 1;
+  }
+  .helpLink {
+    flex: 1;
+    text-align: right;
+  }
+}
+@media (max-width: 960px) {
+  .cardWithHelpHeader {
+    flex-direction: column;
+    .helpLink {
+      text-align: left;
+      padding-top: 10px;
+    }
+  }
+}
+
 #settingsPage {
   padding-bottom: 8rem;
 

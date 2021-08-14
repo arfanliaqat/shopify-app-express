@@ -1,5 +1,5 @@
 import React from "react"
-import { Card, FormLayout, TextField, ChoiceList, Select, Checkbox } from "@shopify/polaris"
+import { Card, FormLayout, TextField, ChoiceList, Select, Checkbox, Link, Heading } from "@shopify/polaris"
 import { WeekDay, WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { allWeekDays } from "../../../backend/src/util/constants"
 import { capitalize } from "../util/tools"
@@ -57,7 +57,20 @@ export default function AvailabilitySettingsCard({ widgetSettings, onWidgetSetti
 	}
 
 	return (
-		<Card title="Availability settings">
+		<Card>
+			<div className="cardWithHelpHeader">
+				<h2 className="cardTitle">
+					<Heading element="h2">Availability settings</Heading>
+				</h2>
+				<div className="helpLink">
+					<Link
+						external
+						url="https://buunto.helpscoutdocs.com/article/7-how-to-configure-the-dates-available-in-the-calendar"
+					>
+						How to configure the dates available in the calendar
+					</Link>
+				</div>
+			</div>
 			<Card.Section>
 				<div className="availableDaysField">
 					<ChoiceList
