@@ -3,11 +3,16 @@ import axios from "axios"
 import { appUrl } from "../constants"
 
 function getCurrentDomain() {
-	let url = window.location.href
-	const start = url.indexOf("://") + 3
-	url = url.substring(start)
-	const end = url.indexOf("/")
-	return url.substring(0, end)
+	const shopDomain: string | undefined = ((window as any).Shopify?.shop) as string
+	if (shopDomain) {
+		return shopDomain
+	} else {
+		let url = window.location.href
+		const start = url.indexOf("://") + 3
+		url = url.substring(start)
+		const end = url.indexOf("/")
+		return url.substring(0, end)
+	}
 }
 
 function toQueryString(parameters: { [key: string]: string }): string {
