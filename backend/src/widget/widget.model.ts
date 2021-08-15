@@ -42,6 +42,9 @@ export class WidgetSettings {
 			styles: {
 				errorFontColor: "#8b0000",
 				errorBorderColor: defaultWidgetStyles.errorBorderColor,
+				fieldLabelColor: defaultWidgetStyles.fieldLabelColor,
+				fieldHelpTextColor: defaultWidgetStyles.fieldHelpTextColor,
+				fieldLabelFontWeight: defaultWidgetStyles.fieldLabelFontWeight,
 				calendarBoxShadow: "0 0 5px rgba(0,0,0,0.15)",
 				calendarBorderRadius: "10px",
 				calendarBackgroundColor: "#ffffff",

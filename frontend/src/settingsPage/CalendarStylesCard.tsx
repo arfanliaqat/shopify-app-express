@@ -65,6 +65,7 @@ export default function CalendarStylesCard({ widgetSettings, onWidgetSettingsCha
 
 						<ColorPickerField
 							label="Calendar background color"
+							fieldId="calendarBackgroundColor"
 							onChange={handleWidgetStyleChange("calendarBackgroundColor")}
 							value={widgetSettings.styles.calendarBackgroundColor}
 						/>
@@ -82,12 +83,14 @@ export default function CalendarStylesCard({ widgetSettings, onWidgetSettingsCha
 					<FormLayout.Group>
 						<ColorPickerField
 							label="Header font color"
+							fieldId="headerFontColor"
 							onChange={handleWidgetStyleChange("headerFontColor")}
 							value={widgetSettings.styles.headerFontColor}
 						/>
 
 						<ColorPickerField
 							label="Days (header) font color"
+							fieldId="headerDaysFontColor"
 							onChange={handleWidgetStyleChange("headerDaysFontColor")}
 							value={widgetSettings.styles.headerDaysFontColor}
 						/>
@@ -105,11 +108,13 @@ export default function CalendarStylesCard({ widgetSettings, onWidgetSettingsCha
 					<FormLayout.Group>
 						<ColorPickerField
 							label="Unavailable day font color"
+							fieldId="dayUnavailableFontColor"
 							onChange={handleWidgetStyleChange("dayUnavailableFontColor")}
 							value={widgetSettings.styles.dayUnavailableFontColor}
 						/>
 						<ColorPickerField
 							label="Available day font color"
+							fieldId="dayAvailableFontColor"
 							onChange={handleWidgetStyleChange("dayAvailableFontColor")}
 							value={widgetSettings.styles.dayAvailableFontColor}
 						/>
@@ -118,11 +123,13 @@ export default function CalendarStylesCard({ widgetSettings, onWidgetSettingsCha
 					<FormLayout.Group>
 						<ColorPickerField
 							label="Day selected background color"
+							fieldId="daySelectedBackgroundColor"
 							onChange={handleWidgetStyleChange("daySelectedBackgroundColor")}
 							value={widgetSettings.styles.daySelectedBackgroundColor}
 						/>
 						<ColorPickerField
 							label="Day selected font color"
+							fieldId="daySelectedFontColor"
 							onChange={handleWidgetStyleChange("daySelectedFontColor")}
 							value={widgetSettings.styles.daySelectedFontColor}
 						/>
@@ -131,6 +138,7 @@ export default function CalendarStylesCard({ widgetSettings, onWidgetSettingsCha
 					<FormLayout.Group>
 						<ColorPickerField
 							label="Next/prev. arrows color"
+							fieldId="arrowIconColor"
 							onChange={handleWidgetStyleChange("arrowIconColor")}
 							value={widgetSettings.styles.arrowIconColor}
 						/>

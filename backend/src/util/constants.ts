@@ -39,7 +39,10 @@ export const DEFAULT_FILTER_TYPE: FilterType = "ALL"
 export const DEFAULT_SHOW_DAY_OF_WEEK_TAG = true
 
 export const defaultWidgetStyles: Partial<WidgetStyles> = {
-	errorBorderColor: "#bc6363"
+	errorBorderColor: "#bc6363",
+	fieldLabelColor: "", // Don't override theme's color
+	fieldHelpTextColor: "", // Don't override theme's color
+	fieldLabelFontWeight: "bold"
 }
 
 export type AppName = "DATE_PICKER" | "STOCK_BY_DATE"

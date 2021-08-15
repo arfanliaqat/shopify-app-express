@@ -27,6 +27,7 @@ export default function PreviewCard({ widgetSettings, onWidgetSettingsChange }: 
 				<Card.Section>
 					<ColorPickerField
 						label="Preview background color"
+						fieldId="previewBackgroundColor"
 						onChange={handleWidgetStyleChange("previewBackgroundColor")}
 						value={widgetSettings.styles.previewBackgroundColor}
 					/>

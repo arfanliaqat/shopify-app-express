@@ -13,6 +13,12 @@ interface Props {
 	onWidgetSettingsChange: (settings: WidgetSettings) => void
 }
 
+const FIELD_LABEL_BOLD = "bold"
+
+function getFieldLabelIsBold(widgetSettings: WidgetSettings): boolean {
+	return (widgetSettings.styles.fieldLabelFontWeight ?? defaultWidgetStyles.fieldLabelFontWeight) == FIELD_LABEL_BOLD
+}
+
 export default function DatePickerSettingsCard({ widgetSettings, onWidgetSettingsChange }: Props) {
 	const handleDatePickerTypeChange = (pickerType: PickerType) => {
 		onWidgetSettingsChange({ ...widgetSettings, pickerType })
@@ -43,6 +49,11 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 		onWidgetSettingsChange({ ...widgetSettings, showDayOfWeekTag })
 	}
 
+	const handleFieldLabelIsBoldChange = (checked: boolean) => {
+		const styles = { ...widgetSettings.styles, fieldLabelFontWeight: checked ? FIELD_LABEL_BOLD : "" }
+		onWidgetSettingsChange({ ...widgetSettings, styles })
+	}
+
 	return (
 		<Card title="Date picker settings" sectioned>
 			<FormLayout>
@@ -67,16 +78,40 @@ export default function DatePickerSettingsCard({ widgetSettings, onWidgetSetting
 				</FormLayout.Group>
 
 				<ColorPickerField
-					label="Error font color"
-					onChange={handleWidgetStyleChange("errorFontColor")}
-					value={widgetSettings.styles.errorFontColor}
+					label="Field label color"
+					fieldId="fieldLabelColor"
+					onChange={handleWidgetStyleChange("fieldLabelColor")}
+					value={widgetSettings.styles.fieldLabelColor ?? defaultWidgetStyles.fieldLabelColor}
+				/>
+				<Checkbox
+					label="Bold field label"
+					checked={getFieldLabelIsBold(widgetSettings)}
+					onChange={handleFieldLabelIsBoldChange}
 				/>
 
-				<ColorPickerField
-					label="Error border color"
-					onChange={handleWidgetStyleChange("errorBorderColor")}
-					value={widgetSettings.styles.errorBorderColor ?? defaultWidgetStyles.errorBorderColor}
-				/>
+				<FormLayout.Group>
+					<ColorPickerField
+						fieldId="errorFontColor"
+						label="Error font color"
+						onChange={handleWidgetStyleChange("errorFontColor")}
+						value={widgetSettings.styles.errorFontColor}
+					/>
+					<ColorPickerField
+						fieldId="errorBorderColor"
+						label="Error border color"
+						onChange={handleWidgetStyleChange("errorBorderColor")}
+						value={widgetSettings.styles.errorBorderColor ?? defaultWidgetStyles.errorBorderColor}
+					/>
+				</FormLayout.Group>
+
+				<FormLayout.Group>
+					<ColorPickerField
+						fieldId="fieldHelpTextColor"
+						label="Field help text color"
+						onChange={handleWidgetStyleChange("fieldHelpTextColor")}
+						value={widgetSettings.styles.fieldHelpTextColor ?? defaultWidgetStyles.fieldHelpTextColor}
+					/>
+				</FormLayout.Group>
 
 				<Checkbox
 					label="A date must be selected to be able to add a product to the cart"

@@ -49,6 +49,9 @@ export interface WidgetSettings {
 export interface WidgetStyles {
 	errorFontColor: string
 	errorBorderColor?: string
+	fieldLabelColor?: string
+	fieldLabelFontWeight?: string
+	fieldHelpTextColor?: string
 	calendarBoxShadow: string
 	calendarBorderRadius: string
 	calendarBackgroundColor: string

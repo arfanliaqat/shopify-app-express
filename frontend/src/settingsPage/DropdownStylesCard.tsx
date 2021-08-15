@@ -31,11 +31,13 @@ export default function DropdownStylesCard({ widgetSettings, onWidgetSettingsCha
 					<FormLayout.Group>
 						<ColorPickerField
 							label="Dropdown border color"
+							fieldId="dropdownBorderColor"
 							onChange={handleWidgetStyleChange("dropdownBorderColor")}
 							value={widgetSettings.styles.dropdownBorderColor}
 						/>
 						<ColorPickerField
 							label="Dropdown background color"
+							fieldId="dropdownBackgroundColor"
 							onChange={handleWidgetStyleChange("dropdownBackgroundColor")}
 							value={widgetSettings.styles.dropdownBackgroundColor}
 						/>
@@ -44,6 +46,7 @@ export default function DropdownStylesCard({ widgetSettings, onWidgetSettingsCha
 					<FormLayout.Group>
 						<ColorPickerField
 							label="Dropdown text color"
+							fieldId="dropdownTextColor"
 							onChange={handleWidgetStyleChange("dropdownTextColor")}
 							value={widgetSettings.styles.dropdownTextColor}
 						/>

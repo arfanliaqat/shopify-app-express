@@ -4,6 +4,9 @@ import { defaultWidgetStyles } from "../../../backend/src/util/constants"
 const queries: WidgetStyles = {
 	errorFontColor: ".buunto-error-message { color: $$ }",
 	errorBorderColor: ".buuntoCal.buunto-error { border: 1px solid $$ } .buunto-dropdown.buunto-error { border: 1px solid $$ } .buunto-text-input.buunto-error { border: 1px solid $$ }",
+	fieldLabelColor: ".buunto-date-picker-label, .buunto-time-slot-picker-label { color: $$ }",
+	fieldLabelFontWeight: ".buunto-date-picker-label, .buunto-time-slot-picker-label { font-weight: $$ }",
+	fieldHelpTextColor: ".buunto-info-message { color: $$ }",
 	calendarBoxShadow: ".buuntoCal { box-shadow: $$ }",
 	calendarBorderRadius: ".buuntoCal { border-radius: $$ }",
 	calendarBackgroundColor: ".buuntoCal { background-color: $$ }",
