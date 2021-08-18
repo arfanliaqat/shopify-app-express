@@ -129,44 +129,10 @@ export default function GuidePage({}: Props) {
 						</TextContainer>
 						<div className="pageSeparator" />
 						<TextContainer>
-							<Heading>Manually placing the date picker</Heading>
-							<p>
-								To manually adjust the position of the date picker a{" "}
-								<TextStyle variation="code">{"<div>"}</TextStyle> can tag can be placed in the source
-								code of your template.
-							</p>
-							<p>
-								To do this Select Online Store &gt; Themes in the side bar. Then select “Edit code” in
-								the “Actions” dropdown.
-							</p>
-							<p>
-								<img
-									src="/public/images/guide_edit_code.png"
-									alt="Edit your theme's code"
-									style={{ maxWidth: "906px", width: "100%" }}
-								/>
-							</p>
-							<p>
-								In "Sections" find "product-template.liquid". Within the{" "}
-								<TextStyle variation="code">{"<form></form>"}</TextStyle> tags, add the following to
-								place the picker.
-							</p>
-							<p>
-								<TextStyle variation="code">{`<div id="${anchorId}"></div>`}</TextStyle>
-							</p>
-							<p>
-								<img
-									src="/public/images/guide_place_div.png"
-									alt="Place the date picker"
-									style={{ maxWidth: "902px", width: "100%" }}
-								/>
-							</p>
-						</TextContainer>
-						<div className="pageSeparator" />
-						<TextContainer>
 							<Heading>Still having some troubles installing Shop By Date?</Heading>
 							<p>
-								Don't hesitate to contact our support team! You can contact us via email at{" "}
+								Don't hesitate to contact our support team using the chat icon at the bottom right of
+								the screen or via email:
 								<Link url="mailto:support@buunto.com">support@buunto.com</Link>.
 							</p>
 						</TextContainer>
