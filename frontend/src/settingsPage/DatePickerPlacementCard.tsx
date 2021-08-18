@@ -1,5 +1,16 @@
 import React from "react"
-import { Card, Checkbox, Banner, RadioButton, Stack, FormLayout, TextField, Select } from "@shopify/polaris"
+import {
+	Card,
+	Checkbox,
+	Banner,
+	RadioButton,
+	Stack,
+	FormLayout,
+	TextField,
+	Select,
+	Heading,
+	Link
+} from "@shopify/polaris"
 import {
 	AnchorPosition,
 	FilterType,
@@ -80,7 +91,20 @@ export default function DatePickerPlacementCard({
 				</Banner>
 			)}
 			<div style={{ height: "30px" }} />
-			<Card title="Date picker placement">
+			<Card>
+				<div className="cardWithHelpHeader">
+					<h2 className="cardTitle">
+						<Heading element="h2">Date picker placement</Heading>
+					</h2>
+					<div className="helpLink">
+						<Link
+							external
+							url="https://buunto.helpscoutdocs.com/article/8-how-to-place-the-date-picker-on-your-shop"
+						>
+							How to place the date picker on your shop
+						</Link>
+					</div>
+				</div>
 				<Card.Section>
 					<Checkbox
 						checked={widgetSettings.isVisible}
