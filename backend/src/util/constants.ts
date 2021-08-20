@@ -64,13 +64,13 @@ export const plans: { [key: string]: PlanOptions } = {
 	BASIC: {
 		title: "Basic",
 		price: safeParseInt(process.env.BASIC_PRICE) || 0,
-		orderLimit: safeParseInt(process.env.BASIC_ORDER_LIMIT) || 25,
+		orderLimit: safeParseInt(process.env.BASIC_ORDER_LIMIT) || 15,
 		supportResponseTime: safeParseInt(process.env.PRO_SUPPORT_RESPONSE_TIME) || 48
 	},
 	PRO: {
 		title: "Pro",
 		price: safeParseInt(process.env.PRO_PRICE) || 5,
-		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 150,
+		orderLimit: safeParseInt(process.env.PRO_ORDER_LIMIT) || 100,
 		supportResponseTime: safeParseInt(process.env.PRO_SUPPORT_RESPONSE_TIME) || 24
 	},
 	UNLIMITED: {
