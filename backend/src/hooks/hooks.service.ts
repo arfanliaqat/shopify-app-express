@@ -29,7 +29,7 @@ export function getChosenDate(widgetSetting: WidgetSettingsViewModel, properties
 }
 
 export function getChosenTimeSlot(widgetSetting: WidgetSettingsViewModel, properties: Property[]): string | undefined {
-	const timeSlotTagLabel = widgetSetting.messages.datePickerInfoText || DEFAULT_TIME_SLOT_TAG_LABEL
+	const timeSlotTagLabel = widgetSetting.messages.timeSlotTagLabel || DEFAULT_TIME_SLOT_TAG_LABEL
 	const timeSlotProperty = properties.find(
 		(property: Property) => property.name?.toLowerCase() == timeSlotTagLabel.toLowerCase()
 	)

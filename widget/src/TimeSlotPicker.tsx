@@ -33,7 +33,7 @@ export default function TimeSlotPicker({ settings, selectedTimeSlot, onSelect, f
 
 	const dropdownDefaultOptionLabel = settings.messages.timeSlotDropdownDefaultOptionLabel || DEFAULT_TIME_SLOT_DROPDOWN_DEFAULT_OPTION_LABEL
 	const timeSlotLabel = settings.messages.timeSlotLabel || DEFAULT_TIME_SLOT_LABEL
-	const timeSlotTagLabel = settings.messages.datePickerInfoText || DEFAULT_TIME_SLOT_TAG_LABEL
+	const timeSlotTagLabel = settings.messages.timeSlotTagLabel || DEFAULT_TIME_SLOT_TAG_LABEL
 
 	let timeSlots = getTimeSlotsByConfigDay(settings.timeSlotsByDay, configDay)
 
