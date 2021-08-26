@@ -14,6 +14,13 @@ import { ProductOrderService } from "../productOrders/productOrders.service"
 import { ShopService } from "../shop/shop.service"
 import { AccessTokenService } from "../accessToken/accessToken.service"
 import _ from "lodash"
+import { readFile } from "fs/promises"
+import path from "path"
+import { DEFAULT_DATE_TAG_LABEL } from "../util/constants"
+import { AssetService } from "../assets/assets.service"
+import { ThemeService } from "../themes/themes.service"
+import { hasScope } from "../accessToken/accessToken.model"
+import { loadAccessToken } from "../accessToken/accessToken.middleware"
 
 const router = Router()
 
@@ -160,7 +167,7 @@ router.get("/product_availability/:productId", async (req: Request, res: Respons
 			widgetSettings = WidgetSettings.getDefault(shopResource.shopId).settings
 		}
 		const availableDates = await AvailabilityPeriodService.findFutureAvailableDates(shopResource.id, widgetSettings)
-		const settings = await WidgetService.findOrCreateWidgetSettings(shopResource.shopId)
+		const settings = await WidgetService.findOrCreateWidgetSettings(shop)
 		res.send({
 			settings,
 			availableDates: availableDates.map(AvailableDate.toViewModel)
@@ -176,7 +183,7 @@ router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Re
 		if (!connectedShop || !connectedShop.id) {
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
-		const settings = await WidgetService.findOrCreateWidgetSettings(connectedShop.id)
+		const settings = await WidgetService.findOrCreateWidgetSettings(connectedShop)
 		const plan = await ShopPlanService.findByShopId(connectedShop.id)
 		const currentOrderCount = await ProductOrderService.countOrdersInCurrentMonth(connectedShop)
 		res.send({ currentOrderCount, plan: ShopPlan.toViewModel(plan), settings })
@@ -185,28 +192,60 @@ router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Re
 	}
 })
 
-router.post("/widget_settings", [loadConnectedShop], async (req: Request, res: Response) => {
+router.post("/widget_settings", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
+		const { connectedShop, accessToken } = getLocals(res)
 		if (!connectedShop || !connectedShop.id) {
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
+		if (!accessToken) {
+			throw new UnexpectedError("`accessToken` should have been provided")
+		}
 		const widgetSettings = req.body as WidgetSettingsViewModel
-		const settings = await WidgetService.updateForShop(connectedShop.id, widgetSettings)
+		const settings = await WidgetService.updateForShop(connectedShop, accessToken, widgetSettings)
 		res.send(settings)
 	} catch (error) {
 		handleErrors(res, error)
 	}
 })
 
-router.post("/widget_settings/reset", [loadConnectedShop], async (req: Request, res: Response) => {
+router.post("/widget_settings/reset", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
 	try {
-		const { connectedShop } = getLocals(res)
+		const { connectedShop, accessToken } = getLocals(res)
 		if (!connectedShop || !connectedShop.id) {
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
-		const settings = await WidgetService.resetSettingsForShop(connectedShop.id)
+		if (!accessToken) {
+			throw new UnexpectedError("`accessToken` should have been provided")
+		}
+		const settings = await WidgetService.resetSettingsForShop(connectedShop, accessToken)
 		res.send(settings)
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
+
+router.get("/date-picker-settings.liquid", async (req: Request, res: Response) => {
+	try {
+		const shopDomain = req.query.shop?.toString()
+		if (!shopDomain) {
+			res.status(404).send({ reason: "'shop' param missing" })
+			return
+		}
+		const shop = await ShopService.findByShopDomainOrPublicDomain(shopDomain)
+		if (!shop?.id) {
+			res.status(404).send({ reason: "No matching shop found" })
+			return
+		}
+		const widgetSettings = await WidgetService.findWidgetSettingsByShopId(shop.id)
+		if (!widgetSettings) {
+			res.status(404).send({ reason: "Widget settings not found" })
+			return
+		}
+
+		const liquidTemplate = await AssetService.getDatePickerSettingsLiquidTemplate(widgetSettings)
+
+		res.contentType("text/plain").send(liquidTemplate)
 	} catch (error) {
 		handleErrors(res, error)
 	}

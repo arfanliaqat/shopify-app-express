@@ -19,7 +19,7 @@ router.get("/auth", (req: Request, res: Response) => {
 
 		// Stupid hack to make it works on Safari
 		res.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
-		res.send(`<script>window.location.href = "${installShopUrl}"</script>`)
+		res.send(`<script>parent.location.href = "${installShopUrl}"</script>`)
 	} catch (error) {
 		handleErrors(res, error)
 	}

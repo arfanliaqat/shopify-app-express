@@ -23,7 +23,8 @@ import { anchorElement } from "./app"
 import { fetchCartData, fetchDatePickerVisibility, fetchWidgetSettings } from "./util/api"
 import { generateAvailableDates } from "./util/generateAvailableDates"
 import TextInputDatePicker from "./TextInputDatePicker"
-import { toTimeSlotDisplay } from "./util/dates"
+import { parseMoment, toTimeSlotDisplay } from "./util/dates"
+import { getThemeConfig } from "./models/ThemeConfig"
 
 export type FormAttributeName = "properties" | "attributes"
 
@@ -74,14 +75,26 @@ export interface Props {
 	widgetSettings?: WidgetSettings
 }
 
-function initialFetchingCartData(settings?: WidgetSettings) {
+function initialFetchingCartData(settings?: WidgetSettings): boolean {
 	if (!settings) {
 		return false
 	}
+	const datePickerConfig = getThemeConfig().datePicker
 	const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
-	if (settings.singleDatePerOrder && showOnPage == "PRODUCT") return true
-	else if (settings.filterType == "COLLECTIONS" && showOnPage == "CART") return true
-	else return settings.filterType == "PRODUCT_TAGS" && showOnPage == "CART"
+	if (settings.singleDatePerOrder && showOnPage == "PRODUCT" && datePickerConfig?.selectedDate === undefined) return true
+	else if (settings.filterType == "COLLECTIONS" && showOnPage == "CART" && datePickerConfig?.cartCollections === undefined) return true
+	else return settings.filterType == "PRODUCT_TAGS" && showOnPage == "CART" && datePickerConfig?.cartTags === undefined
+}
+
+function initialOrderDate(settings?: WidgetSettings): Moment | undefined {
+	if (!settings || !settings.singleDatePerOrder) {
+		return undefined
+	}
+	const datePickerConfig = getThemeConfig().datePicker
+	const strOrderDate = datePickerConfig?.selectedDate
+	if (strOrderDate) {
+		return moment(strOrderDate, TAG_DATE_FORMAT, settings.locale)
+	}
 }
 
 export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSettings }: Props) {
@@ -95,8 +108,8 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 	const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(undefined)
 	const [dateFormError, setDateFormError] = useState<string>(undefined)
 	const [timeSlotFormError, setTimeSlotFormError] = useState<string>(undefined)
-	const [orderDate, setOrderDate] = useState<Moment>(undefined)
-	const [fetchingCartData, setFetchingCartData] = useState<boolean>(initialFetchingCartData(productAvailabilityData?.settings))
+	const [orderDate, setOrderDate] = useState<Moment>(initialOrderDate(widgetSettings))
+	const [fetchingCartData, setFetchingCartData] = useState<boolean>(initialFetchingCartData(widgetSettings))
 	const [productVariantIds, setProductVariantIds] = useState<number[]>(undefined)
 	const [isVisibleOverride, setIsVisibleOverride] = useState<boolean>(undefined)
 	const [fetchingDatePickerVisibility, setFetchingDatePickerVisibility] = useState<boolean>(false)
@@ -225,7 +238,30 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 		if (settings === undefined || !settings.isVisible) return false
 		if (isVisibleOverride === false) return false
 		const showOnPage = settings.showOnPage || DEFAULT_SHOW_ON_PAGE
-		return isCartPage ? showOnPage == "CART" : showOnPage == "PRODUCT"
+		if (isCartPage && showOnPage != "CART") return false
+		if (!isCartPage && showOnPage != "PRODUCT") return false
+
+		const datePickerConfig = getThemeConfig().datePicker
+		if (showOnPage == "CART" && settings.filterType == "PRODUCT_TAGS" && datePickerConfig?.cartTags !== undefined) {
+			const cartTags = datePickerConfig.cartTags.map(t => t.toLowerCase())
+			const filterTags = settings.filterProductTags.map(t => t.toLowerCase())
+			return _.intersection(cartTags, filterTags).length > 0
+		}
+		if (showOnPage == "CART" && settings.filterType == "COLLECTIONS" && datePickerConfig?.cartCollections !== undefined) {
+			const filterCollectionIds = settings.filterCollections.map(collection => collection.id)
+			return _.intersection(datePickerConfig.cartCollections, filterCollectionIds).length > 0
+		}
+		if (showOnPage == "PRODUCT" && settings.filterType == "PRODUCT_TAGS" && datePickerConfig?.productTags !== undefined) {
+			const cartTags = datePickerConfig.productTags.map(t => t.toLowerCase())
+			const filterTags = settings.filterProductTags.map(t => t.toLowerCase())
+			return _.intersection(cartTags, filterTags).length > 0
+		}
+		if (showOnPage == "PRODUCT" && settings.filterType == "COLLECTIONS" && datePickerConfig?.productCollections !== undefined) {
+			const filterCollectionIds = settings.filterCollections.map(collection => collection.id)
+			return _.intersection(datePickerConfig.productCollections, filterCollectionIds).length > 0
+		}
+
+		return true
 	}, [isPreviewMode, settings, isDisabled, isCartPage, isVisibleOverride])
 
 	const hasDateError = useCallback(() => {

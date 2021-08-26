@@ -1,0 +1,59 @@
+{% comment %}
+
+DO NOT MODIFY THIS TEMPLATE. This file is managed automatically by Buunto Date Picker. Any modification will be erased eventually.
+
+{% endcomment %}
+
+<script type="text/javascript">
+
+window.Buunto = window.Buunto || {};
+
+window.Buunto.datePicker = window.Buunto.datePicker || {};
+
+window.Buunto.datePicker.settings = $$widgetSettings$$;
+
+{%- if product -%}
+
+    window.Buunto.datePicker.productCollections = {{ product.collections | map: "id" | json }};
+
+    window.Buunto.datePicker.productTags = {{ product.tags | json }};
+
+{%- endif -%}
+
+{%- if cart -%}
+
+    {% assign cart_product_tags = '' | split: '' %}
+    {% assign cart_product_collections = '' | split: '' %}
+    {% for item in cart.items %}
+
+        {% for tag in item.product.tags %}
+            {% assign cart_product_tags = tag | concat: cart_product_tags %}
+        {% endfor %}
+
+        {% assign collection_ids = item.product.collections | map: 'id' %}
+        {% for id in collection_ids %}
+            {% assign cart_product_collections = id | concat: cart_product_collections %}
+        {% endfor %}
+
+    {% endfor %}
+
+    window.Buunto.datePicker.cartTags = {{ cart_product_tags | uniq | json }};
+
+    window.Buunto.datePicker.cartCollections = {{ cart_product_collections | uniq | json }};
+
+    {% assign selected_date = "" %}
+    {% assign date_tag_label = "$$dateTagLabel$$" %}
+
+    {% for item in cart.items %}
+
+        {%- if item.properties[date_tag_label] and selected_date == "" -%}
+            {% assign selected_date = item.properties[date_tag_label] %}
+        {%- endif %}
+
+    {% endfor %}
+
+    window.Buunto.datePicker.selectedDate = {{ selected_date | json }};
+
+{%- endif -%}
+
+</script>

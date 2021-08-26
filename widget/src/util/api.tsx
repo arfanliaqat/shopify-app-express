@@ -1,6 +1,7 @@
 import { WidgetSettings } from "../models/WidgetSettings"
 import axios from "axios"
 import { appUrl } from "../constants"
+import { getThemeConfig } from "../models/ThemeConfig"
 
 function getCurrentDomain() {
 	const shopDomain: string | undefined = ((window as any).Shopify?.shop) as string
@@ -20,6 +21,10 @@ function toQueryString(parameters: { [key: string]: string }): string {
 }
 
 export async function fetchWidgetSettings(productVariantId?: number): Promise<WidgetSettings> {
+	const widgetSettings = getThemeConfig()?.datePicker?.settings
+	if (widgetSettings) {
+		return widgetSettings
+	}
 	const parameters = {} as { [key: string]: string }
 	parameters["shop"] = getCurrentDomain()
 	if (productVariantId) parameters["productVariantId"] = productVariantId + ""

@@ -90,13 +90,6 @@ export default function SettingsPage({}: Props) {
 		setSuccessMessage("Settings successfully reset!")
 	}
 
-	const isDirty = useMemo(() => {
-		if (widgetSettings && widgetSettings) {
-			return !_.isEqual(initialWidgetSettings, widgetSettings)
-		}
-		return false
-	}, [initialWidgetSettings, widgetSettings])
-
 	if (!widgetSettings || isLoading || !shopPlan) {
 		return <SettingsPageSkeleton />
 	}
@@ -185,8 +178,7 @@ export default function SettingsPage({}: Props) {
 					primaryAction={{
 						content: "Save",
 						onAction: handleSaveSettingsClick,
-						loading: isSaving,
-						disabled: !isDirty
+						loading: isSaving
 					}}
 					secondaryActions={[
 						{

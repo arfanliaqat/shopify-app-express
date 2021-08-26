@@ -4,6 +4,9 @@ import { getConnection } from "../util/database"
 import { WidgetSettings as WidgetSettingsViewModel } from "../../../widget/src/models/WidgetSettings"
 import { WidgetSettings } from "./widget.model"
 import { UnexpectedError } from "../util/error"
+import { AssetService } from "../assets/assets.service"
+import { AccessToken } from "../accessToken/accessToken.model"
+import { AccessTokenService } from "../accessToken/accessToken.service"
 
 export class WidgetService {
 	static async findWidgetSettingsByShopId(shopId: string): Promise<WidgetSettingsViewModel | undefined> {
@@ -15,10 +18,12 @@ export class WidgetService {
 		return result.rows[0]?.settings
 	}
 
-	static async findOrCreateWidgetSettings(shopId: string): Promise<WidgetSettingsViewModel> {
-		const settings = await this.findWidgetSettingsByShopId(shopId)
+	static async findOrCreateWidgetSettings(shop: Shop): Promise<WidgetSettingsViewModel> {
+		if (!shop.id) throw new UnexpectedError("Shop id cannot be null")
+		const settings = await this.findWidgetSettingsByShopId(shop.id)
 		if (settings) return settings
-		return this.resetSettingsForShop(shopId)
+		const token = await AccessTokenService.findAccessTokenByShopId(shop.id)
+		return this.resetSettingsForShop(shop, token)
 	}
 
 	static async upsert(newSettings: WidgetSettings): Promise<void> {
@@ -32,14 +37,22 @@ export class WidgetService {
 		)
 	}
 
-	static async updateForShop(shopId: string, widgetSettings: WidgetSettingsViewModel): Promise<void> {
-		const settings = new WidgetSettings(shopId, widgetSettings)
+	static async updateForShop(
+		shop: Shop,
+		accessToken: AccessToken,
+		widgetSettings: WidgetSettingsViewModel
+	): Promise<void> {
+		if (!shop.id) throw new UnexpectedError("Shop id cannot be null")
+		const settings = new WidgetSettings(shop.id, widgetSettings)
 		await this.upsert(settings)
+		await AssetService.updateSettingsLiquidTemplate(shop, accessToken, widgetSettings)
 	}
 
-	static async resetSettingsForShop(shopId: string): Promise<WidgetSettingsViewModel> {
-		const newSettings = WidgetSettings.getDefault(shopId)
+	static async resetSettingsForShop(shop: Shop, accessToken: AccessToken): Promise<WidgetSettingsViewModel> {
+		if (!shop.id) throw new UnexpectedError("Shop id cannot be null")
+		const newSettings = WidgetSettings.getDefault(shop.id)
 		await this.upsert(newSettings)
+		await AssetService.updateSettingsLiquidTemplate(shop, accessToken, newSettings.settings)
 		return newSettings.settings
 	}
 

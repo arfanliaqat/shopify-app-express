@@ -32,7 +32,7 @@ export class AccessTokenService {
 			INSERT INTO access_tokens (token, shop_id, scopes)
 			VALUES ($1, $2, $3)
 			ON CONFLICT (shop_id) DO UPDATE SET token = $1, scopes = $3`,
-			[accessToken.token, accessToken.shopId, accessToken.scope]
+			[accessToken.token, accessToken.shopId, accessToken.scopes]
 		)
 		return accessToken
 	}

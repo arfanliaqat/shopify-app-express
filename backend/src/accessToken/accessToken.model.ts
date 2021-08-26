@@ -1,21 +1,25 @@
 export interface AccessTokenSchema {
 	token: string
 	shop_id: string
-	scope: string
+	scopes: string
 	created_date: Date
 }
 
 export interface AccessToken {
 	token: string
 	shopId: string
-	scope: string
+	scopes: string
+}
+
+export function hasScope(token: AccessToken, scope: string): boolean {
+	return token.scopes.indexOf(scope) >= 0
 }
 
 export function toAccessToken(schema: AccessTokenSchema): AccessToken {
 	return {
 		token: schema.token,
 		shopId: schema.shop_id,
-		scope: schema.scope
+		scopes: schema.scopes
 	}
 }
 

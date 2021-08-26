@@ -52,7 +52,7 @@ export class AuthService {
 				if (dbShop && dbShop.id) {
 					const accessToken = await AccessTokenService.storeAccessToken({
 						token: accessTokenData.access_token,
-						scope: accessTokenData.scope,
+						scopes: accessTokenData.scope,
 						shopId: dbShop.id
 					})
 					return [dbShop, accessToken]
@@ -72,7 +72,7 @@ export class AuthService {
 			}
 			const accessToken = await AccessTokenService.storeAccessToken({
 				token: accessTokenData.access_token,
-				scope: accessTokenData.scope,
+				scopes: accessTokenData.scope,
 				shopId: dbShop.id
 			})
 			return [dbShop, accessToken]
