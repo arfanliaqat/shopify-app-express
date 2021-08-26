@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express"
-import { handleErrors, UnexpectedError } from "../util/error"
+import { AxiosCallError, handleErrors, UnexpectedError } from "../util/error"
 import { ScriptTagService } from "./scriptTags.service"
 import { ShopService } from "../shop/shop.service"
 import { AccessTokenService } from "../accessToken/accessToken.service"
@@ -55,9 +55,17 @@ router.post("/refresh_all_script_tags", async (req: Request, res: Response) => {
 		const activeShops = await ShopService.findAllActiveShops()
 		for (const shop of activeShops) {
 			if (shop.id) {
-				const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
-				await ScriptTagService.deleteAllScriptTags(shop, accessToken)
-				await ScriptTagService.createScriptTags(shop, accessToken, [])
+				try {
+					const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+					await ScriptTagService.deleteAllScriptTags(shop, accessToken)
+					await ScriptTagService.createScriptTags(shop, accessToken, [])
+				} catch (error) {
+					if (error instanceof AxiosCallError) {
+						console.log(`[refresh_all_script_tags|shop:${shop.domain}] API error, skipping...`)
+					} else {
+						throw error
+					}
+				}
 			}
 		}
 		res.send("Done.")
