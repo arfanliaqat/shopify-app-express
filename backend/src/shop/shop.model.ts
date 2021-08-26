@@ -19,6 +19,10 @@ export class Shop {
 		public rawData?: ShopApiData,
 		public id?: string
 	) {}
+
+	isActive() {
+		return !this.uninstalled
+	}
 }
 
 export function toShop(schema: ShopSchema): Shop {

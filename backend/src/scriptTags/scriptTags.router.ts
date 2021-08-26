@@ -1,44 +1,69 @@
-import { devOnly } from "../util/middlewares"
 import { Request, Response, Router } from "express"
 import { handleErrors, UnexpectedError } from "../util/error"
-import { getLocals } from "../util/locals"
 import { ScriptTagService } from "./scriptTags.service"
-import { loadConnectedShop } from "../shop/shop.middleware"
-import { loadAccessToken } from "../accessToken/accessToken.middleware"
+import { ShopService } from "../shop/shop.service"
+import { AccessTokenService } from "../accessToken/accessToken.service"
 
 const router = Router()
 
-router.get(
-	"/delete_all_script_tags",
-	[devOnly, loadConnectedShop, loadAccessToken],
-	async (req: Request, res: Response) => {
-		try {
-			const { connectedShop, accessToken } = getLocals(res)
-			if (!connectedShop) throw new UnexpectedError("`connectedShop` shouldn't be null")
-			if (!accessToken) throw new UnexpectedError("`accessToken` shouldn't be null")
-			await ScriptTagService.deleteAllScriptTags(connectedShop, accessToken)
-			res.send("Done.")
-		} catch (error) {
-			handleErrors(res, error)
-		}
+router.get("/get_script_tags_for_shop", async (req: Request, res: Response) => {
+	try {
+		const shopDomain = req.query.shop
+		if (!shopDomain) throw new UnexpectedError("`refresh_script_tag_for_shop` shouldn't be null")
+		const shop = await ShopService.findByDomain(shopDomain.toString())
+		if (!shop || !shop.id) throw new UnexpectedError("`shop` not found")
+		const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+		const scriptTags = await ScriptTagService.fetchAllScriptTags(shop, accessToken)
+		res.send(scriptTags)
+	} catch (error) {
+		handleErrors(res, error)
 	}
-)
+})
 
-router.get(
-	"/get_all_script_tags",
-	[devOnly, loadConnectedShop, loadAccessToken],
-	async (req: Request, res: Response) => {
-		try {
-			console.log("123123")
-			const { connectedShop, accessToken } = getLocals(res)
-			if (!connectedShop) throw new UnexpectedError("`connectedShop` shouldn't be null")
-			if (!accessToken) throw new UnexpectedError("`accessToken` shouldn't be null")
-			const scriptTags = await ScriptTagService.fetchAllScriptTags(connectedShop, accessToken)
-			res.send(scriptTags)
-		} catch (error) {
-			handleErrors(res, error)
-		}
+router.post("/delete_script_tags_for_shop", async (req: Request, res: Response) => {
+	try {
+		const shopDomain = req.query.shop
+		if (!shopDomain) throw new UnexpectedError("`refresh_script_tag_for_shop` shouldn't be null")
+		const shop = await ShopService.findByDomain(shopDomain.toString())
+		if (!shop || !shop.id) throw new UnexpectedError("`shop` not found")
+		const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+		await ScriptTagService.deleteAllScriptTags(shop, accessToken)
+		res.send("Done.")
+	} catch (error) {
+		handleErrors(res, error)
 	}
-)
+})
+
+router.post("/refresh_script_tag_for_shop", async (req: Request, res: Response) => {
+	try {
+		const shopDomain = req.query.shop
+		if (!shopDomain) throw new UnexpectedError("`refresh_script_tag_for_shop` shouldn't be null")
+		const shop = await ShopService.findByDomain(shopDomain.toString())
+		if (!shop || !shop.id) throw new UnexpectedError("`shop` not found")
+		if (!shop.isActive()) throw new UnexpectedError("The shop must be active")
+		const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+		await ScriptTagService.deleteAllScriptTags(shop, accessToken)
+		await ScriptTagService.createScriptTags(shop, accessToken, [])
+		res.send("Done.")
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
+
+router.post("/refresh_all_script_tags", async (req: Request, res: Response) => {
+	try {
+		const activeShops = await ShopService.findAllActiveShops()
+		for (const shop of activeShops) {
+			if (shop.id) {
+				const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
+				await ScriptTagService.deleteAllScriptTags(shop, accessToken)
+				await ScriptTagService.createScriptTags(shop, accessToken, [])
+			}
+		}
+		res.send("Done.")
+	} catch (error) {
+		handleErrors(res, error)
+	}
+})
 
 export default router

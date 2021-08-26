@@ -62,10 +62,21 @@ export class ShopService {
 		return result.rows.map(toShop)[0]
 	}
 
-	static async findAllActiveShops(): Promise<Shop[]> {
+	static async findAllShops(): Promise<Shop[]> {
 		const conn: Pool = await getConnection()
 		const result = await conn.query<ShopSchema>(
 			`SELECT id, domain, public_domain, email, trial_used, uninstalled FROM shops`
+		)
+		return result.rows.map(toShop)
+	}
+
+	static async findAllActiveShops(): Promise<Shop[]> {
+		const conn: Pool = await getConnection()
+		const result = await conn.query<ShopSchema>(
+			`
+			SELECT id, domain, public_domain, email, trial_used, uninstalled
+			FROM shops
+			WHERE uninstalled is null`
 		)
 		return result.rows.map(toShop)
 	}

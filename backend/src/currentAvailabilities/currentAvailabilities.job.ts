@@ -19,7 +19,7 @@ export class CurrentAvailabilityJob {
 
 		const timerStart = moment().valueOf()
 		console.log(`${prefix} Job starting...`)
-		const shops = await ShopService.findAllActiveShops()
+		const shops = await ShopService.findAllShops()
 		for (const shop of shops) {
 			const shopTimerStart = moment().valueOf()
 			console.log(`${prefix} Refreshing shop ${shop.domain} (id: ${shop.id})...`)

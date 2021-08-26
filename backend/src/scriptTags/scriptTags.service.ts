@@ -9,7 +9,7 @@ export class ScriptTagService {
 		try {
 			return (
 				await axios.get<{ script_tags: ScriptTag[] }>(
-					`https://${shop.domain}/admin/api/2020-10/script_tags.json`,
+					`https://${shop.domain}/admin/api/2021-07/script_tags.json`,
 					{
 						headers: {
 							"X-Shopify-Access-Token": accessToken.token
@@ -26,7 +26,7 @@ export class ScriptTagService {
 		try {
 			console.log(`[createScriptTag|shop:${shop.domain}] Create ${scriptTag.src}...`)
 			return await axios.post(
-				`https://${shop.domain}/admin/api/2020-10/script_tags.json`,
+				`https://${shop.domain}/admin/api/2021-07/script_tags.json`,
 				{ script_tag: scriptTag },
 				{
 					headers: {
@@ -42,7 +42,7 @@ export class ScriptTagService {
 	static async deleteScriptTag(shop: Shop, accessToken: AccessToken, scriptTag: ScriptTag): Promise<void> {
 		try {
 			console.log(`[deleteScriptTag|shop:${shop.domain}] Delete ${scriptTag.src}...`)
-			return await axios.delete(`https://${shop.domain}/admin/api/2020-10/script_tags/${scriptTag.id}.json`, {
+			return await axios.delete(`https://${shop.domain}/admin/api/2021-07/script_tags/${scriptTag.id}.json`, {
 				headers: {
 					"X-Shopify-Access-Token": accessToken.token
 				}
@@ -57,20 +57,24 @@ export class ScriptTagService {
 		await currentScriptTags.forEach((scriptTag) => this.deleteScriptTag(shop, accessToken, scriptTag))
 	}
 
-	static async createScriptTags(shop: Shop, accessToken: AccessToken): Promise<void> {
+	static async createScriptTags(
+		shop: Shop,
+		accessToken: AccessToken,
+		currentScriptTags?: ScriptTag[]
+	): Promise<void> {
 		console.log(`[createScriptTags|shop:${shop.domain}] Synchronising script tags...`)
-		const currentScriptTags = (await this.fetchAllScriptTags(shop, accessToken)) || []
+		const _currentScriptTags = (currentScriptTags ?? (await this.fetchAllScriptTags(shop, accessToken))) || []
 		const allScriptTagsToCreate = getScriptTagsToCreate()
 		const scriptTagsToCreate = allScriptTagsToCreate.filter((scriptTag) => {
-			return !currentScriptTags.find((currentScriptTag) => currentScriptTag.src == scriptTag.src)
+			return !_currentScriptTags.find((currentScriptTag) => currentScriptTag.src == scriptTag.src)
 		})
-		const scriptTagsToDelete = currentScriptTags.filter((currentScriptTag) => {
+		const scriptTagsToDelete = _currentScriptTags.filter((currentScriptTag) => {
 			return !allScriptTagsToCreate.find((scriptTag) => scriptTag.src == currentScriptTag.src)
 		})
-		await scriptTagsToCreate.map(async (scriptTag) => {
+		scriptTagsToCreate.map(async (scriptTag) => {
 			return this.createScriptTag(shop, accessToken, scriptTag)
 		})
-		await scriptTagsToDelete.map(async (scriptTag) => {
+		scriptTagsToDelete.map(async (scriptTag) => {
 			return this.deleteScriptTag(shop, accessToken, scriptTag)
 		})
 	}
