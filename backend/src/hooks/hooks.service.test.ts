@@ -1,6 +1,6 @@
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { getChosenDate, HooksService } from "./hooks.service"
+import { formatTag, getChosenDate, HooksService } from "./hooks.service"
 import moment, { Moment } from "moment"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import { DatabaseTestService, getConnection } from "../util/database"
@@ -485,6 +485,22 @@ describe("HooksService", () => {
 			const shopPlan = await ShopPlanService.findByShopId(shop!.id!)
 			expect(shopPlan).toBeUndefined()
 		}
+	})
+
+	test("formatTag", () => {
+		const settings = WidgetSettings.getDefault("abc")
+		settings.settings.locale = "en_US"
+		expect(formatTag(settings.settings, moment("2021-08-01", SYSTEM_DATE_FORMAT), undefined)).toBe("Sun Aug 1 2021")
+		expect(formatTag(settings.settings, moment("2021-08-01", SYSTEM_DATE_FORMAT), "09:00 AM - 12:00 PM")).toBe(
+			"Sun Aug 1 2021 (09:00 AM - 12:00 PM)"
+		)
+		expect(formatTag(settings.settings, moment("2021-09-06", SYSTEM_DATE_FORMAT), "09:00 AM - 12:00 PM")).toBe(
+			"Mon Sep 6 2021 (09:00 AM - 12:00 PM)"
+		)
+		settings.settings.locale = "fr_FR"
+		expect(formatTag(settings.settings, moment("2021-09-06", SYSTEM_DATE_FORMAT), "09:00 - 12:00")).toBe(
+			"lun. 6 sept. 2021 (09:00 - 12:00)"
+		)
 	})
 
 	afterAll(async () => {

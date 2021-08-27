@@ -4,16 +4,8 @@ import { ShopResource } from "../shopResource/shopResource.model"
 import moment, { Moment } from "moment"
 import { Pool } from "pg"
 import { handleAxiosErrors, UnexpectedError } from "../util/error"
-import {
-	DAY_OF_WEEK_TAG_DATE_FORMAT,
-	SYSTEM_DATE_FORMAT,
-	SYSTEM_DATETIME_FORMAT,
-	TAG_DATE_FORMAT
-} from "../util/constants"
+import { SYSTEM_DATE_FORMAT, SYSTEM_DATETIME_FORMAT } from "../util/constants"
 import { Shop } from "../shop/shop.model"
-import { OrderEventData } from "../hooks/hooks.model"
-import _ from "lodash"
-import { getChosenDate } from "../hooks/hooks.service"
 import axios from "axios"
 import { AccessTokenService } from "../accessToken/accessToken.service"
 
@@ -101,19 +93,7 @@ export class ProductOrderService {
 		return parseInt(result.rows[0].count)
 	}
 
-	static getTags(productOrders: ProductOrder[]): string {
-		let chosenDates = productOrders.map((productOrder) => productOrder.chosenDate)
-		chosenDates = _.uniqBy(chosenDates, (chosenDate) => chosenDate.valueOf())
-		chosenDates = _.sortBy(chosenDates, (chosenDate) => chosenDate.valueOf())
-		return _.flatten(
-			chosenDates.map((chosenDate) => [
-				chosenDate.format(TAG_DATE_FORMAT).replace(",", ""),
-				chosenDate.format(DAY_OF_WEEK_TAG_DATE_FORMAT)
-			])
-		).join(",")
-	}
-
-	static async updateTags(shop: Shop, orderId: number, tags: string): Promise<void> {
+	static async updateTags(shop: Shop, orderId: number, tags: string[]): Promise<void> {
 		if (!shop || !shop.id) throw new UnexpectedError("'shop.id' cannot be undefined")
 		try {
 			const accessToken = await AccessTokenService.findAccessTokenByShopId(shop.id)
@@ -125,7 +105,7 @@ export class ProductOrderService {
 				{
 					order: {
 						id: orderId,
-						tags: tags
+						tags: tags.join(",")
 					}
 				},
 				{
@@ -142,17 +122,6 @@ export class ProductOrderService {
 }
 
 export class ProductOrderServiceWithTransaction extends WithTransaction {
-	async findByOrderId(orderId: number) {
-		const result = await this.getClient().query<ProductOrderSchema>(
-			`
-			SELECT id, shop_resource_id, order_id, chosen_date, quantity
-			FROM product_orders
-			WHERE order_id = $1`,
-			[orderId]
-		)
-		return result.rows.map(ProductOrder.createFromSchema)
-	}
-
 	async deleteByOrderId(orderId: number): Promise<void> {
 		await this.getClient().query(`DELETE FROM product_orders WHERE order_id = $1`, [orderId])
 	}
@@ -179,17 +148,5 @@ export class ProductOrderServiceWithTransaction extends WithTransaction {
 			productOrder.id = results.rows[0].id
 		}
 		return productOrder
-	}
-
-	async refreshTags(shop: Shop, orderEvent: OrderEventData, chosenTimeSlots: Set<string>): Promise<void> {
-		const productOrders = await this.findByOrderId(orderEvent.id)
-		let tags = ProductOrderService.getTags(productOrders)
-		const arrChosenTimeSlots = Array.from(chosenTimeSlots)
-		if (arrChosenTimeSlots.length > 0) {
-			tags += "," + arrChosenTimeSlots.join(",")
-		}
-		if (tags != orderEvent.tags) {
-			await ProductOrderService.updateTags(shop, orderEvent.id, tags)
-		}
 	}
 }

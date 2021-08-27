@@ -1,6 +1,6 @@
 import { getSubscribedHooks, OrderEventData, OrderEventType, Property, Webhook } from "./hooks.model"
 import { Shop } from "../shop/shop.model"
-import { ProductOrderServiceWithTransaction } from "../productOrders/productOrders.service"
+import { ProductOrderService, ProductOrderServiceWithTransaction } from "../productOrders/productOrders.service"
 import { ProductOrder } from "../productOrders/productOrders.model"
 import { ShopResourceService } from "../shopResource/shopResource.service"
 import moment, { Moment } from "moment"
@@ -34,6 +34,19 @@ export function getChosenTimeSlot(widgetSetting: WidgetSettingsViewModel, proper
 		(property: Property) => property.name?.toLowerCase() == timeSlotTagLabel.toLowerCase()
 	)
 	return timeSlotProperty?.value
+}
+
+export function formatTag(
+	widgetSettings: WidgetSettingsViewModel,
+	chosenDate: Moment,
+	chosenTimeSlot?: string
+): string {
+	const localChosenDate = chosenDate.clone().locale(widgetSettings.locale)
+	let tag = localChosenDate.format("ddd ll")
+	if (chosenTimeSlot) {
+		tag += " (" + chosenTimeSlot + ")"
+	}
+	return tag.replace(/,/g, "")
 }
 
 export class HooksService {
@@ -144,7 +157,7 @@ export class HooksService {
 			const widgetSettings = await WidgetService.findWidgetSettingsByShop(connectedShop)
 
 			const newProductOrdersById: { [id: string]: ProductOrder } = {}
-			const chosenTimeSlots = new Set<string>()
+			const tags = new Set<string>()
 
 			const orderChosenDate = getChosenDate(widgetSettings, orderEvent.note_attributes || [])
 			const orderChosenTimeSlot = getChosenTimeSlot(widgetSettings, orderEvent.note_attributes || [])
@@ -155,11 +168,11 @@ export class HooksService {
 				const chosenTimeSlot = orderChosenTimeSlot
 					? orderChosenTimeSlot
 					: getChosenTimeSlot(widgetSettings, item.properties || [])
-				if (chosenTimeSlot) chosenTimeSlots.add(chosenTimeSlot)
 				const chosenDate = orderChosenDate
 					? orderChosenDate
 					: getChosenDate(widgetSettings, item.properties || [])
 				if (!chosenDate) return
+				tags.add(formatTag(widgetSettings, chosenDate, chosenTimeSlot))
 				const key = shopResource.id + ":" + chosenDate
 				const newProductOrder = newProductOrdersById[key]
 				if (!newProductOrder) {
@@ -192,8 +205,8 @@ export class HooksService {
 				await service.insert(productOrder)
 			})
 
-			if (newProductOrders.length > 0) {
-				await service.refreshTags(connectedShop, orderEvent, chosenTimeSlots)
+			if (tags.size > 0) {
+				await ProductOrderService.updateTags(connectedShop, orderEvent.id, Array.from(tags))
 			}
 
 			await service.commitTransaction()
