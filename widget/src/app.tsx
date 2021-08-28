@@ -155,8 +155,13 @@ function initWidget() {
 						if (productForm?.length === 1) {
 							anchorElement = document.createElement("div")
 							anchorElement.id = anchorId
-							const [elementQuery, anchorPosition] = getProductQueryAndPosition()
-							const refElement = elementQuery ? productForm[0].querySelector(elementQuery) : productForm[0]
+							let [elementQuery, anchorPosition] = getProductQueryAndPosition()
+							let refElement = elementQuery ? productForm[0].querySelector(elementQuery) : productForm[0]
+							if (!refElement) {
+								// If the ref element is not found, make sure to default to something that works
+								refElement = productForm[0]
+								anchorPosition = "FIRST_ELEMENT"
+							}
 							refElement.insertAdjacentElement(toInsertPosition(anchorPosition), anchorElement)
 						}
 					}
