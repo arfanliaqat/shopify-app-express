@@ -79,7 +79,7 @@ export class ShopPlanService {
 						price: shopPlan.price,
 						trial_days: this.getTrialDays(shop),
 						return_url: returnUrl,
-						test: isChargeTestMode
+						test: shop.isTestShop() || isChargeTestMode
 					}
 				},
 				{

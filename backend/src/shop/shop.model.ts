@@ -23,6 +23,10 @@ export class Shop {
 	isActive() {
 		return !this.uninstalled
 	}
+
+	isTestShop(): boolean {
+		return this.domain?.includes("sylvain-")
+	}
 }
 
 export function toShop(schema: ShopSchema): Shop {

@@ -8,7 +8,6 @@ import { loadAccessToken } from "../accessToken/accessToken.middleware"
 import { devOnly } from "../util/middlewares"
 import { ShopService } from "../shop/shop.service"
 import { AccessTokenService } from "../accessToken/accessToken.service"
-import { shopifyConfig } from "../../../frontend/src/models/ShopifyConfig"
 import { shopifyApiPublicKey, shopifyApiSecretKey } from "../util/constants"
 import { AssetService } from "../assets/assets.service"
 
