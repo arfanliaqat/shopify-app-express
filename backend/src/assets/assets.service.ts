@@ -9,6 +9,9 @@ import { handleAxiosErrors } from "../util/error"
 import { Theme } from "../themes/themes.model"
 import { Asset, PutAssetPayload } from "./assets.model"
 import { ThemeService } from "../themes/themes.service"
+import { ShopPlanService } from "../shopPlan/shopPlan.service"
+import { AccessTokenService } from "../accessToken/accessToken.service"
+import { WidgetService } from "../widget/widget.service"
 
 export class AssetService {
 	static async getDatePickerSettingsLiquidTemplate(settings: WidgetSettingsViewModel): Promise<string> {
@@ -21,24 +24,34 @@ export class AssetService {
 
 	static async updateSettingsLiquidTemplate(
 		shop: Shop,
-		accessToken: AccessToken,
-		settings: WidgetSettingsViewModel
+		settings?: WidgetSettingsViewModel
 	): Promise<Asset | undefined> {
 		const logPrefix = `[updateSettingsLiquidTemplate|shop:${shop.domain}]`
-		if (hasScope(accessToken, "write_theme")) {
-			const theme = await ThemeService.fetchMainTheme(shop, accessToken)
-			if (!theme) {
-				console.warn(`${logPrefix} Main theme not found`)
-				return
-			}
-			const templateContent = await AssetService.getDatePickerSettingsLiquidTemplate(settings)
-			return await AssetService.putAsset(shop, accessToken, theme, {
-				key: "snippets/buunto-date-picker-settings.liquid",
-				value: templateContent
-			})
-		} else {
+		const accessToken = shop.id ? await AccessTokenService.findAccessTokenByShopId(shop.id) : undefined
+		if (!accessToken || !hasScope(accessToken, "write_theme")) {
 			console.warn(`${logPrefix} The shop hasn't granted access to alter themes`)
+			return
 		}
+		if (!settings && shop?.id) {
+			settings = await WidgetService.findWidgetSettingsByShopId(shop.id)
+		}
+		if (!settings) {
+			console.warn(`${logPrefix} Settings not found`)
+			return
+		}
+		const theme = await ThemeService.fetchMainTheme(shop, accessToken)
+		if (!theme) {
+			console.warn(`${logPrefix} Main theme not found`)
+			return
+		}
+		if (settings.isVisible) {
+			settings.isVisible = await ShopPlanService.hasActivePlan(shop)
+		}
+		const templateContent = await AssetService.getDatePickerSettingsLiquidTemplate(settings)
+		return await AssetService.putAsset(shop, accessToken, theme, {
+			key: "snippets/buunto-date-picker-settings.liquid",
+			value: templateContent
+		})
 	}
 
 	static async fetchAllAssets(shop: Shop, accessToken: AccessToken, theme: Theme): Promise<Asset[] | undefined> {

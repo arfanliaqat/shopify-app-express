@@ -10,6 +10,7 @@ import { ShopService } from "../shop/shop.service"
 import { AccessTokenService } from "../accessToken/accessToken.service"
 import { shopifyConfig } from "../../../frontend/src/models/ShopifyConfig"
 import { shopifyApiPublicKey, shopifyApiSecretKey } from "../util/constants"
+import { AssetService } from "../assets/assets.service"
 
 const router = Router()
 
@@ -81,6 +82,9 @@ router.get("/plan_confirmation", async (req: Request, res: Response) => {
 		if (!chargeId) throw new BadParameter("Missing 'charge_id' parameter")
 
 		await ShopPlanService.createAndSavePlan(shop.id, chargeId, plan as Plan)
+
+		// Update the liquid template
+		await AssetService.updateSettingsLiquidTemplate(shop)
 
 		res.redirect(`https://${shop.domain}/admin/apps/${shopifyApiPublicKey}/app?shopOrigin=${shop.domain}`)
 	} catch (error) {

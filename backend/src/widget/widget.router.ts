@@ -192,33 +192,27 @@ router.get("/widget_settings", [loadConnectedShop], async (req: Request, res: Re
 	}
 })
 
-router.post("/widget_settings", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
+router.post("/widget_settings", [loadConnectedShop], async (req: Request, res: Response) => {
 	try {
-		const { connectedShop, accessToken } = getLocals(res)
+		const { connectedShop } = getLocals(res)
 		if (!connectedShop || !connectedShop.id) {
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
-		if (!accessToken) {
-			throw new UnexpectedError("`accessToken` should have been provided")
-		}
 		const widgetSettings = req.body as WidgetSettingsViewModel
-		const settings = await WidgetService.updateForShop(connectedShop, accessToken, widgetSettings)
+		const settings = await WidgetService.updateForShop(connectedShop, widgetSettings)
 		res.send(settings)
 	} catch (error) {
 		handleErrors(res, error)
 	}
 })
 
-router.post("/widget_settings/reset", [loadConnectedShop, loadAccessToken], async (req: Request, res: Response) => {
+router.post("/widget_settings/reset", [loadConnectedShop], async (req: Request, res: Response) => {
 	try {
-		const { connectedShop, accessToken } = getLocals(res)
+		const { connectedShop } = getLocals(res)
 		if (!connectedShop || !connectedShop.id) {
 			throw new UnexpectedError("`connectedShop` should have been provided")
 		}
-		if (!accessToken) {
-			throw new UnexpectedError("`accessToken` should have been provided")
-		}
-		const settings = await WidgetService.resetSettingsForShop(connectedShop, accessToken)
+		const settings = await WidgetService.resetSettingsForShop(connectedShop)
 		res.send(settings)
 	} catch (error) {
 		handleErrors(res, error)

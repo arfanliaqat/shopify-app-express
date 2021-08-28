@@ -106,7 +106,7 @@ describe("ShopPlanService", () => {
 			.withResourceId("Product", 4321)
 			.buildAndSave()
 
-		await ShopPlanService.sendPlanLimitNotifications(shop!)
+		await ShopPlanService.checkPlanLimit(shop!)
 
 		expect(emailTestStore).toHaveLength(0)
 
@@ -122,7 +122,7 @@ describe("ShopPlanService", () => {
 				.buildAndSave()
 		}
 
-		await ShopPlanService.sendPlanLimitNotifications(shop!)
+		await ShopPlanService.checkPlanLimit(shop!)
 
 		expect(emailTestStore).toHaveLength(1)
 		expect(emailTestStore[0].TemplateAlias).toBe("approaching-plan-limit")
@@ -130,7 +130,7 @@ describe("ShopPlanService", () => {
 
 		// 3. Email isn't sent twice
 
-		await ShopPlanService.sendPlanLimitNotifications(shop!)
+		await ShopPlanService.checkPlanLimit(shop!)
 
 		expect(emailTestStore).toHaveLength(1)
 	})
@@ -145,7 +145,7 @@ describe("ShopPlanService", () => {
 			.withResourceId("Product", 4321)
 			.buildAndSave()
 
-		await ShopPlanService.sendPlanLimitNotifications(shop!)
+		await ShopPlanService.checkPlanLimit(shop!)
 
 		expect(emailTestStore).toHaveLength(0)
 
@@ -161,7 +161,7 @@ describe("ShopPlanService", () => {
 				.buildAndSave()
 		}
 
-		await ShopPlanService.sendPlanLimitNotifications(shop!)
+		await ShopPlanService.checkPlanLimit(shop!)
 
 		expect(emailTestStore).toHaveLength(1)
 		expect(emailTestStore[0].TemplateAlias).toBe("reached-plan-limit")
@@ -169,7 +169,7 @@ describe("ShopPlanService", () => {
 
 		// 3. Email isn't sent twice
 
-		await ShopPlanService.sendPlanLimitNotifications(shop!)
+		await ShopPlanService.checkPlanLimit(shop!)
 
 		expect(emailTestStore).toHaveLength(1)
 	})

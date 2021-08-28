@@ -12,6 +12,8 @@ import { ProductOrderService } from "../productOrders/productOrders.service"
 import moment from "moment"
 import NotificationService from "../notifications/notifications.service"
 import { generateNonce } from "../util/tools"
+import { AssetService } from "../assets/assets.service"
+import { templateSettings } from "lodash"
 
 interface RecurringApplicationChargeResponse {
 	confirmation_url: string
@@ -183,7 +185,7 @@ export class ShopPlanService {
 		await conn.query<ShopPlanSchema>(`DELETE FROM shop_plans WHERE shop_id = $1`, [shop.id])
 	}
 
-	static async sendPlanLimitNotifications(shop: Shop): Promise<void> {
+	static async checkPlanLimit(shop: Shop): Promise<void> {
 		if (!shop.id) throw new UnexpectedError("The shop's id isn't defined")
 		const shopPlan = await this.findByShopId(shop.id)
 		const monthStart = moment().startOf("month")
@@ -203,6 +205,8 @@ export class ShopPlanService {
 				if (notifications.length == 0) {
 					await NotificationService.reachedPlanLimit(shop, shopPlan)
 				}
+				// Update the asset to disable the date picker
+				await AssetService.updateSettingsLiquidTemplate(shop)
 			} else if (approachingLimit) {
 				const notifications = await NotificationService.findNotifications(
 					shop,

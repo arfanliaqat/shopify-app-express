@@ -224,7 +224,7 @@ export class HooksService {
 			}
 		}
 
-		await ShopPlanService.sendPlanLimitNotifications(connectedShop)
+		await ShopPlanService.checkPlanLimit(connectedShop)
 	}
 
 	static async ingestAppUninstalledEvent(shop: Shop): Promise<void> {
