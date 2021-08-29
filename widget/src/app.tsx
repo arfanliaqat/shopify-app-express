@@ -143,6 +143,11 @@ function initWidget() {
 							const [cartPageQuery, cartPageAnchorPosition] = getCartPageQueryAndPosition()
 							anchorPosition = cartPageAnchorPosition
 							refElement = cartForm.querySelector(cartPageQuery)
+							if (!refElement) {
+								// If the ref element is not found, make sure to default to something that works
+								refElement = cartForm.querySelector("table")
+								anchorPosition = "AFTER"
+							}
 						} else {
 							isCartDrawer = true
 						}
