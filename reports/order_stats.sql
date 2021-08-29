@@ -1,7 +1,7 @@
 select
        to_char(po.created_date, 'FMMonth YYYY'),
        sh.public_domain,
-       coalesce(sp.order_limit, 15),
+       coalesce(sp.order_limit, 15) as plan_limit,
        count(distinct order_id) as orders,
        sh.uninstalled::date as uninstalled
 from product_orders po
