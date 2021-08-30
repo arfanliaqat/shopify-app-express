@@ -1,15 +1,16 @@
-import React, { useMemo, useState } from "react"
+import React, { useContext, useMemo, useState } from "react"
 import { FormLayout, Select, Button } from "@shopify/polaris"
 import { TimeSlot, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
 import { SelectOption } from "@shopify/polaris/dist/types/latest/src/components/Select/Select"
 import { formatLocaleTime } from "../../../../widget/src/util/dates"
+import { SettingsLayoutContext } from "../SettingsLayout"
 
 interface Props {
 	onAdd: (timeSlot: TimeSlot) => void
-	widgetSettings: WidgetSettings
 }
 
-function getTimeSlotOptions(widgetSettings: WidgetSettings) {
+function getTimeSlotOptions(widgetSettings: WidgetSettings): SelectOption[] {
+	if (!widgetSettings) return []
 	const options = [] as SelectOption[]
 	for (let i = 0; i < 24; i++) {
 		const hour = (i < 10 ? "0" + i : i) + ""
@@ -25,13 +26,17 @@ function toMinutesOfDay(time: string): number {
 	return parseInt(timeSplit[0]) * 60 + parseInt(timeSplit[1])
 }
 
-export default function AddTimeSlot({ widgetSettings, onAdd }: Props) {
+export default function AddTimeSlot({ onAdd }: Props) {
+	const { widgetSettings } = useContext(SettingsLayoutContext)
+
 	const [from, setFrom] = useState("09:00")
 	const [fromError, setFromError] = useState(false)
 	const [to, setTo] = useState("18:00")
 	const [toError, setToError] = useState(false)
 
 	const timeSlotOptions = useMemo(() => getTimeSlotOptions(widgetSettings), [widgetSettings])
+
+	if (!widgetSettings) return null
 
 	const handleAddClick = () => {
 		const fromInMinutes = toMinutesOfDay(from)

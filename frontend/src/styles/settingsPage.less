@@ -10,7 +10,7 @@
     flex: 1;
   }
   .helpLink {
-    flex: 1;
+    flex: 2;
     text-align: right;
   }
 }
@@ -34,7 +34,11 @@
     padding: 0
   }
   .widgetPreview {
-    padding: 2rem
+    padding: 2rem;
+    min-height: 260px;
+    .buunto-date-picker {
+      margin-bottom: 0;
+    }
   }
   .Polaris-ChoiceList__Choices {
     display: flex;
@@ -88,8 +92,10 @@
   padding: 20px;
 }
 
-@media (max-width: 960px) {
-  #settingsPage .Polaris-ChoiceList__Choices {
-    flex-direction: column;
-  }
+#settingsPage .Polaris-ChoiceList__Choices {
+  flex-direction: column;
+}
+
+.Polaris-Tabs {
+  justify-content: center;
 }

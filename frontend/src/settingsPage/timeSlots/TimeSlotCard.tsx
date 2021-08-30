@@ -1,13 +1,11 @@
-import React from "react"
-import { ConfigDay, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
+import React, { useContext } from "react"
+import { ConfigDay } from "../../../../widget/src/models/WidgetSettings"
 import { Checkbox, Card, FormLayout } from "@shopify/polaris"
 import TimeSlots from "./TimeSlots"
 import { capitalize } from "../../util/tools"
+import { SettingsLayoutContext } from "../SettingsLayout"
 
-interface Props {
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
 const configDays: ConfigDay[] = [
 	"MONDAY",
@@ -20,17 +18,20 @@ const configDays: ConfigDay[] = [
 	"DEFAULT"
 ]
 
-export default function TimeSlotCard({ widgetSettings, onWidgetSettingsChange }: Props) {
+export default function TimeSlotCard({}: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const handleTimeSlotsEnabled = (timeSlotsEnabled: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, timeSlotsEnabled })
+		setWidgetSettings({ ...widgetSettings, timeSlotsEnabled })
 	}
 
 	const handleMandatoryTimeSlotChecked = (mandatoryTimeSlot: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, mandatoryTimeSlot })
+		setWidgetSettings({ ...widgetSettings, mandatoryTimeSlot })
 	}
 
 	const handleTimeSlotDeselectedFirstChecked = (timeSlotDeselectedFirst: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, timeSlotDeselectedFirst })
+		setWidgetSettings({ ...widgetSettings, timeSlotDeselectedFirst })
 	}
 
 	const hasExceptions = Object.keys(widgetSettings.timeSlotsByDay || {}).length > 1
@@ -58,12 +59,7 @@ export default function TimeSlotCard({ widgetSettings, onWidgetSettingsChange }:
 										{configDay != "DEFAULT" && (
 											<div className="label">On {capitalize(configDay)}:</div>
 										)}
-										<TimeSlots
-											widgetSettings={widgetSettings}
-											onWidgetSettingsChange={onWidgetSettingsChange}
-											configDay={configDay}
-											hasExceptions={hasExceptions}
-										/>
+										<TimeSlots configDay={configDay} />
 									</div>
 								)
 							} else {

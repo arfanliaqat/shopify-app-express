@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 import { Card, Checkbox, FormLayout, Select } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { PickerType, WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
@@ -7,11 +7,9 @@ import {
 	DEFAULT_SHOW_DAY_OF_WEEK_TAG,
 	defaultWidgetStyles
 } from "../../../backend/src/util/constants"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
 const FIELD_LABEL_BOLD = "bold"
 
@@ -19,39 +17,42 @@ function getFieldLabelIsBold(widgetSettings: WidgetSettings): boolean {
 	return (widgetSettings.styles.fieldLabelFontWeight ?? defaultWidgetStyles.fieldLabelFontWeight) == FIELD_LABEL_BOLD
 }
 
-export default function DatePickerSettingsCard({ widgetSettings, onWidgetSettingsChange }: Props) {
+export default function DatePickerSettingsCard({}: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const handleDatePickerTypeChange = (pickerType: PickerType) => {
-		onWidgetSettingsChange({ ...widgetSettings, pickerType })
+		setWidgetSettings({ ...widgetSettings, pickerType })
 	}
 
 	const handleLanguageChange = (locale: string) => {
-		onWidgetSettingsChange({ ...widgetSettings, locale })
+		setWidgetSettings({ ...widgetSettings, locale })
 	}
 
 	const handleMandatoryDateSelectChange = (mandatoryDateSelect: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, mandatoryDateSelect })
+		setWidgetSettings({ ...widgetSettings, mandatoryDateSelect })
 	}
 
 	const handleDateDeselectedFirstChange = (dateUnselectedFirst: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, dateDeselectedFirst: dateUnselectedFirst })
+		setWidgetSettings({ ...widgetSettings, dateDeselectedFirst: dateUnselectedFirst })
 	}
 
 	const handleSingleDatePerOrderChange = (singleDatePerOrder: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, singleDatePerOrder })
+		setWidgetSettings({ ...widgetSettings, singleDatePerOrder })
 	}
 
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleShowDayOfWeekTagChange = (showDayOfWeekTag) => {
-		onWidgetSettingsChange({ ...widgetSettings, showDayOfWeekTag })
+		setWidgetSettings({ ...widgetSettings, showDayOfWeekTag })
 	}
 
 	const handleFieldLabelIsBoldChange = (checked: boolean) => {
 		const styles = { ...widgetSettings.styles, fieldLabelFontWeight: checked ? FIELD_LABEL_BOLD : "" }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	return (

@@ -10,7 +10,7 @@ import CalendarPage from "./calendarPage/CalendarPage"
 import NotFoundPage from "./NotFoundPage"
 
 import "./styles/main.less"
-import SettingsPage from "./settingsPage/SettingsPage"
+import SettingsArea from "./settingsPage/SettingsArea"
 import { isStockByDateApp } from "./common/constants"
 import PlansPage from "./plansPage/PlansPage"
 import { shopifyConfig } from "./models/ShopifyConfig"
@@ -50,7 +50,7 @@ ReactDOM.render(
 			<ErrorBoundary>
 				<BrowserRouter>
 					<Switch>
-						<Route exact path="/app" component={isStockByDateApp ? HomePage : SettingsPage} />
+						<Route exact path="/app" component={isStockByDateApp ? HomePage : SettingsArea} />
 						{isStockByDateApp && (
 							<Route
 								exact
@@ -65,7 +65,7 @@ ReactDOM.render(
 								component={AvailabilityPeriodPage}
 							/>
 						)}
-						{isStockByDateApp && <Route exact path="/app/settings" component={SettingsPage} />}
+						{isStockByDateApp && <Route exact path="/app/settings" component={SettingsArea} />}
 						<Route path="/app/plans" component={PlansPage} />
 						<Route path="/app/guide" component={GuidePage} />
 						<Route path="*" component={NotFoundPage} />

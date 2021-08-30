@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 import {
 	Card,
 	Checkbox,
@@ -16,7 +16,6 @@ import {
 	FilterType,
 	Page,
 	PlacementMethod,
-	WidgetSettings,
 	Collection
 } from "../../../widget/src/models/WidgetSettings"
 import {
@@ -27,48 +26,44 @@ import {
 } from "../../../backend/src/util/constants"
 import CollectionPicker from "./CollectionPicker"
 import ProductTagPicker from "./ProductTagPicker"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	initialWidgetSettings: WidgetSettings
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
-export default function DatePickerPlacementCard({
-	initialWidgetSettings,
-	widgetSettings,
-	onWidgetSettingsChange
-}: Props) {
+export default function DatePickerPlacementCard({}: Props) {
+	const { initialWidgetSettings, widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const handleVisibilityChange = (isVisible: boolean) => {
-		onWidgetSettingsChange({ ...widgetSettings, isVisible })
+		setWidgetSettings({ ...widgetSettings, isVisible })
 	}
 
 	const handleShowOnPage = (checked: boolean, showOnPage: Page) => {
-		onWidgetSettingsChange({ ...widgetSettings, showOnPage })
+		setWidgetSettings({ ...widgetSettings, showOnPage })
 	}
 
 	const handlePlacementMethod = (checked: boolean, placementMethod: PlacementMethod) => {
-		onWidgetSettingsChange({ ...widgetSettings, placementMethod })
+		setWidgetSettings({ ...widgetSettings, placementMethod })
 	}
 
 	const handleAnchorSelector = (anchorSelector: string) => {
-		onWidgetSettingsChange({ ...widgetSettings, anchorSelector })
+		setWidgetSettings({ ...widgetSettings, anchorSelector })
 	}
 
 	const handleAnchorPosition = (anchorPosition: AnchorPosition) => {
-		onWidgetSettingsChange({ ...widgetSettings, anchorPosition })
+		setWidgetSettings({ ...widgetSettings, anchorPosition })
 	}
 
 	const handleFilterType = (checked: boolean, filterType: FilterType) => {
-		onWidgetSettingsChange({ ...widgetSettings, filterType })
+		setWidgetSettings({ ...widgetSettings, filterType })
 	}
 
 	const handleCollectionsChange = (filterCollections: Collection[]) => {
-		onWidgetSettingsChange({ ...widgetSettings, filterCollections })
+		setWidgetSettings({ ...widgetSettings, filterCollections })
 	}
 
 	const handleProductTagsChange = (filterProductTags: string[]) => {
-		onWidgetSettingsChange({ ...widgetSettings, filterProductTags })
+		setWidgetSettings({ ...widgetSettings, filterProductTags })
 	}
 
 	const showOnPage = widgetSettings.showOnPage || DEFAULT_SHOW_ON_PAGE
@@ -79,18 +74,14 @@ export default function DatePickerPlacementCard({
 	return (
 		<>
 			{!initialWidgetSettings.isVisible && (
-				<Banner status="warning" action={{ content: "Guide", url: "/app/guide" }}>
-					The date picker is currently hidden from your shop. To make it visible make sure to tick the
-					following box and save. <br />
-					Read our guide for more information.
-				</Banner>
+				<>
+					<Banner status="warning">
+						The date picker is currently hidden from your shop. To make it visible make sure to tick the
+						"Make the date picker visible on your store" box and save. <br />
+					</Banner>
+					<div style={{ height: "30px" }} />
+				</>
 			)}
-			{initialWidgetSettings.isVisible && (
-				<Banner status="info" action={{ content: "Guide", url: "/app/guide" }}>
-					Is the date picker still not visible? Please make sure to check our guide.
-				</Banner>
-			)}
-			<div style={{ height: "30px" }} />
 			<Card>
 				<div className="cardWithHelpHeader">
 					<h2 className="cardTitle">

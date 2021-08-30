@@ -1,22 +1,23 @@
-import React from "react"
-import { WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import React, { useContext } from "react"
+import { WidgetStyles } from "../../../widget/src/models/WidgetSettings"
 import { Card, TextField, FormLayout } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
-export default function DropdownStylesCard({ widgetSettings, onWidgetSettingsChange }: Props) {
+export default function DropdownStylesCard({}: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleBorderWidthChange = (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, dropdownBorderWidth: value + "px" }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const parsePixelSize = (strValue: string): number => {

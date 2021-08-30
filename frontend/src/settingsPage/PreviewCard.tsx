@@ -1,18 +1,18 @@
-import React from "react"
+import React, { useContext } from "react"
 import { Card } from "@shopify/polaris"
 import Preview from "./Preview"
 import ColorPickerField from "./ColorPickerField"
-import { WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import { WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
-export default function PreviewCard({ widgetSettings, onWidgetSettingsChange }: Props) {
+export default function PreviewCard({}: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	return (
@@ -22,7 +22,7 @@ export default function PreviewCard({ widgetSettings, onWidgetSettingsChange }: 
 					<div className="Polaris-Heading">Preview</div>
 				</Card.Section>
 				<Card.Section>
-					<Preview widgetSettings={widgetSettings} />
+					<Preview />
 				</Card.Section>
 				<Card.Section>
 					<ColorPickerField

@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useContext } from "react"
 import { Card, Checkbox, FormLayout, Select } from "@shopify/polaris"
 import ColorPickerField from "./ColorPickerField"
 import { WidgetSettings, WidgetStyles } from "../../../widget/src/models/WidgetSettings"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
 const BOX_SHADOW = "0 0 5px rgba(0,0,0,0.15)"
 const BOX_BORDER_RADIUS = "10px"
@@ -22,30 +23,30 @@ function getBoldHeaderDays(widgetSettings: WidgetSettings): boolean {
 	return widgetSettings.styles.headerDaysFontWeight == HEADER_FONT_WEIGHT
 }
 
-interface Props {
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
-export default function CalendarStylesCard({ widgetSettings, onWidgetSettingsChange }: Props) {
+export default function CalendarStylesCard({}: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const handleWithShadowChange = (checked: boolean) => {
 		const styles = { ...widgetSettings.styles, calendarBoxShadow: checked ? BOX_SHADOW : "" }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleBoldHeaderDaysChange = (checked: boolean) => {
 		const styles = { ...widgetSettings.styles, headerDaysFontWeight: checked ? HEADER_FONT_WEIGHT : "" }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleThemeChange = (theme: string) => {
 		const styles = { ...widgetSettings.styles, calendarBorderRadius: theme == "ROUNDED" ? BOX_BORDER_RADIUS : "" }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	const handleWidgetStyleChange = (key: keyof WidgetStyles) => (value: string) => {
 		const styles: WidgetStyles = { ...widgetSettings.styles, [key]: value }
-		onWidgetSettingsChange({ ...widgetSettings, styles })
+		setWidgetSettings({ ...widgetSettings, styles })
 	}
 
 	return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { WidgetSettings } from "../../../widget/src/models/WidgetSettings"
 import { SYSTEM_DATE_FORMAT } from "../../../backend/src/util/constants"
 import moment from "moment"
@@ -7,10 +7,9 @@ import { getDaysBetween } from "../util/tools"
 import _ from "lodash"
 import { anchorId, isStockByDateApp, widgetScriptName } from "../common/constants"
 import { AvailableDate } from "../../../widget/src/models/AvailableDate"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	widgetSettings: WidgetSettings
-}
+interface Props {}
 
 function getMockAvailableDates(settings: WidgetSettings): AvailableDate[] {
 	const start = moment().startOf("day").add(settings.firstAvailableDateInDays, "day")
@@ -54,7 +53,9 @@ function getMockProductAvailabilityData(settings: WidgetSettings): ProductAvaila
 }
 
 let timeoutId: any
-export default function Preview({ widgetSettings }: Props) {
+export default function Preview({}: Props) {
+	const { widgetSettings } = useContext(SettingsLayoutContext)
+
 	useEffect(() => {
 		const script = document.createElement("script")
 		script.src = `/widget/build/${widgetScriptName}`
@@ -79,12 +80,11 @@ export default function Preview({ widgetSettings }: Props) {
 		}, 200)
 	}, [jsonWidgetSettings])
 
+	if (!widgetSettings) return null
+
 	return (
 		<div className="widgetPreview" style={{ background: widgetSettings.styles.previewBackgroundColor }}>
 			<div id={anchorId} data-preview="true" data-preview-data={jsonWidgetSettings} />
-			<div className="errorMessagePreview" style={{ color: widgetSettings.styles.errorFontColor }}>
-				This is an example error message.
-			</div>
 		</div>
 	)
 }

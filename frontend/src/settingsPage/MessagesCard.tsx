@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useContext } from "react"
 import { Card, FormLayout, TextField } from "@shopify/polaris"
-import { WidgetMessages, WidgetSettings } from "../../../widget/src/models/WidgetSettings"
+import { WidgetMessages } from "../../../widget/src/models/WidgetSettings"
 import { isStockByDateApp } from "../common/constants"
 import {
 	DEFAULT_DATE_TAG_LABEL,
@@ -12,16 +12,17 @@ import {
 	DEFAULT_TIME_SLOT_LABEL,
 	DEFAULT_TIME_SLOT_TAG_LABEL
 } from "../../../backend/src/util/constants"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-}
+interface Props {}
 
-export default function MessagesCard({ widgetSettings, onWidgetSettingsChange }: Props) {
+export default function MessagesCard({}: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const handleWidgetMessageChange = (key: keyof WidgetMessages) => (value: string) => {
 		const messages: WidgetMessages = { ...widgetSettings.messages, [key]: value }
-		onWidgetSettingsChange({ ...widgetSettings, messages })
+		setWidgetSettings({ ...widgetSettings, messages })
 	}
 
 	const showDayOfWeekTag = widgetSettings.showDayOfWeekTag ?? DEFAULT_SHOW_DAY_OF_WEEK_TAG

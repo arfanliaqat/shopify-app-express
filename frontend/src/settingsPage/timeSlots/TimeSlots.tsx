@@ -1,19 +1,20 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import { Button, Popover, Tag } from "@shopify/polaris"
 import AddTimeSlot from "./AddTimeSlot"
-import { ConfigDay, TimeSlot, TimeSlotsByDay, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
+import { ConfigDay, TimeSlot, TimeSlotsByDay } from "../../../../widget/src/models/WidgetSettings"
 import _ from "lodash"
 import AddTimeSlotException from "./AddTimeSlotException"
 import { toTimeSlotDisplay } from "../../../../widget/src/util/dates"
+import { SettingsLayoutContext } from "../SettingsLayout"
 
 interface Props {
 	configDay: ConfigDay
-	widgetSettings: WidgetSettings
-	onWidgetSettingsChange: (settings: WidgetSettings) => void
-	hasExceptions: boolean
 }
 
-export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, configDay, hasExceptions }: Props) {
+export default function TimeSlots({ configDay }: Props) {
+	const { widgetSettings, setWidgetSettings } = useContext(SettingsLayoutContext)
+	if (!widgetSettings) return null
+
 	const [addTimeSlotOpen, setAddTimeSlotOpen] = useState<boolean>()
 	const [addExceptionOpen, setAddException] = useState<boolean>()
 
@@ -22,7 +23,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 	const handleAddTimeSlot = (newTimeSlot: TimeSlot) => {
 		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		timeSlotsByDay[configDay] = _.sortBy([...timeSlots, newTimeSlot], "from")
-		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay: timeSlotsByDay })
+		setWidgetSettings({ ...widgetSettings, timeSlotsByDay: timeSlotsByDay })
 		setAddTimeSlotOpen(false)
 	}
 
@@ -30,19 +31,19 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		timeSlotsByDay[configDay] = [...timeSlots]
 		timeSlotsByDay[configDay].splice(index, 1)
-		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay })
+		setWidgetSettings({ ...widgetSettings, timeSlotsByDay })
 	}
 
 	const handleRemoveException = (configDay: ConfigDay) => () => {
 		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		delete timeSlotsByDay[configDay]
-		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay })
+		setWidgetSettings({ ...widgetSettings, timeSlotsByDay })
 	}
 
 	const handleAddTimeSlotException = (configDay: ConfigDay) => {
 		const timeSlotsByDay = _.clone(widgetSettings.timeSlotsByDay) || ({} as TimeSlotsByDay)
 		timeSlotsByDay[configDay] = []
-		onWidgetSettingsChange({ ...widgetSettings, timeSlotsByDay })
+		setWidgetSettings({ ...widgetSettings, timeSlotsByDay })
 		setAddException(false)
 	}
 
@@ -70,7 +71,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 						onClose={() => setAddTimeSlotOpen(false)}
 						preferredAlignment="left"
 					>
-						<AddTimeSlot widgetSettings={widgetSettings} onAdd={handleAddTimeSlot} />
+						<AddTimeSlot onAdd={handleAddTimeSlot} />
 					</Popover>
 				</div>
 				{configDay != "DEFAULT" && (
@@ -90,7 +91,7 @@ export default function TimeSlots({ widgetSettings, onWidgetSettingsChange, conf
 							onClose={() => setAddException(false)}
 							preferredAlignment="left"
 						>
-							<AddTimeSlotException onAdd={handleAddTimeSlotException} widgetSettings={widgetSettings} />
+							<AddTimeSlotException onAdd={handleAddTimeSlotException} />
 						</Popover>
 					</div>
 				)}

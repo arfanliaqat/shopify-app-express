@@ -1,20 +1,20 @@
-import React from "react"
+import React, { useContext } from "react"
 import { Banner, Button, Card, Layout, ProgressBar, TextContainer } from "@shopify/polaris"
-import ShopPlan from "../models/ShopPlan"
 import { plans } from "../../../backend/src/util/constants"
+import { SettingsLayoutContext } from "./SettingsLayout"
 
-interface Props {
-	shopPlan: ShopPlan
-	currentOrderCount: number
-}
+interface Props {}
 
-export default function CurrentPlanCard({ currentOrderCount, shopPlan }: Props) {
+export default function CurrentPlanCard({}: Props) {
+	const { currentOrderCount, shopPlan } = useContext(SettingsLayoutContext)
+	if (!shopPlan) return null
+
 	const progressPercent = (currentOrderCount * 100) / shopPlan.orderLimit
 	const approachingLimit = shopPlan.orderLimit > 0 && progressPercent >= 80
 	const reachedLimit = shopPlan.orderLimit > 0 && currentOrderCount >= shopPlan.orderLimit
 	const planOptions = plans[shopPlan.plan]
 	return (
-		<Card sectioned>
+		<Card title="Plan and usage" sectioned>
 			<Layout>
 				<Layout.Section>
 					<div className="ordersCount">

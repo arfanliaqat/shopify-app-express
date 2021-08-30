@@ -1,16 +1,19 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import { Button, FormLayout, Select } from "@shopify/polaris"
-import { ConfigDay, WidgetSettings } from "../../../../widget/src/models/WidgetSettings"
+import { ConfigDay } from "../../../../widget/src/models/WidgetSettings"
+import { SettingsLayoutContext } from "../SettingsLayout"
 
 interface Props {
 	onAdd: (day: ConfigDay) => void
-	widgetSettings: WidgetSettings
 }
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-export default function AddTimeSlotException({ onAdd, widgetSettings }: Props) {
+export default function AddTimeSlotException({ onAdd }: Props) {
+	const { widgetSettings } = useContext(SettingsLayoutContext)
 	const [selectedDay, setSelectedDay] = useState<ConfigDay>("MONDAY")
+
+	if (!widgetSettings) return null
 
 	const configDays = Object.keys(widgetSettings.timeSlotsByDay)
 
