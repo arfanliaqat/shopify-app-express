@@ -1,6 +1,6 @@
 import { ShopBuilder } from "../shop/shop.builder"
 import { ShopResourceBuilder } from "../shopResource/shopResource.builder"
-import { formatTag, getChosenDate, HooksService } from "./hooks.service"
+import { combineTags, formatDateTag, formatTimeSlotTag, getChosenDate, HooksService } from "./hooks.service"
 import moment, { Moment } from "moment"
 import { ProductOrderService } from "../productOrders/productOrders.service"
 import { DatabaseTestService, getConnection } from "../util/database"
@@ -487,20 +487,45 @@ describe("HooksService", () => {
 		}
 	})
 
-	test("formatTag", () => {
+	test("formatDateTag", () => {
 		const settings = WidgetSettings.getDefault("abc")
 		settings.settings.locale = "en_US"
-		expect(formatTag(settings.settings, moment("2021-08-01", SYSTEM_DATE_FORMAT), undefined)).toBe("Sun Aug 1 2021")
-		expect(formatTag(settings.settings, moment("2021-08-01", SYSTEM_DATE_FORMAT), "09:00 AM - 12:00 PM")).toBe(
-			"Sun Aug 1 2021 (09:00 AM - 12:00 PM)"
-		)
-		expect(formatTag(settings.settings, moment("2021-09-06", SYSTEM_DATE_FORMAT), "09:00 AM - 12:00 PM")).toBe(
-			"Mon Sep 6 2021 (09:00 AM - 12:00 PM)"
-		)
+		expect(formatDateTag(settings.settings, moment("2021-08-01", SYSTEM_DATE_FORMAT))).toBe("Sun Aug 1 2021")
+		expect(formatDateTag(settings.settings, moment("2021-09-06", SYSTEM_DATE_FORMAT))).toBe("Mon Sep 6 2021")
 		settings.settings.locale = "fr_FR"
-		expect(formatTag(settings.settings, moment("2021-09-06", SYSTEM_DATE_FORMAT), "09:00 - 12:00")).toBe(
-			"lun. 6 sept. 2021 (09:00 - 12:00)"
+		expect(formatDateTag(settings.settings, moment("2021-09-06", SYSTEM_DATE_FORMAT))).toBe("lun. 6 sept. 2021")
+	})
+
+	test("formatTimeSlotTag", () => {
+		expect(formatTimeSlotTag("09:00 AM - 12:00 PM   ")).toBe("09:00 AM - 12:00 PM")
+		expect(formatTimeSlotTag("09:00 -,, 12:00")).toBe("09:00 - 12:00")
+		expect(formatTimeSlotTag("09:00 - 12:00")).toBe("09:00 - 12:00")
+	})
+
+	test("combineTags", () => {
+		expect(combineTags(new Set<string>(), new Set<string>())).toStrictEqual([])
+		expect(
+			combineTags(
+				new Set<string>(["A"]),
+				new Set<string>()
+			)
+		).toStrictEqual(["A"])
+		expect(
+			combineTags(
+				new Set<string>(),
+				new Set<string>(["B", ""])
+			)
+		).toStrictEqual(["B"])
+		const tags = new Set(
+			combineTags(
+				new Set<string>(["A", "B"]),
+				new Set<string>(["C", "D"])
+			)
 		)
+		expect(tags.has("A")).toBeTruthy()
+		expect(tags.has("B")).toBeTruthy()
+		expect(tags.has("C")).toBeTruthy()
+		expect(tags.has("D")).toBeTruthy()
 	})
 
 	afterAll(async () => {
