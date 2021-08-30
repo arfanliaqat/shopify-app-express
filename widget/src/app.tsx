@@ -148,6 +148,11 @@ function initWidget() {
 								refElement = cartForm.querySelector("table")
 								anchorPosition = "AFTER"
 							}
+							if (!refElement) {
+								// Make extra sure the date picker appears somewhere on the cart page
+								refElement = cartForm
+								anchorPosition = "LAST_ELEMENT"
+							}
 						} else {
 							isCartDrawer = true
 						}
