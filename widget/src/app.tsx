@@ -10,6 +10,7 @@ import {
 	DEFAULT_PLACEMENT_METHOD,
 	DEFAULT_SHOW_ON_PAGE
 } from "../../backend/src/util/constants"
+import _ from "lodash"
 
 export let anchorElement = undefined
 
@@ -95,12 +96,16 @@ function getCartDrawerQueryAndPosition(): [string, AnchorPosition] {
 }
 
 function getProductVariantId(): number | undefined {
-	const productForm = document.querySelector("form[action*='/cart/add']")
+	const productForm = _.first(getProductFormElements())
 	if (productForm) {
-		const selectedOption = productForm.querySelector("select[name='id'] option[selected]")
-		if (selectedOption) {
-			const strProductVariantId = selectedOption.getAttribute("value")
-			return parseInt(strProductVariantId)
+		const idField = productForm.querySelector("[name='id']")
+		if (idField.tagName == "SELECT") {
+			const strProductVariantId = idField.querySelector("option[selected]")?.getAttribute("value")
+			return strProductVariantId ? parseInt(strProductVariantId) : undefined
+		}
+		if (idField.tagName == "INPUT") {
+			const strProductVariantId = idField.getAttribute("value")
+			return strProductVariantId ? parseInt(strProductVariantId) : undefined
 		}
 	}
 }
