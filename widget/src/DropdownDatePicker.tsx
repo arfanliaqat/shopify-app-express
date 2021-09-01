@@ -5,7 +5,6 @@ import {
 	DEFAULT_DATE_TAG_LABEL,
 	DEFAULT_DAY_OF_WEEK_TAG_LABEL,
 	DEFAULT_DROPDOWN_DEFAULT_OPTION_LABEL,
-	DEFAULT_SINGLE_DATE_PER_ORDER_MESSAGE,
 	DEFAULT_SHOW_DAY_OF_WEEK_TAG
 } from "../../backend/src/util/constants"
 import { h, Fragment } from "preact"
@@ -17,7 +16,6 @@ import classNames from "classnames"
 import { FormAttributeName } from "./AvailableDatePicker"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
 import DatePickerInfoText from "./DatePickerInfoText"
-import { isAnchorElementNotInsideForm } from "./app"
 
 interface Props {
 	onSelect: (value: string) => void

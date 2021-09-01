@@ -15,7 +15,6 @@ import { CalendarIcon } from "./Icons"
 import classNames from "classnames"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
 import DatePickerInfoText from "./DatePickerInfoText"
-import { isAnchorElementNotInsideForm } from "./app"
 
 interface Props {
 	onSelect: (value: string) => void
