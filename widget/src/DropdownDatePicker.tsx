@@ -17,6 +17,7 @@ import classNames from "classnames"
 import { FormAttributeName } from "./AvailableDatePicker"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
 import DatePickerInfoText from "./DatePickerInfoText"
+import { isAnchorElementNotInsideForm } from "./app"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -26,9 +27,10 @@ interface Props {
 	formError: string | undefined
 	formAttributeName: FormAttributeName
 	showOnlyOnDatePerOrderMessage: boolean
+	formId: string | undefined
 }
 
-export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError, formAttributeName, showOnlyOnDatePerOrderMessage }: Props) {
+export default function DropdownDatePicker({ settings, onSelect, availableDates, selectedAvailableDate, formError, formAttributeName, showOnlyOnDatePerOrderMessage, formId }: Props) {
 	const handleSelect = (e) => {
 		if (e.target.value) {
 			onSelect(e.target.value)
@@ -54,7 +56,8 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 			<div className="buunto-field">
 				<select className={classNames("buunto-date-picker-dropdown", "buunto-dropdown", { "buunto-error": !!formError })}
 						name={`${formAttributeName}[${dateTagLabel}]`}
-						onChange={handleSelect}>
+						onChange={handleSelect}
+						form={formId}>
 					{settings.dateDeselectedFirst && <option value="">{dropdownDefaultOptionLabel}</option>}
 					{availableDates.map((availableDate) => {
 						const momentDate = parseMoment(settings, availableDate.date, SYSTEM_DATE_FORMAT)
@@ -66,7 +69,7 @@ export default function DropdownDatePicker({ settings, onSelect, availableDates,
 						</option>
 					})}
 				</select>
-				{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+				{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay} form={formId} />}
 				{showOnlyOnDatePerOrderMessage && <SingleDatePerOrderMessage settings={settings} />}
 				<DatePickerInfoText settings={settings} />
 			</div>

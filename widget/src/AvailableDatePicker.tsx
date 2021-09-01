@@ -23,7 +23,7 @@ import { anchorElement } from "./app"
 import { fetchCartData, fetchDatePickerVisibility, fetchWidgetSettings } from "./util/api"
 import { generateAvailableDates } from "./util/generateAvailableDates"
 import TextInputDatePicker from "./TextInputDatePicker"
-import { parseMoment, toTimeSlotDisplay } from "./util/dates"
+import { toTimeSlotDisplay } from "./util/dates"
 import { getThemeConfig } from "./models/ThemeConfig"
 
 export type FormAttributeName = "properties" | "attributes"
@@ -73,6 +73,7 @@ export interface Props {
 	isCartPage?: boolean
 	isCartDrawer?: boolean
 	widgetSettings?: WidgetSettings
+	formId?: string
 }
 
 function initialFetchingCartData(settings?: WidgetSettings): boolean {
@@ -97,7 +98,7 @@ function initialOrderDate(settings?: WidgetSettings): Moment | undefined {
 	}
 }
 
-export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSettings }: Props) {
+export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSettings, formId }: Props) {
 
 	const [productAvailabilityData, setProductAvailabilityData] = useState<ProductAvailabilityData>(widgetSettings ? {
 		settings: widgetSettings,
@@ -289,7 +290,9 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 				form.addEventListener(isCartPage ? "submit" : "click", onSubmit)
 			}
 			return () => {
-				form.removeEventListener(isCartPage ? "submit" : "click", onSubmit)
+				if (form) {
+					form.removeEventListener(isCartPage ? "submit" : "click", onSubmit)
+				}
 			}
 		}
 	}, [selectedAvailableDate, settings, isVisible, hasDateError, hasTimeSlotError])
@@ -332,6 +335,7 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 				formError={dateFormError}
 				formAttributeName={formAttributeName}
 				showOnlyOnDatePerOrderMessage={!!orderDate}
+                formId={formId}
 			/>}
 			{settings.pickerType == "CALENDAR" && availableDates.length > 0 && <CalendarDatePicker
 				availableDates={availableDates}
@@ -340,6 +344,7 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 				formError={dateFormError}
 				formAttributeName={formAttributeName}
 				showOnlyOnDatePerOrderMessage={!!orderDate}
+                formId={formId}
 			/>}
 			{settings.pickerType == "TEXT_INPUT" && availableDates.length > 0 && <TextInputDatePicker
 				availableDates={availableDates}
@@ -348,6 +353,7 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 				formError={dateFormError}
 				formAttributeName={formAttributeName}
 				showOnlyOnDatePerOrderMessage={!!orderDate}
+                formId={formId}
 			/>}
 			{settings.timeSlotsEnabled && Object.keys(settings.timeSlotsByDay || {}).length > 0 && <TimeSlotPicker
 				formError={timeSlotFormError}
@@ -356,6 +362,7 @@ export default function AvailableDatePicker({ isCartPage, isCartDrawer, widgetSe
 				selectedTimeSlot={selectedTimeSlot}
 				configDay={selectedDay || "DEFAULT"}
 				formAttributeName={formAttributeName}
+                formId={formId}
 			/>}
 		</div>
 	)

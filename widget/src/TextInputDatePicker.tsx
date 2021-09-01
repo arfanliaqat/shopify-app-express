@@ -15,6 +15,7 @@ import { CalendarIcon } from "./Icons"
 import classNames from "classnames"
 import SingleDatePerOrderMessage from "./SingleDatePerOrderMessage"
 import DatePickerInfoText from "./DatePickerInfoText"
+import { isAnchorElementNotInsideForm } from "./app"
 
 interface Props {
 	onSelect: (value: string) => void
@@ -23,9 +24,10 @@ interface Props {
 	formError: string | undefined
 	formAttributeName: FormAttributeName
 	showOnlyOnDatePerOrderMessage: boolean
+	formId: string | undefined
 }
 
-export default function TextInputDatePicker({ onSelect, availableDates, settings, formError, formAttributeName, showOnlyOnDatePerOrderMessage }: Props) {
+export default function TextInputDatePicker({ onSelect, availableDates, settings, formError, formAttributeName, showOnlyOnDatePerOrderMessage, formId }: Props) {
 
 	const [selectedDate, setSelectedDate] = useState<string | undefined>(
 		settings.dateDeselectedFirst ? undefined : availableDates[0]?.date
@@ -91,8 +93,9 @@ export default function TextInputDatePicker({ onSelect, availableDates, settings
 							setOpen(true)
 							return false
 						}}
+						form={formId}
 					/>
-					{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+					{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay} form={formId} />}
 					{open && <div className="buunto-popover">
 					  <Calendar
 						  availableDates={availableDates}

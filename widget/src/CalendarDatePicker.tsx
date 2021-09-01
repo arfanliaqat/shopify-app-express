@@ -22,9 +22,10 @@ interface Props {
 	formError: string | undefined
 	formAttributeName: FormAttributeName
 	showOnlyOnDatePerOrderMessage: boolean
+	formId: string | undefined
 }
 
-export default function CalendarDatePicker({ availableDates, settings, onSelect, formError, formAttributeName, showOnlyOnDatePerOrderMessage }: Props) {
+export default function CalendarDatePicker({ availableDates, settings, onSelect, formError, formAttributeName, showOnlyOnDatePerOrderMessage, formId }: Props) {
 
 	const [selectedDate, setSelectedDate] = useState<string | undefined>(
 		settings.dateDeselectedFirst ? undefined : availableDates[0]?.date
@@ -54,8 +55,8 @@ export default function CalendarDatePicker({ availableDates, settings, onSelect,
 	return <Fragment>
 		{formError && <div className="buunto-error-message">{formError}</div>}
 		<div className="buunto-field">
-			{formattedSelectedDate && <input type="hidden" name={`${formAttributeName}[${dateTagLabel}]`} value={formattedSelectedDate}/>}
-			{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay}/>}
+			{formattedSelectedDate && <input type="hidden" name={`${formAttributeName}[${dateTagLabel}]`} value={formattedSelectedDate} form={formId} />}
+			{formattedSelectedDay && showDayOfWeekTag && <input type="hidden" name={`${formAttributeName}[${dayOfWeekTagLabel}]`} value={formattedSelectedDay} form={formId} />}
 			<Calendar
 				availableDates={availableDates}
 				selectedDate={selectedDate}

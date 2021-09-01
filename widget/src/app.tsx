@@ -4,7 +4,7 @@ import "./styles/main.less"
 import { anchorId, appUrl } from "./constants"
 import axios from "axios"
 import { fetchWidgetSettings } from "./util/api"
-import { AnchorPosition, WidgetSettings } from "./models/WidgetSettings"
+import { AnchorPosition, Page, WidgetSettings } from "./models/WidgetSettings"
 import {
 	DEFAULT_ANCHOR_POSITION,
 	DEFAULT_PLACEMENT_METHOD,
@@ -23,6 +23,7 @@ type SupportedTheme =
 	| "BOUNDLESS"
 	| "VENTURE"
 	| "EXPRESS"
+	| "DAWN"
 
 function getThemeId(): number {
 	return (window as any).Shopify?.theme?.theme_store_id as number
@@ -49,6 +50,8 @@ function getTheme(): SupportedTheme {
 			return "VENTURE"
 		case 885:
 			return "EXPRESS"
+		case 887:
+			return "DAWN"
 	}
 	return undefined
 }
@@ -80,7 +83,8 @@ function getCartPageQueryAndPosition(): [string, AnchorPosition] {
 	if (theme == "BOUNDLESS") return [".cart__policies", "AFTER"]
 	if (theme == "VENTURE") return [".cart__taxes", "AFTER"]
 	if (theme == "EXPRESS") return [".cart__totals", "AFTER"]
-	return ["table", "AFTER"]
+	if (theme == "DAWN") return [".cart__ctas", "BEFORE"]
+	return ["form table", "AFTER"]
 }
 
 function getCartDrawerQueryAndPosition(): [string, AnchorPosition] {
@@ -101,6 +105,34 @@ function getProductVariantId(): number | undefined {
 	}
 }
 
+function getProductFormElements(): Element[] {
+	const theme = getTheme()
+	if (theme == "DAWN") {
+		return Array.from(document.querySelectorAll("form[action*='/cart/add']"))
+			.filter((el) => el.querySelector("[type='submit']"))
+	} else {
+		return Array.from(document.querySelectorAll("form[action*='/cart/add']"))
+	}
+}
+
+function getCartFormElement(): Element {
+	const theme = getTheme()
+	if (theme == "DAWN") {
+		return document.querySelector("form[action='/cart'].cart__contents,form[action*='/cart?'].cart__contents")
+	} else {
+		return document.querySelector("form[action='/cart'],form[action*='/cart?']")
+	}
+}
+
+function getFormId(showOnPage: Page, isCartPage: boolean, isCartDrawer: boolean): string | undefined {
+	if (showOnPage == "CART" && isCartPage && !isCartDrawer) {
+		return getCartFormElement()?.getAttribute("id")
+	} else {
+		const productForms = getProductFormElements()
+		return productForms.length > 0 ? productForms[0]?.getAttribute("id") : undefined
+	}
+}
+
 function initWidget() {
 	const productVariantId = getProductVariantId()
 	fetchWidgetSettings(productVariantId).then((widgetSettings: WidgetSettings) => {
@@ -109,9 +141,9 @@ function initWidget() {
 		}
 
 		const showOnPage = widgetSettings.showOnPage || DEFAULT_SHOW_ON_PAGE
-		const productForm = document.querySelectorAll("form[action*='/cart/add']")
+		const productForm = getProductFormElements()
 		const hasProductForm = productForm.length > 0
-		const cartForm = document.querySelector("form[action='/cart'],form[action*='/cart?']")
+		const cartForm = getCartFormElement()
 		const hasCartForm = !!cartForm
 		const isCartPage = hasCartForm && !hasProductForm || window.location.pathname.startsWith("/cart")
 		let isCartDrawer = false
@@ -127,7 +159,7 @@ function initWidget() {
 					anchorElement = document.createElement("div")
 					anchorElement.id = anchorId
 					refElement.insertAdjacentElement(toInsertPosition(anchorPosition), anchorElement)
-					if (!isCartPage && !anchorElement.closest("form[action*='/cart/add']")) {
+					if (anchorElement.closest(".drawer")) {
 						isCartDrawer = true
 					}
 				}
@@ -142,10 +174,10 @@ function initWidget() {
 						if (!refElement) {
 							const [cartPageQuery, cartPageAnchorPosition] = getCartPageQueryAndPosition()
 							anchorPosition = cartPageAnchorPosition
-							refElement = cartForm.querySelector(cartPageQuery)
+							refElement = document.querySelector(cartPageQuery)
 							if (!refElement) {
 								// If the ref element is not found, make sure to default to something that works
-								refElement = cartForm.querySelector("table")
+								refElement = document.querySelector("form table")
 								anchorPosition = "AFTER"
 							}
 							if (!refElement) {
@@ -189,9 +221,17 @@ function initWidget() {
 					formElement.className = (formElement.className + " buunto-theme-" + themeName + "-form").trim()
 				}
 			}
+
+			const formId = getFormId(widgetSettings.showOnPage, isCartPage, isCartDrawer)
 			try {
-				render(<AvailableDatePicker widgetSettings={widgetSettings} isCartPage={isCartPage || isCartDrawer}
-											isCartDrawer={isCartDrawer}/>, anchorElement)
+				render(
+					<AvailableDatePicker
+						widgetSettings={widgetSettings}
+						isCartPage={isCartPage || isCartDrawer}
+						isCartDrawer={isCartDrawer}
+						formId={formId}
+					/>, anchorElement
+				)
 			} catch (e) {
 				console.error(e)
 				axios.post(appUrl + "/errors", { error: e.stack }, {
